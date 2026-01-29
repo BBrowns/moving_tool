@@ -1,0 +1,101 @@
+/* Export view styles */
+.export-view {
+    max-width: 800px;
+}
+
+.export-section {
+    margin-bottom: var(--space-8);
+}
+
+.section-title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-4);
+}
+
+.section-desc {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-4);
+}
+
+.export-cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.export-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+}
+
+.export-icon {
+    font-size: var(--text-2xl);
+    flex-shrink: 0;
+}
+
+.export-info {
+    flex: 1;
+}
+
+.export-name {
+    font-weight: var(--font-semibold);
+}
+
+.export-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+}
+
+/* Email templates */
+.email-templates {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--space-3);
+}
+
+.email-template-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.email-template-btn:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+}
+
+.template-icon {
+    font-size: var(--text-2xl);
+}
+
+.template-name {
+    font-weight: var(--font-medium);
+}
+
+/* Print styles */
+@media print {
+
+    .sidebar,
+    .page-header,
+    button {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        padding: 0 !important;
+    }
+}
