@@ -1,6 +1,6 @@
 /* Costs view styles */
 .costs-view {
-    max-width: 900px;
+    max-width: 100%;
 }
 
 .costs-summary {
@@ -185,6 +185,17 @@
     border-color: var(--color-text-tertiary);
 }
 
-.user-button.selected {
-    font-weight: var(--font-bold);
+/* Main layout grid for desktop */
+.costs-view-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+}
+
+@media (min-width: 1024px) {
+    .costs-view-grid {
+        grid-template-columns: 350px 1fr;
+        /* Sidebar for settlements/summary, Main for expenses */
+        align-items: start;
+    }
 }

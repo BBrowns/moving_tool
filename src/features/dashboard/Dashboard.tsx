@@ -1,4 +1,5 @@
 // Dashboard view - Overview of moving progress
+import { useState } from 'react';
 import { useProjectStore, useTaskStore, usePackingStore, useShoppingStore, useCostStore, getUpcomingTasks } from '../../stores';
 import { formatCurrency } from '../../domain/cost';
 import './dashboard.css';
@@ -19,9 +20,24 @@ export function Dashboard() {
     const itemsNeeded = items.filter(i => i.status === 'needed').length;
 
     // Days until move
-    const daysUntilMove = project?.movingDate
-        ? Math.ceil((new Date(project.movingDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-        : null;
+    const [now] = useState(() => Date.now());
+
+    let daysUntilMove: number | null = null;
+    if (project?.movingDate) {
+        // Handle both string and Date object, and ensure valid date
+        const dateVal = new Date(project.movingDate);
+        if (!isNaN(dateVal.getTime()) && dateVal.getFullYear() > 2000 && dateVal.getFullYear() < 3000) {
+            // Reset time to midnight for accurate day diff
+            const target = new Date(dateVal);
+            target.setHours(0, 0, 0, 0);
+
+            const current = new Date(now);
+            current.setHours(0, 0, 0, 0);
+
+            const diffTime = target.getTime() - current.getTime();
+            daysUntilMove = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+    }
 
     return (
         <div className="dashboard">

@@ -10,16 +10,18 @@ import { TasksView } from './features/tasks/TasksView';
 import { PackingView } from './features/packing/PackingView';
 import { ShoppingView } from './features/shopping/ShoppingView';
 import { CostsView } from './features/costs/CostsView';
+import { ProjectOverview } from './features/projects/ProjectOverview';
+import { SettingsView } from './features/settings/SettingsView';
 import { ExportView } from './features/export/ExportView';
 
 // Styles
 import './index.css';
 import './components/common/common.css';
 
-type View = 'dashboard' | 'tasks' | 'packing' | 'shopping' | 'costs' | 'emails' | 'export';
+type View = 'dashboard' | 'tasks' | 'packing' | 'shopping' | 'costs' | 'emails' | 'export' | 'settings' | 'projects' | 'onboarding';
 
 function App() {
-  const { project, users, isLoading: projectLoading, loadProject } = useProjectStore();
+  const { project, users, projects, isLoading: projectLoading, loadProjects, loadProject, setActiveProject, clearActiveProject } = useProjectStore();
   const { loadTasks } = useTaskStore();
   const { loadPacking } = usePackingStore();
   const { loadItems } = useShoppingStore();
@@ -28,10 +30,13 @@ function App() {
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Load project on mount
+  // Load projects on mount
   useEffect(() => {
-    loadProject().then(() => setIsInitialized(true));
-  }, [loadProject]);
+    loadProjects().then(() => {
+      // Try to load last active project or just init
+      loadProject().then(() => setIsInitialized(true));
+    });
+  }, [loadProjects, loadProject]);
 
   // Load all data when project is available
   useEffect(() => {
@@ -58,9 +63,33 @@ function App() {
     );
   }
 
-  // Show onboarding if no project
-  if (!project) {
-    return <Onboarding onComplete={() => loadProject()} />;
+  // Show onboarding if no projects exist or explicitly requested
+  if (projects.length === 0 || currentView === 'onboarding') {
+    return (
+      <Onboarding
+        onComplete={async () => {
+          // After project creation, reload projects and set view to dashboard
+          await loadProjects();
+          await loadProject();
+          setCurrentView('dashboard');
+        }}
+      />
+    );
+  }
+
+  // Show Project Overview if no project selected or explicitly requested
+  if (!project || currentView === 'projects') {
+    return (
+      <ProjectOverview
+        onCreateNew={() => {
+          clearActiveProject();
+          setCurrentView('onboarding');
+        }}
+        onSelectProject={(id) => {
+          setActiveProject(id).then(() => setCurrentView('dashboard'));
+        }}
+      />
+    );
   }
 
   // Render current view
@@ -76,6 +105,8 @@ function App() {
         return <ShoppingView />;
       case 'costs':
         return <CostsView />;
+      case 'settings':
+        return <SettingsView />;
       case 'emails':
       case 'export':
         return <ExportView />;

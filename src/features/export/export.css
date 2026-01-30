@@ -1,6 +1,6 @@
 /* Export view styles */
 .export-view {
-    max-width: 800px;
+    max-width: 100%;
 }
 
 .export-section {
@@ -19,9 +19,15 @@
 }
 
 .export-cards {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+    .export-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 .export-card {

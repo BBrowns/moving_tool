@@ -1,6 +1,6 @@
 /* Tasks view styles */
 .tasks-view {
-    max-width: 900px;
+    max-width: 100%;
 }
 
 .task-filters {
@@ -16,9 +16,22 @@
 }
 
 .task-categories {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: var(--space-6);
+    align-items: start;
+}
+
+@media (min-width: 768px) {
+    .task-categories {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1280px) {
+    .task-categories {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 .task-category-section {

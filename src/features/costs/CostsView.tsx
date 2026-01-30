@@ -95,105 +95,110 @@ export function CostsView() {
                 </div>
             </header>
 
-            {/* Summary */}
-            <div className="costs-summary">
-                <div className="summary-card total">
-                    <div className="summary-label">Totaal uitgegeven</div>
-                    <div className="summary-value">{formatCurrency(totalExpenses)}</div>
+            {/* Main Content Grid */}
+            <div className="costs-view-grid">
+                <div className="costs-sidebar">
+                    {/* Summary */}
+                    <div className="costs-summary">
+                        <div className="summary-card total">
+                            <div className="summary-label">Totaal uitgegeven</div>
+                            <div className="summary-value">{formatCurrency(totalExpenses)}</div>
+                        </div>
+
+                        {users.map(user => (
+                            <div key={user.id} className="summary-card" style={{ borderTopColor: user.color }}>
+                                <div className="summary-label">{user.name} betaald</div>
+                                <div className="summary-value">{formatCurrency(expensesByUser[user.id] || 0)}</div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Settlements */}
+                    {settlements.length > 0 && (
+                        <section className="settlements-section">
+                            <h2 className="section-title">💰 Te verrekenen</h2>
+                            <div className="settlements-list">
+                                {settlements.map((settlement, idx) => {
+                                    const fromUser = users.find(u => u.id === settlement.fromUserId);
+                                    const toUser = users.find(u => u.id === settlement.toUserId);
+                                    return (
+                                        <div key={idx} className="settlement-card">
+                                            <span
+                                                className="settlement-user from"
+                                                style={{ backgroundColor: fromUser?.color }}
+                                            >
+                                                {fromUser?.name}
+                                            </span>
+                                            <span className="settlement-arrow">betaalt</span>
+                                            <span className="settlement-amount">{formatCurrency(settlement.amount)}</span>
+                                            <span className="settlement-arrow">aan</span>
+                                            <span
+                                                className="settlement-user to"
+                                                style={{ backgroundColor: toUser?.color }}
+                                            >
+                                                {toUser?.name}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </section>
+                    )}
                 </div>
 
-                {users.map(user => (
-                    <div key={user.id} className="summary-card" style={{ borderTopColor: user.color }}>
-                        <div className="summary-label">{user.name} betaald</div>
-                        <div className="summary-value">{formatCurrency(expensesByUser[user.id] || 0)}</div>
-                    </div>
-                ))}
-            </div>
+                {/* Expenses list */}
+                <section className="expenses-section">
+                    <h2 className="section-title">📋 Uitgaven ({expenses.length})</h2>
 
-            {/* Settlements */}
-            {settlements.length > 0 && (
-                <section className="settlements-section">
-                    <h2 className="section-title">💰 Te verrekenen</h2>
-                    <div className="settlements-list">
-                        {settlements.map((settlement, idx) => {
-                            const fromUser = users.find(u => u.id === settlement.fromUserId);
-                            const toUser = users.find(u => u.id === settlement.toUserId);
-                            return (
-                                <div key={idx} className="settlement-card">
-                                    <span
-                                        className="settlement-user from"
-                                        style={{ backgroundColor: fromUser?.color }}
-                                    >
-                                        {fromUser?.name}
-                                    </span>
-                                    <span className="settlement-arrow">betaalt</span>
-                                    <span className="settlement-amount">{formatCurrency(settlement.amount)}</span>
-                                    <span className="settlement-arrow">aan</span>
-                                    <span
-                                        className="settlement-user to"
-                                        style={{ backgroundColor: toUser?.color }}
-                                    >
-                                        {toUser?.name}
-                                    </span>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </section>
-            )}
-
-            {/* Expenses list */}
-            <section className="expenses-section">
-                <h2 className="section-title">📋 Uitgaven ({expenses.length})</h2>
-
-                {expenses.length === 0 ? (
-                    <div className="empty-state">
-                        <div className="empty-state-icon">💸</div>
-                        <div className="empty-state-title">Geen uitgaven</div>
-                        <p>Voeg een uitgave toe om te beginnen met bijhouden.</p>
-                    </div>
-                ) : (
-                    <div className="expenses-list">
-                        {expenses.map(expense => {
-                            const paidBy = users.find(u => u.id === expense.paidById);
-                            return (
-                                <div key={expense.id} className="expense-card" onClick={() => startEdit(expense)}>
-                                    <div className="expense-main">
-                                        <div className="expense-description">{expense.description}</div>
-                                        <div className="expense-meta">
-                                            <span className="expense-date">
-                                                {new Date(expense.date).toLocaleDateString('nl-NL')}
-                                            </span>
-                                            {expense.category && (
-                                                <span className="expense-category">{expense.category}</span>
-                                            )}
+                    {expenses.length === 0 ? (
+                        <div className="empty-state">
+                            <div className="empty-state-icon">💸</div>
+                            <div className="empty-state-title">Geen uitgaven</div>
+                            <p>Voeg een uitgave toe om te beginnen met bijhouden.</p>
+                        </div>
+                    ) : (
+                        <div className="expenses-list">
+                            {expenses.map(expense => {
+                                const paidBy = users.find(u => u.id === expense.paidById);
+                                return (
+                                    <div key={expense.id} className="expense-card" onClick={() => startEdit(expense)}>
+                                        <div className="expense-main">
+                                            <div className="expense-description">{expense.description}</div>
+                                            <div className="expense-meta">
+                                                <span className="expense-date">
+                                                    {new Date(expense.date).toLocaleDateString('nl-NL')}
+                                                </span>
+                                                {expense.category && (
+                                                    <span className="expense-category">{expense.category}</span>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div className="expense-amount">{formatCurrency(expense.amount)}</div>
+                                        <div className="expense-amount">{formatCurrency(expense.amount)}</div>
 
-                                    <div className="expense-paid-by">
-                                        <span
-                                            className="paid-by-badge"
-                                            style={{ backgroundColor: paidBy?.color }}
-                                            title={`Betaald door ${paidBy?.name}`}
+                                        <div className="expense-paid-by">
+                                            <span
+                                                className="paid-by-badge"
+                                                style={{ backgroundColor: paidBy?.color }}
+                                                title={`Betaald door ${paidBy?.name}`}
+                                            >
+                                                {paidBy?.name.charAt(0)}
+                                            </span>
+                                        </div>
+
+                                        <button
+                                            className="btn btn-ghost btn-icon btn-sm"
+                                            onClick={(e) => { e.stopPropagation(); deleteExpense(expense.id); }}
                                         >
-                                            {paidBy?.name.charAt(0)}
-                                        </span>
+                                            🗑️
+                                        </button>
                                     </div>
-
-                                    <button
-                                        className="btn btn-ghost btn-icon btn-sm"
-                                        onClick={(e) => { e.stopPropagation(); deleteExpense(expense.id); }}
-                                    >
-                                        🗑️
-                                    </button>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </section>
+                                );
+                            })}
+                        </div>
+                    )}
+                </section>
+            </div>
 
             {/* Add/Edit Modal */}
             <Modal

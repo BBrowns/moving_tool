@@ -1,6 +1,6 @@
 /* Dashboard styles */
 .dashboard {
-    max-width: 1000px;
+    max-width: 100%;
 }
 
 .countdown-badge {
@@ -11,11 +11,110 @@
     font-weight: var(--font-semibold);
 }
 
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+    width: 100%;
+}
+
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stat-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: all var(--transition-fast);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary-light);
+}
+
+.stat-icon {
+    font-size: 24px;
+    margin-bottom: var(--space-2);
+    background: var(--color-bg-secondary);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+}
+
+.stat-value {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    color: var(--color-text-primary);
+    font-feature-settings: "tnum";
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-top: var(--space-1);
+    font-weight: var(--font-medium);
+}
+
+/* Progress bar in stat card */
+.progress {
+    height: 6px;
+    width: 100%;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: var(--radius-full);
+}
+
+.progress-bar.success {
+    background: var(--color-success);
+}
+
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: 1fr;
+    /* Mobile first: 1 column */
     gap: var(--space-6);
     margin-top: var(--space-6);
+}
+
+/* Tablet: 2 cols */
+@media (min-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Large Desktop: 3 cols if space permits, or stick to 2 if content is wide */
+@media (min-width: 1280px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 .empty-message {

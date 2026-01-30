@@ -1,5 +1,7 @@
 // Sidebar navigation component
+import { useState } from 'react';
 import { useProjectStore, useTaskStore } from '../../stores';
+import { ThemeToggle } from '../common/ThemeToggle';
 
 interface NavItem {
     path: string;
@@ -34,8 +36,9 @@ export function Sidebar({ activePath = 'dashboard', onNavigate }: SidebarProps) 
     ];
 
     // Calculate days until moving
+    const [now] = useState(() => Date.now());
     const daysUntilMove = project?.movingDate
-        ? Math.ceil((new Date(project.movingDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+        ? Math.ceil((new Date(project.movingDate).getTime() - now) / (1000 * 60 * 60 * 24))
         : null;
 
     const handleClick = (path: string) => {
@@ -51,6 +54,7 @@ export function Sidebar({ activePath = 'dashboard', onNavigate }: SidebarProps) 
                     <span className="sidebar-logo-icon">🏠</span>
                     <span>Verhuistool</span>
                 </div>
+                <ThemeToggle />
             </div>
 
             <nav className="sidebar-nav">
@@ -91,6 +95,18 @@ export function Sidebar({ activePath = 'dashboard', onNavigate }: SidebarProps) 
                             <span>{item.label}</span>
                         </a>
                     ))}
+
+                    <a
+                        href="#settings"
+                        className={`nav-link ${activePath === 'settings' ? 'active' : ''}`}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            handleClick('settings');
+                        }}
+                    >
+                        <span className="nav-link-icon">⚙️</span>
+                        <span>Instellingen</span>
+                    </a>
                 </div>
             </nav>
 
@@ -110,6 +126,13 @@ export function Sidebar({ activePath = 'dashboard', onNavigate }: SidebarProps) 
                             </span>
                         )}
                     </div>
+
+                    <button
+                        className="switch-project-btn"
+                        onClick={() => handleClick('projects')}
+                    >
+                        <span>🔀</span> Wissel verhuizing
+                    </button>
                 </div>
             )}
         </aside>
