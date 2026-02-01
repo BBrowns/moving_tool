@@ -1,0 +1,32 @@
+.theme-toggle {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    color: var(--color-text-secondary);
+    transition: all var(--transition-fast);
+}
+
+.theme-toggle:hover {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+}
+
+.toggle-icon {
+    position: absolute;
+    opacity: 0;
+    transform: scale(0.5) rotate(-90deg);
+    transition: all var(--transition-base);
+}
+
+.toggle-icon.active {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+}
