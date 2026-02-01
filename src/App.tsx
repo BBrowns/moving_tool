@@ -1,6 +1,6 @@
 // Main App component - routing and initialization
 import { useState, useEffect } from 'react';
-import { useProjectStore, useTaskStore, usePackingStore, useShoppingStore, useCostStore } from './stores';
+import { useProjectStore, useTaskStore, usePackingStore, useShoppingStore, useCostStore, usePlaybookStore } from './stores';
 
 // Components
 import { Layout } from './components/Layout/Layout';
@@ -13,12 +13,13 @@ import { CostsView } from './features/costs/CostsView';
 import { ProjectOverview } from './features/projects/ProjectOverview';
 import { SettingsView } from './features/settings/SettingsView';
 import { ExportView } from './features/export/ExportView';
+import { PlaybookView } from './features/playbook/PlaybookView';
 
 // Styles
 import './index.css';
 import './components/common/common.css';
 
-type View = 'dashboard' | 'tasks' | 'packing' | 'shopping' | 'costs' | 'emails' | 'export' | 'settings' | 'projects' | 'onboarding';
+type View = 'dashboard' | 'tasks' | 'packing' | 'shopping' | 'costs' | 'playbook' | 'emails' | 'export' | 'settings' | 'projects' | 'onboarding';
 
 function App() {
   const { project, users, projects, isLoading: projectLoading, loadProjects, loadProject, setActiveProject, clearActiveProject } = useProjectStore();
@@ -26,6 +27,7 @@ function App() {
   const { loadPacking } = usePackingStore();
   const { loadItems } = useShoppingStore();
   const { loadExpenses } = useCostStore();
+  const { loadPlaybook } = usePlaybookStore();
 
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [isInitialized, setIsInitialized] = useState(false);
@@ -45,6 +47,7 @@ function App() {
       loadPacking(project.id);
       loadItems(project.id);
       loadExpenses(project.id, users.map(u => u.id));
+      loadPlaybook(project.id);
     }
   }, [project, users, loadTasks, loadPacking, loadItems, loadExpenses]);
 
@@ -105,6 +108,8 @@ function App() {
         return <ShoppingView />;
       case 'costs':
         return <CostsView />;
+      case 'playbook':
+        return <PlaybookView />;
       case 'settings':
         return <SettingsView />;
       case 'emails':

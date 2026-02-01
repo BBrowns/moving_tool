@@ -3,9 +3,10 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useProjectStore, usePackingStore, getBoxesForRoom, getItemsForBox } from '../../stores';
+import { useProjectStore, usePackingStore, useCostStore, getBoxesForRoom, getItemsForBox } from '../../stores';
 import { generateBoxQR } from '../../api/qrGenerator';
-import type { Box } from '../../domain/packing';
+import { getRoomBudgetSummary } from '../../domain/cost';
+import type { Box, Room } from '../../domain/packing';
 
 // Components
 import { RoomSection } from './components/RoomSection';
@@ -16,10 +17,11 @@ export function PackingView() {
     const { project } = useProjectStore();
     const {
         rooms, boxes, boxItems,
-        addRoom, deleteRoom,
+        addRoom, updateRoom, deleteRoom,
         addBox, updateBox, deleteBox,
         addBoxItem, deleteBoxItem
     } = usePackingStore();
+    const { expenses } = useCostStore();
 
     // -- State --
     const [showRoomModal, setShowRoomModal] = useState(false);
@@ -31,6 +33,15 @@ export function PackingView() {
     const selectedBox = useMemo(() =>
         selectedBoxId ? boxes.find(b => b.id === selectedBoxId) || null : null
         , [boxes, selectedBoxId]);
+
+    // Compute budget summaries for all rooms
+    const roomBudgetSummaries = useMemo(() => {
+        const summaries = new Map<string, ReturnType<typeof getRoomBudgetSummary>>();
+        rooms.forEach(room => {
+            summaries.set(room.id, getRoomBudgetSummary(room.id, room.budget?.allocated, expenses));
+        });
+        return summaries;
+    }, [rooms, expenses]);
 
     // Form inputs
     const [roomName, setRoomName] = useState('');
@@ -46,13 +57,20 @@ export function PackingView() {
             setShowRoomModal(false);
         } catch (error) {
             console.error("Failed to add room:", error);
-            // In a real app, toast.error("Could not add room");
         }
     }, [project, roomName, addRoom]);
 
+    const handleUpdateRoom = useCallback(async (id: string, updates: Partial<Room>) => {
+        try {
+            await updateRoom(id, updates);
+        } catch (error) {
+            console.error("Failed to update room:", error);
+        }
+    }, [updateRoom]);
+
     const handleAddBox = useCallback(async (roomId: string) => {
         try {
-            const newBox = await addBox(roomId); // Label is optional initially
+            const newBox = await addBox(roomId);
             setSelectedBoxId(newBox.id);
             setShowBoxModal(true);
         } catch (error) {
@@ -83,7 +101,7 @@ export function PackingView() {
             const items = getItemsForBox(boxItems, box.id);
             const qr = await generateBoxQR(box, room, items);
             setQrDataUrl(qr);
-            setSelectedBoxId(box.id); // Ensure box is selected for context
+            setSelectedBoxId(box.id);
         } catch (error) {
             console.error("QR Generation failed:", error);
         }
@@ -149,10 +167,12 @@ export function PackingView() {
                                 roomBoxes={getBoxesForRoom(boxes, room.id)}
                                 allBoxes={boxes}
                                 allItems={boxItems}
+                                budgetSummary={roomBudgetSummaries.get(room.id)}
                                 onAddBox={handleAddBox}
                                 onDeleteRoom={deleteRoom}
                                 onOpenBox={handleOpenBox}
                                 onGenerateQR={handleGenerateQR}
+                                onUpdateRoom={handleUpdateRoom}
                             />
                         ))}
                     </AnimatePresence>

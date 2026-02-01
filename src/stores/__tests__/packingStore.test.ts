@@ -1,7 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { usePackingStore } from '../packingStore';
 import { db } from '../../db/database';
-import type { Room, Box } from '../../domain/packing';
 
 // Mock DB is handled by fake-indexeddb in setup.ts
 

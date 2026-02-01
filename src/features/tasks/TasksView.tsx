@@ -1,9 +1,12 @@
 // Tasks view - Task list with filters and CRUD
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useProjectStore, useTaskStore, getFilteredTasks } from '../../stores';
 import { TASK_CATEGORY_LABELS, TASK_STATUS_LABELS, type Task, type TaskCategory, type TaskStatus } from '../../domain/task';
 import { Modal } from '../../components/common/Modal';
 import './tasks.css';
+
+// Fixed order of categories (to prevent jumping when tasks are deleted)
+const CATEGORY_ORDER = Object.keys(TASK_CATEGORY_LABELS) as TaskCategory[];
 
 export function TasksView() {
     const { project, users } = useProjectStore();
@@ -23,12 +26,23 @@ export function TasksView() {
 
     const filteredTasks = getFilteredTasks(tasks, filters);
 
-    // Group by category
-    const tasksByCategory = filteredTasks.reduce((acc, task) => {
-        if (!acc[task.category]) acc[task.category] = [];
-        acc[task.category].push(task);
-        return acc;
-    }, {} as Record<TaskCategory, Task[]>);
+    // Group by category with stable ordering
+    const sortedCategories = useMemo(() => {
+        // Group tasks by category
+        const tasksByCategory: Record<TaskCategory, Task[]> = {} as Record<TaskCategory, Task[]>;
+        filteredTasks.forEach(task => {
+            if (!tasksByCategory[task.category]) tasksByCategory[task.category] = [];
+            tasksByCategory[task.category].push(task);
+        });
+
+        // Return categories in fixed order (only those with tasks)
+        return CATEGORY_ORDER
+            .filter(category => tasksByCategory[category]?.length > 0)
+            .map(category => ({
+                category,
+                tasks: tasksByCategory[category],
+            }));
+    }, [filteredTasks]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -127,10 +141,10 @@ export function TasksView() {
 
             {/* Task list by category */}
             <div className="task-categories">
-                {Object.entries(tasksByCategory).map(([category, categoryTasks]) => (
+                {sortedCategories.map(({ category, tasks: categoryTasks }) => (
                     <section key={category} className="task-category-section">
                         <h2 className="task-category-title">
-                            {TASK_CATEGORY_LABELS[category as TaskCategory]}
+                            {TASK_CATEGORY_LABELS[category]}
                             <span className="task-count">{categoryTasks.length}</span>
                         </h2>
 

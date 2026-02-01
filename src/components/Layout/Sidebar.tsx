@@ -28,6 +28,7 @@ export function Sidebar({ activePath = 'dashboard', onNavigate }: SidebarProps) 
         { path: 'packing', icon: '📦', label: 'Inpakken' },
         { path: 'shopping', icon: '🛒', label: 'Shopping' },
         { path: 'costs', icon: '💰', label: 'Kosten' },
+        { path: 'playbook', icon: '📓', label: 'Playbook' },
     ];
 
     const toolItems: NavItem[] = [

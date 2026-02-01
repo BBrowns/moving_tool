@@ -4,7 +4,7 @@
 import { create } from 'zustand';
 import { nanoid } from 'nanoid';
 import { db } from '../db/database';
-import type { Room, Box, BoxItem } from '../domain/packing';
+import type { Room, Box, BoxItem, RoomType } from '../domain/packing';
 
 // Default room colors
 const ROOM_COLORS = [
@@ -28,7 +28,7 @@ interface PackingState {
     loadPacking: (projectId: string) => Promise<void>;
 
     // Room actions
-    addRoom: (projectId: string, name: string) => Promise<Room>;
+    addRoom: (projectId: string, name: string, roomType?: RoomType) => Promise<Room>;
     updateRoom: (id: string, updates: Partial<Room>) => Promise<void>;
     deleteRoom: (id: string) => Promise<void>;
 
@@ -73,14 +73,16 @@ export const usePackingStore = create<PackingState>((set, get) => ({
     },
 
     // Room actions
-    addRoom: async (projectId, name) => {
+    addRoom: async (projectId, name, roomType = 'overig') => {
         const { rooms } = get();
         const room: Room = {
             id: nanoid(),
             projectId,
             name,
+            roomType,
             color: ROOM_COLORS[rooms.length % ROOM_COLORS.length],
             order: rooms.length,
+            createdAt: new Date(),
         };
 
         await db.rooms.add(room);
@@ -131,6 +133,7 @@ export const usePackingStore = create<PackingState>((set, get) => ({
             label,
             isFragile: false,
             priority: 'medium',
+            status: 'empty',
             createdAt: new Date(),
         };
 

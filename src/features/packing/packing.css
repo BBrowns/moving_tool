@@ -450,3 +450,152 @@
 .full-width {
     width: 100%;
 }
+
+/* ============================================================================
+   ROOM EDITOR STYLES
+   ============================================================================ */
+
+.room-editor-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.editor-section {
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+}
+
+.section-title {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.calculated-values {
+    margin-top: var(--space-4);
+    padding: var(--space-3);
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+}
+
+.calc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+}
+
+.calc-row:not(:last-child) {
+    border-bottom: 1px solid var(--color-border);
+}
+
+.calc-row strong {
+    color: var(--color-text-primary);
+    font-weight: var(--font-semibold);
+}
+
+/* Budget Progress Bar */
+.budget-summary {
+    margin-top: var(--space-4);
+}
+
+.budget-bar {
+    height: 8px;
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+}
+
+.budget-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-success), var(--color-success-dark, #16a34a));
+    transition: width 0.3s ease;
+    border-radius: var(--radius-full);
+}
+
+.budget-bar-fill.over-budget {
+    background: linear-gradient(90deg, var(--color-warning), var(--color-danger));
+}
+
+.budget-details {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-3);
+}
+
+.budget-stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.budget-stat .stat-label {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.budget-stat .stat-value {
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-primary);
+}
+
+.budget-stat .stat-value.positive {
+    color: var(--color-success);
+}
+
+.budget-stat .stat-value.negative {
+    color: var(--color-danger);
+}
+
+/* Color Picker */
+.color-picker {
+    width: 48px;
+    height: 38px;
+    padding: 2px;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+}
+
+/* Room Stats in Header */
+.room-stats {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+}
+
+.room-stat-badge {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    background: var(--color-bg-tertiary);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.room-stat-badge.over-budget {
+    background: var(--color-danger-bg, #fef2f2);
+    color: var(--color-danger);
+}
+
+/* Room Info Extended */
+.room-info-extended {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}

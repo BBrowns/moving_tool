@@ -1,14 +1,22 @@
 // Shopping store - Zustand state management
-// Manages shopping list items
+// Manages shopping list items with support for different acquisition types
 
 import { create } from 'zustand';
 import { nanoid } from 'nanoid';
 import { db } from '../db/database';
-import type { ShoppingItem, ShoppingStatus, ShoppingCategory, SavedLink } from '../domain/shopping';
+import type {
+    ShoppingItem,
+    ShoppingStatus,
+    ShoppingCategory,
+    SavedLink,
+    AcquisitionType
+} from '../domain/shopping';
 
 interface ShoppingFilters {
     status?: ShoppingStatus;
     category?: ShoppingCategory;
+    acquisitionType?: AcquisitionType;
+    roomId?: string;
 }
 
 interface ShoppingState {
@@ -63,6 +71,8 @@ export const useShoppingStore = create<ShoppingState>((set, get) => ({
             ...itemData,
             id: nanoid(),
             savedLinks: [],
+            acquisitionType: itemData.acquisitionType || 'retail',
+            status: itemData.status || 'needed',
             createdAt: new Date(),
         };
 

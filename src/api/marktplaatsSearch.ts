@@ -12,6 +12,9 @@ export const marktplaatsCategoryPaths: Record<ShoppingCategory, string> = {
     keuken: 'huis-en-inrichting/keuken',
     decoratie: 'huis-en-inrichting/woonaccessoires',
     elektronica: 'computers-en-software',
+    badkamer: 'huis-en-inrichting/badkamer',
+    slaapkamer: 'huis-en-inrichting/slaapkamer',
+    tuin: 'tuin-en-terras',
     overig: '',
 };
 

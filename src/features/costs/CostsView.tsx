@@ -1,7 +1,7 @@
 // Costs view - Expense tracking and settlements
 import { useState } from 'react';
 import { useProjectStore, useCostStore, getExpensesByUser, getTotalExpenses } from '../../stores';
-import { formatCurrency, parseCurrency, type Expense } from '../../domain/cost';
+import { formatCurrency, parseCurrency, type Expense, type ExpenseCategory, EXPENSE_CATEGORY_LABELS } from '../../domain/cost';
 import { Modal } from '../../components/common/Modal';
 import './costs.css';
 
@@ -17,7 +17,7 @@ export function CostsView() {
         amount: '',
         paidById: users[0]?.id || '',
         splitBetween: users.map(u => u.id),
-        category: '',
+        category: 'overig' as ExpenseCategory,
         date: new Date().toISOString().split('T')[0],
     });
 
@@ -34,7 +34,7 @@ export function CostsView() {
             amount: parseCurrency(formData.amount),
             paidById: formData.paidById,
             splitBetween: formData.splitBetween,
-            category: formData.category || undefined,
+            category: formData.category,
             date: new Date(formData.date),
         };
 
@@ -53,7 +53,7 @@ export function CostsView() {
             amount: '',
             paidById: users[0]?.id || '',
             splitBetween: users.map(u => u.id),
-            category: '',
+            category: 'overig' as ExpenseCategory,
             date: new Date().toISOString().split('T')[0],
         });
         setShowAddModal(false);
@@ -66,7 +66,7 @@ export function CostsView() {
             amount: (expense.amount / 100).toString(),
             paidById: expense.paidById,
             splitBetween: expense.splitBetween,
-            category: expense.category || '',
+            category: expense.category || 'overig',
             date: new Date(expense.date).toISOString().split('T')[0],
         });
         setEditingExpense(expense);
@@ -298,13 +298,15 @@ export function CostsView() {
 
                     <div className="form-group">
                         <label className="form-label">Categorie</label>
-                        <input
-                            type="text"
-                            className="form-input"
+                        <select
+                            className="form-input form-select"
                             value={formData.category}
-                            onChange={e => setFormData({ ...formData, category: e.target.value })}
-                            placeholder="bijv. Transport, Materiaal"
-                        />
+                            onChange={e => setFormData({ ...formData, category: e.target.value as ExpenseCategory })}
+                        >
+                            {Object.entries(EXPENSE_CATEGORY_LABELS).map(([value, { label, emoji }]) => (
+                                <option key={value} value={value}>{emoji} {label}</option>
+                            ))}
+                        </select>
                     </div>
                 </form>
             </Modal>

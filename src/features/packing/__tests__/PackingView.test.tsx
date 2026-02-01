@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { PackingView } from '../PackingView';
 import { usePackingStore } from '../../../stores/packingStore';
@@ -25,7 +25,13 @@ describe('PackingView', () => {
 
         // Mock project store
         useProjectStore.setState({
-            project: { id: 'p1', name: 'My Move', date: new Date(), createdAt: new Date() }
+            project: {
+                id: 'p1',
+                name: 'My Move',
+                movingDate: new Date(),
+                newAddress: { street: 'Test', houseNumber: '1', postalCode: '1234AB', city: 'Test' },
+                createdAt: new Date()
+            }
         });
     });
 
