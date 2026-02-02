@@ -40,6 +40,8 @@ class TaskCard extends StatelessWidget {
         ),
         title: Text(
           task.title,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             decoration: isDone ? TextDecoration.lineThrough : null,
             color: isDone ? context.colors.onSurfaceVariant : null,
@@ -48,6 +50,8 @@ class TaskCard extends StatelessWidget {
         subtitle: task.deadline != null ? Text(
           '📅 ${task.deadline!.day}-${task.deadline!.month}-${task.deadline!.year}',
           style: context.textTheme.bodySmall,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ) : null,
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

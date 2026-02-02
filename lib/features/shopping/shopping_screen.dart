@@ -23,6 +23,7 @@ class ShoppingScreen extends ConsumerWidget {
 
     return ResponsiveScaffold(
       title: 'Shopping',
+      fabHeroTag: 'shopping_fab',
       fabLabel: 'Item',
       fabIcon: Icons.add,
       onFabPressed: () => _showItemDialog(context, ref),

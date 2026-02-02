@@ -75,34 +75,44 @@ class RoomCard extends StatelessWidget {
                   )
                 ],
               ),
-              const SizedBox(height: 16),
-              Text(
-                room.name,
-                style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              // Note: items.length might be misleading if it's GLOBAL items.
-              // Ideally this card should only receive items for this room/boxes. 
-              // But for now matching legacy behavior which seemed to pass all items.
-              Text(
-                '${boxes.length} dozen • ${items.length} items', 
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: context.colors.onSurfaceVariant,
+              const SizedBox(height: 12),
+              
+              // Flexible Middle Content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      room.name,
+                      style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${boxes.length} dozen • ${items.length} items', 
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
-              const Spacer(),
-              // Progress Bar
+
+              const SizedBox(height: 12),
+              // Progress Bar (Bottom pinned)
               if (boxes.isNotEmpty) ...[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Ingepakt', style: context.textTheme.labelSmall),
+                    Flexible(child: Text('Ingepakt', style: context.textTheme.labelSmall)),
                     Text('${(progress * 100).toInt()}%', style: context.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold)),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 LinearProgressIndicator(
                   value: progress,
                   backgroundColor: context.colors.surfaceContainerHighest,
@@ -121,7 +131,7 @@ class RoomCard extends StatelessWidget {
                      children: [
                        Icon(Icons.info_outline, size: 16, color: context.colors.onSurfaceVariant),
                        const SizedBox(width: 8),
-                       Text('Nog geen dozen', style: context.textTheme.bodySmall),
+                       Flexible(child: Text('Nog geen dozen', style: context.textTheme.bodySmall, overflow: TextOverflow.ellipsis)),
                      ],
                    ),
                  )

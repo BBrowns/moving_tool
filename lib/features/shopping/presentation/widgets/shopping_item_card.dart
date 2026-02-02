@@ -21,9 +21,13 @@ class ShoppingItemCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: Text(item.status.icon, style: const TextStyle(fontSize: 24)),
-        title: Text(item.name),
+        title: Text(item.name, maxLines: 2, overflow: TextOverflow.ellipsis),
         subtitle: item.budgetMax != null 
-            ? Text('Budget: €${item.budgetMin?.toStringAsFixed(0) ?? "0"} - €${item.budgetMax!.toStringAsFixed(0)}')
+            ? Text(
+                'Budget: €${item.budgetMin?.toStringAsFixed(0) ?? "0"} - €${item.budgetMax!.toStringAsFixed(0)}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              )
             : null,
         trailing: PopupMenuButton<ShoppingStatus>(
           icon: const Icon(Icons.more_vert),

@@ -53,6 +53,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
     return ResponsiveScaffold(
       title: 'Taken',
+      fabHeroTag: 'tasks_fab',
       fabLabel: 'Taak',
       fabIcon: Icons.add,
       onFabPressed: () => _showTaskDialog(context),
@@ -295,11 +296,14 @@ class _StatusColumn extends StatelessWidget {
                     children: [
                       Icon(statusIcon, color: statusColor, size: 20),
                       const SizedBox(width: 8),
-                      Text(
-                        status.label,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: statusColor,
+                      Flexible(
+                        child: Text(
+                          status.label,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: statusColor,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const Spacer(),
@@ -399,10 +403,13 @@ class _CategorySection extends StatelessWidget {
             children: [
               Text(category.icon, style: const TextStyle(fontSize: 20)),
               const SizedBox(width: 8),
-              Text(
-                category.label.replaceFirst(RegExp(r'^[^\s]+\s'), ''),
-                style: context.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+              Flexible(
+                child: Text(
+                  category.label.replaceFirst(RegExp(r'^[^\s]+\s'), ''),
+                  style: context.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               const SizedBox(width: 8),

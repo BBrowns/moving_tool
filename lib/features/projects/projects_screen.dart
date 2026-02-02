@@ -33,6 +33,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
 
     return ResponsiveScaffold(
       title: 'Mijn Verhuizingen',
+      fabHeroTag: 'projects_fab',
       fabLabel: 'Nieuwe verhuizing',
       fabIcon: Icons.add,
       onFabPressed: () => context.push('/onboarding'),

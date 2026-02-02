@@ -13,6 +13,7 @@ class ResponsiveScaffold extends StatelessWidget {
   final String? fabLabel;
   final IconData? fabIcon;
   final VoidCallback? onFabPressed;
+  final Object? fabHeroTag;
 
   const ResponsiveScaffold({
     super.key,
@@ -23,6 +24,7 @@ class ResponsiveScaffold extends StatelessWidget {
     this.fabLabel,
     this.fabIcon,
     this.onFabPressed,
+    this.fabHeroTag,
   });
 
   @override
@@ -63,6 +65,7 @@ class ResponsiveScaffold extends StatelessWidget {
               onPressed: onFabPressed,
               icon: Icon(fabIcon ?? Icons.add),
               label: Text(fabLabel ?? 'Add'),
+              heroTag: fabHeroTag,
             )
           : null,
     );

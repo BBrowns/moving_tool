@@ -100,6 +100,16 @@ class BoxNotifier extends Notifier<List<PackingBox>> {
     await repository.deleteBox(id);
     state = state.where((b) => b.id != id).toList();
   }
+
+  Future<void> toggleBoxPacked(String id) async {
+    final box = state.firstWhere((b) => b.id == id);
+    final newStatus = box.status == BoxStatus.packed 
+        ? BoxStatus.packing 
+        : BoxStatus.packed;
+    
+    final updated = box.copyWith(status: newStatus);
+    await update(updated);
+  }
 }
 
 final boxProvider = NotifierProvider<BoxNotifier, List<PackingBox>>(BoxNotifier.new);
@@ -143,6 +153,12 @@ class BoxItemNotifier extends Notifier<List<BoxItem>> {
   Future<void> delete(String id) async {
     await repository.deleteItem(id);
     state = state.where((i) => i.id != id).toList();
+  }
+
+  Future<void> togglePacked(String id) async {
+    final item = state.firstWhere((i) => i.id == id);
+    final updated = item.copyWith(isPacked: !item.isPacked);
+    await update(updated);
   }
 }
 

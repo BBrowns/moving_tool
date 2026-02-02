@@ -4,6 +4,7 @@ class BoxItem {
   final String name;
   final int quantity;
   final double? estimatedValue;
+  final bool isPacked;
   final DateTime createdAt;
 
   BoxItem({
@@ -12,6 +13,7 @@ class BoxItem {
     required this.name,
     this.quantity = 1,
     this.estimatedValue,
+    this.isPacked = false,
     required this.createdAt,
   });
 
@@ -20,6 +22,7 @@ class BoxItem {
     String? name,
     int? quantity,
     double? estimatedValue,
+    bool? isPacked,
   }) {
     return BoxItem(
       id: id,
@@ -27,6 +30,7 @@ class BoxItem {
       name: name ?? this.name,
       quantity: quantity ?? this.quantity,
       estimatedValue: estimatedValue ?? this.estimatedValue,
+      isPacked: isPacked ?? this.isPacked,
       createdAt: createdAt,
     );
   }

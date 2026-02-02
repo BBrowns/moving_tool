@@ -60,10 +60,20 @@ class DashboardScreen extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      TextButton.icon(
-                        onPressed: () => context.push('/projects'),
-                        icon: const Icon(Icons.swap_horiz_rounded),
-                        label: const Text('Wissel'),
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () => context.go('/settings'),
+                            icon: const Icon(Icons.settings_rounded),
+                            tooltip: 'Instellingen',
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton.icon(
+                            onPressed: () => context.push('/projects'),
+                            icon: const Icon(Icons.swap_horiz_rounded),
+                            label: const Text('Wissel'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -241,7 +251,7 @@ class _PlaybookHeroCard extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -257,19 +267,24 @@ class _PlaybookHeroCard extends StatelessWidget {
                         children: [
                           const Icon(Icons.star_rounded, color: Colors.white, size: 16),
                           const SizedBox(width: 6),
-                          Text(
-                            'Jouw Gids',
-                            style: context.textTheme.labelMedium?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                          Flexible(
+                            child: Text(
+                              'Jouw Gids',
+                              style: context.textTheme.labelMedium?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     Text(
                       'Moving Playbook',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: context.textTheme.headlineSmall?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -278,6 +293,8 @@ class _PlaybookHeroCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       'Tips & Tricks voor een soepele verhuizing',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: context.textTheme.bodyMedium?.copyWith(
                         color: Colors.white.withValues(alpha: 0.9),
                       ),
@@ -336,60 +353,71 @@ class _BentoCard extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Header: Icon + Arrow
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: Icon(icon, color: color, size: 28),
+                      child: Icon(icon, color: color, size: 24),
                     ),
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.shade50,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.arrow_forward_rounded,
-                        size: 16,
+                        size: 14,
                         color: isDark ? Colors.white70 : Colors.grey.shade400,
                       ),
                     ),
                   ],
                 ),
                 
-                const Spacer(),
-                
-                // Content
-                Text(
-                  value,
-                  style: context.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    height: 1.0,
-                    color: isDark ? Colors.white : Colors.black87,
+                // Content with scale-down protection
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          value,
+                          style: context.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            height: 1.0,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          title,
+                          style: context.textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white70 : Colors.grey.shade700,
+                          ),
+                        ),
+                        Text(
+                          subtitle,
+                          style: context.textTheme.bodySmall?.copyWith(
+                            color: isDark ? Colors.white38 : Colors.grey.shade500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  title,
-                  style: context.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white70 : Colors.grey.shade700,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: isDark ? Colors.white38 : Colors.grey.shade500,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

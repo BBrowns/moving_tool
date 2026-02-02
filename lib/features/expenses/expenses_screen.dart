@@ -5,9 +5,10 @@ import 'package:moving_tool_flutter/features/expenses/domain/entities/expense.da
 import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/core/widgets/responsive_scaffold.dart';
-import 'package:moving_tool_flutter/features/expenses/presentation/widgets/expense_list.dart';
-import 'package:moving_tool_flutter/features/expenses/presentation/widgets/expense_summary.dart';
+import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
 import 'package:moving_tool_flutter/data/providers/providers.dart'; // For projectProvider
+import 'package:intl/intl.dart';
+import 'package:moving_tool_flutter/features/expenses/presentation/screens/settlement_history_screen.dart';
 
 class ExpensesScreen extends ConsumerWidget {
   const ExpensesScreen({super.key});
@@ -17,51 +18,210 @@ class ExpensesScreen extends ConsumerWidget {
     final expenses = ref.watch(expenseProvider);
     final project = ref.watch(projectProvider);
     
-    final totalExpenses = expenses.fold(0.0, (sum, e) => sum + e.amount);
-    final users = project?.users ?? [];
+    // Filter out settled expenses for the main view
+    final openExpenses = expenses.where((e) => e.settlementId == null).toList();
     
-    // Calculate settlements
+    final totalExpenses = ref.read(expenseProvider.notifier).totalExpenses; // Use getter we updated
+    final users = project?.users ?? [];
+
+    // Sort expenses by date (newest first)
+    final sortedExpenses = List<Expense>.from(openExpenses)
+      ..sort((a, b) => b.date.compareTo(a.date));
+      
+    // Calculate settlements for OPEN expenses only
     final settlements = users.isNotEmpty 
-        ? calculateSettlements(expenses, users.map((u) => u.id).toList())
+        ? calculateSettlements(openExpenses, users.map((u) => u.id).toList())
         : <Settlement>[];
 
-    return DefaultTabController(
-      length: 2,
-      child: ResponsiveScaffold(
-        title: 'Kosten',
-        fabLabel: 'Uitgave',
-        fabIcon: Icons.add,
-        onFabPressed: () => _showExpenseDialog(context, ref, users),
-        body: Column(
+    return ResponsiveScaffold(
+      fabHeroTag: 'expenses_fab',
+      title: 'Kosten',
+      actions: [
+        IconButton(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SettlementHistoryScreen()),
+          ),
+          icon: const Icon(Icons.history),
+          tooltip: 'Geschiedenis',
+        ),
+        IconButton(
+          onPressed: () => _showSettlementDialog(context, ref, settlements, users),
+          icon: const Icon(Icons.handshake_outlined), // Changed to handshake
+          tooltip: 'Verrekenen',
+        ),
+      ],
+      fabLabel: 'Uitgave',
+      fabIcon: Icons.add,
+      onFabPressed: () => _showExpenseDialog(context, ref, users),
+      body: ResponsiveWrapper(
+        maxWidth: 800,
+        child: CustomScrollView(
+          slivers: [
+            // Balance Header
+            SliverToBoxAdapter(
+              child: _BalanceHeader(total: totalExpenses, users: users, expenses: openExpenses),
+            ),
+            
+            // Transaction List
+            if (openExpenses.isEmpty)
+              SliverFillRemaining(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.savings_outlined,
+                        size: 80, 
+                        color: context.colors.primary.withOpacity(0.2)
+                      ),
+                      const SizedBox(height: 16),
+                      Text('Nog geen uitgaven', style: context.textTheme.titleLarge),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Voeg de eerste uitgave toe',
+                        style: TextStyle(color: context.colors.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.only(bottom: 80),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final expense = sortedExpenses[index];
+                      final showHeader = index == 0 || 
+                          !DateUtils.isSameDay(sortedExpenses[index - 1].date, expense.date);
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (showHeader) _DateHeader(date: expense.date),
+                          _ExpenseTile(
+                            expense: expense,
+                            users: users,
+                            onTap: () => _showExpenseDialog(context, ref, users, expense: expense),
+                          ),
+                        ],
+                      );
+                    },
+                    childCount: sortedExpenses.length,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSettlementDialog(BuildContext context, WidgetRef ref, List<Settlement> settlements, List<User> users) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Material(
-              color: context.colors.surface,
-              child: const TabBar(
-                tabs: [
-                  Tab(text: 'Uitgaven'),
-                  Tab(text: 'Overzicht'),
-                ],
-              ),
+            Text(
+              'Verrekenen',
+              style: context.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
-            Expanded(
-              child: TabBarView(
-                physics: const _NestedTabBarViewPhysics(),
-                children: [
-                  ExpenseList(
-                    expenses: expenses,
-                    users: users,
-                    onDelete: (id) => ref.read(expenseProvider.notifier).delete(id),
-                    onEdit: (expense) => _showExpenseDialog(context, ref, users, expense: expense),
+            const SizedBox(height: 24),
+            if (settlements.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Column(
+                  children: [
+                    Icon(Icons.check_circle_outline, size: 64, color: Colors.green.withOpacity(0.5)),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Alles is verrekend!',
+                      textAlign: TextAlign.center,
+                      style: context.textTheme.bodyLarge,
+                    ),
+                  ],
+                ),
+              )
+            else ...[
+               ...settlements.map((settlement) {
+                final fromUser = users.firstWhere((u) => u.id == settlement.fromUserId, orElse: () => User(id: '', name: 'Onbekend', color: 'Grey'));
+                final toUser = users.firstWhere((u) => u.id == settlement.toUserId, orElse: () => User(id: '', name: 'Onbekend', color: 'Grey'));
+                
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        child: Text(fromUser.name[0]),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: RichText(
+                          text: TextSpan(
+                            style: context.textTheme.bodyLarge,
+                            children: [
+                              TextSpan(text: '${fromUser.name} '),
+                              const TextSpan(text: 'betaalt '),
+                              TextSpan(
+                                text: '€${settlement.amount.toStringAsFixed(2)}',
+                                style: TextStyle(fontWeight: FontWeight.bold, color: context.colors.error),
+                              ),
+                              const TextSpan(text: ' aan '),
+                              TextSpan(text: toUser.name),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward, color: Colors.grey),
+                    ],
                   ),
-                  ExpenseSummary(
-                    total: totalExpenses,
-                    expenses: expenses,
-                    users: users,
-                    settlements: settlements,
-                  ),
-                ],
+                );
+              }),
+              const SizedBox(height: 32),
+              FilledButton.icon(
+                onPressed: () async {
+                   final confirmed = await showDialog<bool>(
+                    context: context, 
+                    builder: (c) => AlertDialog(
+                      title: const Text('Bevestig Verrekening'),
+                      content: const Text('Weet je zeker dat je wilt verrekenen? Alle huidige uitgaven worden als "betaald" gemarkeerd en de balans gaat naar 0.'),
+                      actions: [
+                        TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Annuleren')),
+                        FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('Verrekenen')),
+                      ],
+                    )
+                  );
+                  
+                  if (confirmed == true) {
+                     // For now, attribute to the first user or a system user
+                     // In a real app, this would be the logged-in user
+                     final creatorId = users.isNotEmpty ? users.first.id : 'unknown';
+                     await ref.read(expenseProvider.notifier).settleUp(
+                       users.map((u) => u.id).toList(), 
+                       createdByUserId: creatorId
+                     );
+                     if (context.mounted) Navigator.pop(context);
+                  }
+                },
+                icon: const Icon(Icons.check_circle_outline),
+                label: const Text('Verrekenen & Balans resetten'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.green, // Distinctive color
+                  padding: const EdgeInsets.all(16),
+                ),
               ),
-            ),
+            ],
+            if (settlements.isEmpty)
+              FilledButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Sluiten'),
+              ),
           ],
         ),
       ),
@@ -204,63 +364,200 @@ class ExpensesScreen extends ConsumerWidget {
   }
 }
 
-class _NestedTabBarViewPhysics extends ScrollPhysics {
-  const _NestedTabBarViewPhysics({super.parent});
+class _BalanceHeader extends StatelessWidget {
+  final double total;
+  final List<User> users;
+  final List<Expense> expenses;
+
+  const _BalanceHeader({
+    required this.total,
+    required this.users,
+    required this.expenses,
+  });
 
   @override
-  _NestedTabBarViewPhysics applyTo(ScrollPhysics? ancestor) {
-    return _NestedTabBarViewPhysics(parent: buildParent(ancestor));
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppTheme.primary,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            'Totaal uitgegeven',
+            style: context.textTheme.labelLarge?.copyWith(
+              color: Colors.white.withValues(alpha: 0.8),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '€ ${total.toStringAsFixed(2)}',
+            style: context.textTheme.displayMedium?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          if (users.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: users.map((user) {
+                  final paid = expenses
+                    .where((e) => e.paidById == user.id)
+                    .fold(0.0, (sum, e) => sum + e.amount);
+                  
+                  return Column(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: Colors.white,
+                        radius: 16,
+                        child: Text(
+                          user.name[0].toUpperCase(),
+                          style: TextStyle(
+                            color: AppTheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '€${paid.toStringAsFixed(0)}',
+                        style: context.textTheme.labelMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
   }
+}
+
+class _DateHeader extends StatelessWidget {
+  final DateTime date;
+
+  const _DateHeader({required this.date});
 
   @override
-  double applyBoundaryConditions(ScrollMetrics position, double value) {
-    // If we are at the edge, allow the parent to handle the gesture (return 0.0)
-    // Standard ClampingScrollPhysics returns the overscroll amount to 'absorb' it.
-    // By returning 0.0 when at boundary, we tell the system "I didn't consume this, it's valid delta".
-    // But we need to ensure we don't actually scroll out of bounds.
-    // Wait, if we return 0.0, the ScrollPosition treats it as a valid move for ITSELF and moves pixels.
-    // If pixels are at min/max, it updates.
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    String label;
+    if (DateUtils.isSameDay(date, now)) {
+      label = 'Vandaag';
+    } else if (DateUtils.isSameDay(date, now.subtract(const Duration(days: 1)))) {
+      label = 'Gisteren';
+    } else {
+      label = DateFormat('d MMMM', 'nl_NL').format(date);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+      child: Text(
+        label.toUpperCase(),
+        style: context.textTheme.labelMedium?.copyWith(
+          color: context.colors.onSurfaceVariant,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
+  }
+}
+
+class _ExpenseTile extends StatelessWidget {
+  final Expense expense;
+  final List<User> users;
+  final VoidCallback onTap;
+
+  const _ExpenseTile({
+    required this.expense,
+    required this.users,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final payer = users.where((u) => u.id == expense.paidById).firstOrNull;
+    final payerName = payer?.name ?? 'Onbekend';
     
-    // Correct logic for Nested PageViews:
-    // If we are at min (0) and trying to go less (negative delta => value < pixels), 
-    // we want to declare "Boundary Hit" so parent takes over?
-    // Actually, Flutter's DragGestureRecognizer for PageView is competitive.
-    // If the inner Scrollable returns 'overscroll' via Notification, the outer might pick it up?
-    
-    // Actually, the trick is usually to enforce 'Clamping' behavior locally which reports Overscroll,
-    // and ensure the Outer PageView listener picks up that Overscroll.
-    // But PageView defaults to Clamping already on Android.
-    
-    // Let's try to delegate to parent physics logic:
-    // This implementation simply forces 'overscroll' to be reported as 0 consumption, 
-    // allowing the event to propagate?
-    
-    // No, strictly speaking:
-    // If (value < position.pixels && position.pixels <= position.minScrollExtent) // Underscroll
-    // OR (value > position.pixels && position.pixels >= position.maxScrollExtent) // Overscroll
-    // THEN return value - position.pixels; // Handled! (Consumed).
-    
-    // If we want parent to handle it, we should NOT define boundary conditions?
-    // BouncingScrollPhysics (iOS) does NOT define simple boundaries, it allows scrolling past.
-    // If we use BouncingScrollPhysics, the inner view bounces. Parent ignores it.
-    
-    // If we use ClampingScrollPhysics, it clamps. Parent ignores it.
-    
-    // We want: If at edge + drag away -> Allow Parent.
-    // This is hard to do cleanly with just Physics in Flutter 2/3.
-    // However, defining a 'ClampingScrollPhysics' that explicitly does NOT report handled boundary
-    // might trick the DragArena? 
-    
-    // A simpler known hack:
-    // return 0.0; // Never block.
-    
-    // Logic:
-    // If we are overlapping (at edge), we return 0.0.
-    // This lets the scrollable try to move. It will fail to move pixels (clamped by extent), 
-    // producing an OverscrollNotification.
-    // The Parent PageView listens to OverscrollNotification? 
-    // Yes, PageView wraps child in NotificationLister.
-    
-    return 0.0;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: context.colors.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(expense.category.icon, style: const TextStyle(fontSize: 24)),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    expense.description,
+                    style: context.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Betaald door $payerName',
+                    style: context.textTheme.bodySmall?.copyWith(
+                      color: context.colors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                 Text(
+                  '€ ${expense.amount.toStringAsFixed(2)}',
+                  style: context.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    // Typically 'Splitser' shows positive/neutral for total amounts
+                    // If we had 'Your Share', we'd color it red/green.
+                    color: context.colors.onSurface, 
+                  ),
+                ),
+                 // If we have user ID context, we could show "You borrowed €5.00"
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

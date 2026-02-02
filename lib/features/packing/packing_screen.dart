@@ -22,6 +22,7 @@ class PackingScreen extends ConsumerWidget {
 
     return ResponsiveScaffold(
       title: 'Inpakken',
+      fabHeroTag: 'packing_fab',
       fabLabel: 'Kamer',
       fabIcon: Icons.add,
       onFabPressed: () => _ShowDialogs.showRoomDialog(context, ref),
@@ -254,6 +255,8 @@ class _BoxListItem extends ConsumerWidget {
       onDeleteBox: () => ref.read(boxProvider.notifier).delete(box.id),
       onEditBox: () => _ShowDialogs.showBoxDialog(context, ref, box.roomId, box: box),
       onEditItem: (item) => _ShowDialogs.showItemDialog(context, ref, box.id, item: item),
+      onToggleItem: (item) => ref.read(boxItemProvider.notifier).togglePacked(item.id),
+      onToggleBox: () => ref.read(boxProvider.notifier).toggleBoxPacked(box.id),
     );
   }
 }

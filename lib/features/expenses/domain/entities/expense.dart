@@ -52,6 +52,7 @@ class Expense {
   final String paidById;
   final List<String> splitBetweenIds;
   final DateTime date;
+  final String? settlementId;
   final String? receiptUrl;
   final String notes;
   final DateTime createdAt;
@@ -67,6 +68,7 @@ class Expense {
     this.receiptUrl,
     this.notes = '',
     required this.createdAt,
+    this.settlementId,
   });
 
   double get amountPerPerson {
@@ -83,6 +85,7 @@ class Expense {
     DateTime? date,
     String? receiptUrl,
     String? notes,
+    String? settlementId,
   }) {
     return Expense(
       id: id,
@@ -95,6 +98,7 @@ class Expense {
       receiptUrl: receiptUrl ?? this.receiptUrl,
       notes: notes ?? this.notes,
       createdAt: createdAt,
+      settlementId: settlementId ?? this.settlementId,
     );
   }
 
@@ -110,6 +114,7 @@ class Expense {
       'receiptUrl': receiptUrl,
       'notes': notes,
       'createdAt': createdAt.toIso8601String(),
+      'settlementId': settlementId,
     };
   }
 }
@@ -124,6 +129,22 @@ class Settlement {
     required this.toUserId,
     required this.amount,
   });
+
+  factory Settlement.fromJson(Map<String, dynamic> json) {
+    return Settlement(
+      fromUserId: json['fromUserId'] as String,
+      toUserId: json['toUserId'] as String,
+      amount: (json['amount'] as num).toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'fromUserId': fromUserId,
+      'toUserId': toUserId,
+      'amount': amount,
+    };
+  }
 }
 
 List<Settlement> calculateSettlements(
@@ -136,6 +157,8 @@ List<Settlement> calculateSettlements(
   }
 
   for (final expense in expenses) {
+    if (expense.settlementId != null) continue; // Skip settled expenses
+
     balances[expense.paidById] =
         (balances[expense.paidById] ?? 0) + expense.amount;
     final perPerson = expense.amountPerPerson;
@@ -177,3 +200,4 @@ List<Settlement> calculateSettlements(
 
   return settlements;
 }
+

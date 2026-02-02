@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:moving_tool_flutter/core/models/models.dart';
+import 'package:moving_tool_flutter/features/expenses/domain/entities/settlement_batch.dart';
 
 /// Hive-based database service with persistent storage
 class DatabaseService {
@@ -16,8 +17,39 @@ class DatabaseService {
   static const String _journalBox = 'journal';
   static const String _notesBox = 'notes';
   static const String _settingsBox = 'settings';
+  static const String _settlementsBox = 'settlements';
   
   static const String _activeProjectKey = 'activeProjectId';
+  
+
+
+  // ... (Add Settlement Operations)
+  // ============================================================================
+  // Settlement operations
+  // ============================================================================
+  
+  static List<SettlementBatch> getAllSettlementBatches() {
+    final box = Hive.box<String>(_settlementsBox);
+    return box.values.map((json) => _settlementBatchFromJson(json)).toList();
+  }
+  
+  static Future<void> saveSettlementBatch(SettlementBatch batch) async {
+    final box = Hive.box<String>(_settlementsBox);
+    await box.put(batch.id, _settlementBatchToJson(batch));
+  }
+  
+  static Future<void> deleteSettlementBatch(String id) async {
+    final box = Hive.box<String>(_settlementsBox);
+    await box.delete(id);
+  }
+
+  // ... (Add JSON helpers)
+  static String _settlementBatchToJson(SettlementBatch b) => jsonEncode(b.toJson());
+  
+  static SettlementBatch _settlementBatchFromJson(String json) {
+    return SettlementBatch.fromJson(jsonDecode(json));
+  }
+
 
   static Future<void> initialize({bool isTest = false, String? testPath}) async {
     if (isTest) {
@@ -41,6 +73,7 @@ class DatabaseService {
     await Hive.openBox<String>(_journalBox);
     await Hive.openBox<String>(_notesBox);
     await Hive.openBox<String>(_settingsBox);
+    await Hive.openBox<String>(_settlementsBox);
   }
 
   // ============================================================================
@@ -423,6 +456,7 @@ class DatabaseService {
     'boxId': i.boxId,
     'name': i.name,
     'quantity': i.quantity,
+    'isPacked': i.isPacked,
     'createdAt': i.createdAt.toIso8601String(),
   });
   
@@ -433,6 +467,7 @@ class DatabaseService {
       boxId: m['boxId'],
       name: m['name'],
       quantity: m['quantity'] ?? 1,
+      isPacked: m['isPacked'] ?? false,
       createdAt: DateTime.parse(m['createdAt']),
     );
   }
@@ -479,6 +514,7 @@ class DatabaseService {
     'receiptUrl': e.receiptUrl,
     'notes': e.notes,
     'createdAt': e.createdAt.toIso8601String(),
+    'settlementId': e.settlementId,
   });
   
   static Expense _expenseFromJson(String json) {
@@ -494,6 +530,7 @@ class DatabaseService {
       receiptUrl: m['receiptUrl'],
       notes: m['notes'] ?? '',
       createdAt: DateTime.parse(m['createdAt']),
+      settlementId: m['settlementId'],
     );
   }
 
