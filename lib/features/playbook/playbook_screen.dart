@@ -1,45 +1,152 @@
-// Playbook Screen - Journal and notes
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/providers/providers.dart';
-import '../../data/models/models.dart';
-import '../../core/theme/app_theme.dart';
+import 'package:moving_tool_flutter/features/playbook/presentation/providers/playbook_providers.dart';
+import 'package:moving_tool_flutter/features/playbook/domain/entities/journal_entry.dart';
+import 'package:moving_tool_flutter/features/playbook/domain/entities/playbook_note.dart';
+import 'package:moving_tool_flutter/core/theme/app_theme.dart';
+import 'package:moving_tool_flutter/features/playbook/presentation/widgets/journal_entry_tile.dart';
+import 'package:moving_tool_flutter/features/playbook/presentation/widgets/note_card.dart';
 
-class PlaybookScreen extends ConsumerWidget {
+class PlaybookScreen extends ConsumerStatefulWidget {
   const PlaybookScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PlaybookScreen> createState() => _PlaybookScreenState();
+}
+
+class _PlaybookScreenState extends ConsumerState<PlaybookScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final journal = ref.watch(journalProvider);
     final notes = ref.watch(notesProvider);
 
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Playbook'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Dagboek'),
-              Tab(text: 'Notities'),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            _JournalTab(entries: journal),
-            _NotesTab(
-              notes: notes,
-              onAdd: () => _showAddNoteDialog(context, ref),
-              onTogglePin: (id) => ref.read(notesProvider.notifier).togglePin(id),
-              onDelete: (id) => ref.read(notesProvider.notifier).delete(id),
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Playbook'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Dagboek'),
+            Tab(text: 'Notities'),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => _showAddNoteDialog(context, ref),
-          icon: const Icon(Icons.add),
-          label: const Text('Notitie'),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _JournalTab(
+            entries: journal,
+            onAdd: () => _showAddJournalEntryDialog(context, ref),
+          ),
+          _NotesTab(
+            notes: notes,
+            onAdd: () => _showAddNoteDialog(context, ref),
+            onTogglePin: (id) => ref.read(notesProvider.notifier).togglePin(id),
+            onDelete: (id) => ref.read(notesProvider.notifier).delete(id),
+          ),
+        ],
+      ),
+      floatingActionButtonLocation: MediaQuery.of(context).size.width > 600 
+          ? FloatingActionButtonLocation.centerFloat 
+          : FloatingActionButtonLocation.endFloat,
+      floatingActionButton: (_tabController.index == 0 && journal.isEmpty) || 
+                            (_tabController.index == 1 && notes.isEmpty)
+          ? null // Hide FAB if empty (EmptyState button takes over)
+          : FloatingActionButton.extended(
+              onPressed: _tabController.index == 0 
+                  ? () => _showAddJournalEntryDialog(context, ref)
+                  : () => _showAddNoteDialog(context, ref),
+              icon: Icon(_tabController.index == 0 ? Icons.edit_note : Icons.add),
+              label: Text(_tabController.index == 0 ? 'Loggen' : 'Notitie'),
+            ),
+    );
+  }
+
+  void _showAddJournalEntryDialog(BuildContext context, WidgetRef ref) {
+    final titleController = TextEditingController();
+    final descriptionController = TextEditingController();
+    JournalEventType selectedType = JournalEventType.custom;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            left: 16, right: 16, top: 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('Logboek item', style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<JournalEventType>(
+                value: selectedType,
+                decoration: const InputDecoration(labelText: 'Type'),
+                items: JournalEventType.values.map((t) => DropdownMenuItem(
+                  value: t,
+                  child: Row(children: [
+                    Text(t.icon),
+                    const SizedBox(width: 8),
+                    Text(t.label),
+                  ]),
+                )).toList(),
+                onChanged: (v) => setModalState(() => selectedType = v!),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: titleController,
+                autofocus: true,
+                decoration: const InputDecoration(labelText: 'Titel'),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: descriptionController,
+                maxLines: 2,
+                decoration: const InputDecoration(labelText: 'Beschrijving (optioneel)'),
+              ),
+              const SizedBox(height: 24),
+              const SizedBox(height: 24),
+              ValueListenableBuilder<TextEditingValue>(
+                valueListenable: titleController,
+                builder: (context, value, child) {
+                  return ElevatedButton(
+                    onPressed: value.text.isNotEmpty 
+                        ? () {
+                            ref.read(journalProvider.notifier).log(
+                              type: selectedType,
+                              title: titleController.text,
+                              description: descriptionController.text.isEmpty ? null : descriptionController.text,
+                            );
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Logboek item toegevoegd')),
+                            );
+                          }
+                        : null,
+                    child: const Text('Toevoegen'),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -75,17 +182,22 @@ class PlaybookScreen extends ConsumerWidget {
               decoration: const InputDecoration(labelText: 'Inhoud', alignLabelWithHint: true),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                if (titleController.text.isNotEmpty) {
-                  ref.read(notesProvider.notifier).add(
-                    title: titleController.text,
-                    content: contentController.text,
-                  );
-                  Navigator.pop(context);
-                }
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: titleController,
+              builder: (context, value, child) {
+                return ElevatedButton(
+                  onPressed: value.text.isNotEmpty 
+                      ? () {
+                          ref.read(notesProvider.notifier).add(
+                            title: titleController.text,
+                            content: contentController.text,
+                          );
+                          Navigator.pop(context);
+                        }
+                      : null,
+                  child: const Text('Opslaan'),
+                );
               },
-              child: const Text('Opslaan'),
             ),
           ],
         ),
@@ -96,8 +208,12 @@ class PlaybookScreen extends ConsumerWidget {
 
 class _JournalTab extends StatelessWidget {
   final List<JournalEntry> entries;
+  final VoidCallback onAdd;
 
-  const _JournalTab({required this.entries});
+  const _JournalTab({
+    required this.entries,
+    required this.onAdd,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +228,12 @@ class _JournalTab extends StatelessWidget {
             const SizedBox(height: 8),
             Text('Activiteiten worden hier automatisch bijgehouden', 
                 style: TextStyle(color: context.colors.onSurfaceVariant)),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: onAdd,
+              icon: const Icon(Icons.add),
+              label: const Text('Eerste activiteit loggen'),
+            ),
           ],
         ),
       );
@@ -143,18 +265,7 @@ class _JournalTab extends StatelessWidget {
                 ),
               ),
             ),
-            ...dayEntries.map((entry) => Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: ListTile(
-                leading: Text(entry.type.icon, style: const TextStyle(fontSize: 24)),
-                title: Text(entry.title),
-                subtitle: entry.description != null ? Text(entry.description!) : null,
-                trailing: Text(
-                  '${entry.timestamp.hour.toString().padLeft(2, '0')}:${entry.timestamp.minute.toString().padLeft(2, '0')}',
-                  style: context.textTheme.bodySmall,
-                ),
-              ),
-            )),
+            ...dayEntries.map((entry) => JournalEntryTile(entry: entry)),
           ],
         );
       },
@@ -208,42 +319,10 @@ class _NotesTab extends StatelessWidget {
       itemCount: sorted.length,
       itemBuilder: (context, index) {
         final note = sorted[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 8),
-          child: ListTile(
-            leading: note.isPinned 
-                ? const Icon(Icons.push_pin, color: AppTheme.warning)
-                : const Icon(Icons.note_outlined),
-            title: Text(note.title, style: const TextStyle(fontWeight: FontWeight.w600)),
-            subtitle: note.content.isNotEmpty 
-                ? Text(note.content, maxLines: 2, overflow: TextOverflow.ellipsis)
-                : null,
-            trailing: PopupMenuButton(
-              icon: const Icon(Icons.more_vert),
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  onTap: () => onTogglePin(note.id),
-                  child: Row(
-                    children: [
-                      Icon(note.isPinned ? Icons.push_pin_outlined : Icons.push_pin),
-                      const SizedBox(width: 8),
-                      Text(note.isPinned ? 'Losmaken' : 'Vastpinnen'),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  onTap: () => onDelete(note.id),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.delete, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text('Verwijderen', style: TextStyle(color: Colors.red)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+        return NoteCard(
+          note: note,
+          onTogglePin: () => onTogglePin(note.id),
+          onDelete: () => onDelete(note.id),
         );
       },
     );

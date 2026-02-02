@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
-import '../../data/models/models.dart';
+import '../../core/models/models.dart';
 import '../../data/providers/providers.dart';
 import '../../core/theme/app_theme.dart';
 
@@ -25,6 +25,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   DateTime _movingDate = DateTime.now().add(const Duration(days: 30));
 
   @override
+  void initState() {
+    super.initState();
+    // Check if we have existing projects to skip welcome screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final projects = ref.read(projectsProvider);
+      if (projects.isNotEmpty) {
+        setState(() => _currentPage = 1);
+        _pageController.jumpToPage(1);
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _pageController.dispose();
     _nameController.dispose();
@@ -43,7 +56,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   void _previousPage() {
-    if (_currentPage > 0) {
+    final projects = ref.read(projectsProvider);
+    // If we have projects (skipping welcome), don't go back to page 0
+    if (_currentPage > (projects.isNotEmpty ? 1 : 0)) {
       _pageController.previousPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -52,49 +67,93 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Future<void> _completeOnboarding() async {
-    final uuid = const Uuid();
-    
-    // Create users
-    final users = <User>[];
-    if (_user1Controller.text.isNotEmpty) {
-      users.add(User(
+    try {
+      final uuid = const Uuid();
+      
+      // Create users
+      final users = <User>[];
+      if (_user1Controller.text.isNotEmpty) {
+        users.add(User(
+          id: uuid.v4(),
+          name: _user1Controller.text,
+          color: '#6366F1',
+        ));
+      }
+      if (_user2Controller.text.isNotEmpty) {
+        users.add(User(
+          id: uuid.v4(),
+          name: _user2Controller.text,
+          color: '#8B5CF6',
+        ));
+      }
+      
+      // Create project
+      final project = Project(
         id: uuid.v4(),
-        name: _user1Controller.text,
-        color: '#6366F1',
-      ));
-    }
-    if (_user2Controller.text.isNotEmpty) {
-      users.add(User(
-        id: uuid.v4(),
-        name: _user2Controller.text,
-        color: '#8B5CF6',
-      ));
-    }
-    
-    // Create project
-    final project = Project(
-      id: uuid.v4(),
-      name: _nameController.text.isEmpty ? 'Mijn Verhuizing' : _nameController.text,
-      movingDate: _movingDate,
-      fromAddress: Address(),
-      toAddress: Address(),
-      users: users,
-      createdAt: DateTime.now(),
-    );
-    
-    await ref.read(projectProvider.notifier).save(project);
-    
-    if (mounted) {
-      context.go('/dashboard');
+        name: _nameController.text.isEmpty ? 'Mijn Verhuizing' : _nameController.text,
+        movingDate: _movingDate,
+        fromAddress: Address(),
+        toAddress: Address(),
+        users: users,
+        createdAt: DateTime.now(),
+      );
+      
+      // Save project and update both providers
+      if (!mounted) return;
+      await ref.read(projectProvider.notifier).save(project);
+      
+      if (!mounted) return;
+      await ref.read(projectProvider.notifier).setActive(project.id);
+      
+      if (!mounted) return;
+      ref.read(projectsProvider.notifier).load(); // Refresh projects list
+      
+      if (mounted) {
+        print('Onboarding: Navigating to Dashboard');
+        context.go('/dashboard');
+      }
+    } catch (e, stack) {
+      print('Onboarding Error: $e');
+      print(stack);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final projects = ref.watch(projectsProvider);
+    final hasProjects = projects.isNotEmpty;
+
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
+            // Top Bar with Close button for existing users
+            if (hasProjects)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        if (context.canPop()) {
+                          context.pop();
+                        } else {
+                          context.go('/projects');
+                        }
+                      },
+                      icon: const Icon(Icons.close),
+                      tooltip: 'Annuleren',
+                    ),
+                  ],
+                ),
+              ),
+
             // Progress indicator
             Padding(
               padding: const EdgeInsets.all(24),
@@ -118,6 +177,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             Expanded(
               child: PageView(
                 controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(), // Prevent swiping back to welcome if skipped
                 onPageChanged: (page) => setState(() => _currentPage = page),
                 children: [
                   _buildWelcomePage(),
@@ -132,7 +192,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               padding: const EdgeInsets.all(24),
               child: Row(
                 children: [
-                  if (_currentPage > 0)
+                  if (_currentPage > (hasProjects ? 1 : 0))
                     OutlinedButton(
                       onPressed: _previousPage,
                       child: const Text('Terug'),
