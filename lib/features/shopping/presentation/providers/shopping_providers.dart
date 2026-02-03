@@ -37,6 +37,9 @@ class ShoppingNotifier extends Notifier<List<ShoppingItem>> {
     ShoppingPriority priority = ShoppingPriority.medium,
     double? budgetMin,
     double? budgetMax,
+    String? marktplaatsQuery,
+    bool isMarktplaatsTracked = false,
+    double? targetPrice,
   }) async {
     final item = ShoppingItem(
       id: _uuid.v4(),
@@ -45,6 +48,9 @@ class ShoppingNotifier extends Notifier<List<ShoppingItem>> {
       priority: priority,
       budgetMin: budgetMin,
       budgetMax: budgetMax,
+      marktplaatsQuery: marktplaatsQuery,
+      isMarktplaatsTracked: isMarktplaatsTracked,
+      targetPrice: targetPrice,
       createdAt: DateTime.now(),
     );
     await repository.saveItem(item);

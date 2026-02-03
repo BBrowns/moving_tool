@@ -12,7 +12,14 @@ class JournalEntryTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
-        leading: Text(entry.type.icon, style: const TextStyle(fontSize: 24)),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(entry.type.icon, size: 24, color: Theme.of(context).colorScheme.primary),
+        ),
         title: Text(entry.title),
         subtitle: entry.description != null ? Text(entry.description!) : null,
         trailing: Text(

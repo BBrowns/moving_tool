@@ -53,7 +53,7 @@ class RoomCard extends StatelessWidget {
                       color: AppTheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Text(room.icon, style: const TextStyle(fontSize: 24)),
+                    child: Icon(room.iconData, size: 24, color: AppTheme.primary),
                   ),
                   Row(
                     children: [

@@ -60,7 +60,7 @@ class ShoppingScreen extends ConsumerWidget {
                       ),
                       child: Row(
                         children: [
-                          Text(status.icon, style: const TextStyle(fontSize: 18)),
+                          Icon(status.icon, size: 20, color: context.colors.onSurfaceVariant),
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
@@ -127,7 +127,7 @@ class ShoppingScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('🛒', style: TextStyle(fontSize: 64)),
+            Icon(Icons.shopping_cart_outlined, size: 64, color: context.colors.onSurfaceVariant.withOpacity(0.5)),
             const SizedBox(height: 16),
             Text('Nog geen items', style: context.textTheme.titleLarge),
           ],
@@ -162,63 +162,143 @@ class ShoppingScreen extends ConsumerWidget {
   void _showItemDialog(BuildContext context, WidgetRef ref, {ShoppingItem? item}) {
     final isEditing = item != null;
     final nameController = TextEditingController(text: item?.name);
+    final mpQueryController = TextEditingController(text: item?.marktplaatsQuery);
+    final targetPriceController = TextEditingController(text: item?.targetPrice?.toStringAsFixed(0));
+    
     ShoppingPriority priority = item?.priority ?? ShoppingPriority.medium;
+    bool isTracked = item?.isMarktplaatsTracked ?? false;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-          left: 16, right: 16, top: 16,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              isEditing ? 'Item bewerken' : 'Nieuw item', 
-              style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: nameController,
-              autofocus: !isEditing,
-              decoration: const InputDecoration(labelText: 'Naam', hintText: 'Wat heb je nodig?'),
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<ShoppingPriority>(
-              value: priority,
-              decoration: const InputDecoration(labelText: 'Prioriteit'),
-              items: ShoppingPriority.values.map((p) => DropdownMenuItem(
-                value: p,
-                child: Text(p.label),
-              )).toList(),
-              onChanged: (v) => priority = v!,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                if (nameController.text.isNotEmpty) {
-                  if (isEditing) {
-                    ref.read(shoppingProvider.notifier).update(
-                      item!.copyWith(
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            left: 16, right: 16, top: 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                isEditing ? 'Item bewerken' : 'Nieuw item', 
+                style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: nameController,
+                autofocus: !isEditing,
+                decoration: const InputDecoration(labelText: 'Naam', hintText: 'Wat heb je nodig?'),
+                onChanged: (value) {
+                  // Auto-fill query if empty
+                  if (!isEditing && mpQueryController.text.isEmpty) {
+                     mpQueryController.text = value; 
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<ShoppingPriority>(
+                value: priority,
+                decoration: const InputDecoration(labelText: 'Prioriteit'),
+                items: ShoppingPriority.values.map((p) => DropdownMenuItem(
+                  value: p,
+                  child: Text(p.label),
+                )).toList(),
+                onChanged: (v) => setState(() => priority = v!),
+              ),
+              const SizedBox(height: 24),
+              
+              // Marktplaats Section
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.shopping_bag_outlined, color: AppTheme.primary),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Marktplaats Tracker', 
+                          style: context.textTheme.titleMedium?.copyWith(
+                            color: AppTheme.primary,
+                            fontWeight: FontWeight.bold
+                          )
+                        ),
+                        const Spacer(),
+                        Switch(
+                          value: isTracked, 
+                          onChanged: (v) => setState(() => isTracked = v),
+                        ),
+                      ],
+                    ),
+                    if (isTracked) ...[
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: mpQueryController,
+                        decoration: const InputDecoration(
+                          labelText: 'Zoekterm', 
+                          hintText: 'Bijv. IKEA Pax',
+                          prefixIcon: Icon(Icons.search),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: targetPriceController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Doelprijs (€)', 
+                          hintText: 'Max. prijs',
+                          prefixIcon: Icon(Icons.euro),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                      ),
+                    ]
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  if (nameController.text.isNotEmpty) {
+                    final targetPrice = double.tryParse(targetPriceController.text);
+                    final query = mpQueryController.text.isEmpty ? nameController.text : mpQueryController.text;
+
+                    if (isEditing) {
+                      ref.read(shoppingProvider.notifier).update(
+                        item!.copyWith(
+                          name: nameController.text,
+                          priority: priority,
+                          marktplaatsQuery: query,
+                          isMarktplaatsTracked: isTracked,
+                          targetPrice: targetPrice,
+                        )
+                      );
+                    } else {
+                      ref.read(shoppingProvider.notifier).add(
                         name: nameController.text,
                         priority: priority,
-                      )
-                    );
-                  } else {
-                    ref.read(shoppingProvider.notifier).add(
-                      name: nameController.text,
-                      priority: priority,
-                    );
+                        marktplaatsQuery: query,
+                        isMarktplaatsTracked: isTracked,
+                        targetPrice: targetPrice,
+                      );
+                    }
+                    Navigator.pop(context);
                   }
-                  Navigator.pop(context);
-                }
-              },
-              child: Text(isEditing ? 'Opslaan' : 'Toevoegen'),
-            ),
-          ],
+                },
+                child: Text(isEditing ? 'Opslaan' : 'Toevoegen'),
+              ),
+            ],
+          ),
         ),
       ),
     );

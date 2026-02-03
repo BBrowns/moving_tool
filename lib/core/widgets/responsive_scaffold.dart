@@ -50,7 +50,7 @@ class ResponsiveScaffold extends StatelessWidget {
       const SizedBox(width: 8),
       ...?actions,
       const SizedBox(width: 8),
-      const ThemeSwitcherButton(),
+      const SizedBox(width: 8),
       const SizedBox(width: 8),
     ];
 
@@ -72,43 +72,4 @@ class ResponsiveScaffold extends StatelessWidget {
   }
 }
 
-class ThemeSwitcherButton extends ConsumerWidget {
-  const ThemeSwitcherButton({super.key});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeModeProvider);
-
-    IconData icon = Icons.brightness_auto;
-    String tooltip = 'System Theme';
-
-    switch (themeMode) {
-      case ThemeMode.system:
-        icon = Icons.brightness_auto;
-        tooltip = 'System Theme';
-        break;
-      case ThemeMode.light:
-        icon = Icons.wb_sunny;
-        tooltip = 'Light Theme';
-        break;
-      case ThemeMode.dark:
-        icon = Icons.nightlight_round;
-        tooltip = 'Dark Theme';
-        break;
-    }
-
-    return IconButton(
-      icon: Icon(icon),
-      tooltip: tooltip,
-      onPressed: () {
-        // Cycle: System -> Light -> Dark -> System
-        final newMode = switch (themeMode) {
-          ThemeMode.system => ThemeMode.light,
-          ThemeMode.light => ThemeMode.dark,
-          ThemeMode.dark => ThemeMode.system,
-        };
-        ref.read(themeModeProvider.notifier).set(newMode);
-      },
-    );
-  }
-}

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Room {
   final String id;
   final String name;
@@ -8,7 +10,7 @@ class Room {
   final String notes;
   final DateTime createdAt;
 
-  Room({
+  const Room({
     required this.id,
     required this.name,
     this.icon = '📦',
@@ -18,6 +20,20 @@ class Room {
     this.notes = '',
     required this.createdAt,
   });
+
+  IconData get iconData {
+    switch (icon) {
+      case '🛋️': return Icons.chair_rounded;
+      case '🛏️': return Icons.bed_rounded;
+      case '🍳': return Icons.kitchen_rounded;
+      case '🚿': return Icons.shower_rounded;
+      case '👶': return Icons.child_care_rounded;
+      case '🧑‍💻': return Icons.computer_rounded;
+      case '📦': return Icons.inventory_2_rounded;
+      case '🔧': return Icons.build_rounded;
+      default: return Icons.weekend_rounded;
+    }
+  }
 
   Room copyWith({
     String? name,

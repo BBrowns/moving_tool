@@ -63,7 +63,7 @@ class DashboardScreen extends ConsumerWidget {
                       Row(
                         children: [
                           IconButton(
-                            onPressed: () => context.go('/settings'),
+                            onPressed: () => context.push('/settings'),
                             icon: const Icon(Icons.settings_rounded),
                             tooltip: 'Instellingen',
                           ),
@@ -93,7 +93,7 @@ class DashboardScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               sliver: SliverToBoxAdapter(
                 child: _PlaybookHeroCard(
-                  onTap: () => context.go('/playbook'),
+                  onTap: () => context.push('/playbook'),
                 ),
               ),
             ),
@@ -452,7 +452,7 @@ class _ActivityTile extends StatelessWidget {
               color: context.colors.surfaceContainerHighest.withValues(alpha: 0.5),
               shape: BoxShape.circle,
             ),
-            child: Text(entry.type.icon, style: const TextStyle(fontSize: 16)),
+            child: Icon(entry.type.icon, size: 20, color: context.colors.onSurfaceVariant),
           ),
           const SizedBox(width: 16),
           Expanded(

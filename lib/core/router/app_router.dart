@@ -93,6 +93,24 @@ final routerProvider = Provider<GoRouter>((ref) {
           isMainTab: false,
         ),
       ),
+      GoRoute(
+        path: '/settings',
+        pageBuilder: (context, state) => _buildAdaptivePage(
+          child: const SettingsScreen(),
+          state: state,
+          isMainTab: false,
+        ),
+      ),
+
+      GoRoute(
+        path: '/playbook',
+        pageBuilder: (context, state) => _buildAdaptivePage(
+          child: const PlaybookScreen(),
+          state: state,
+          isMainTab: false,
+        ),
+      ),
+      
       // Main app shell with navigation
       // Main app shell with navigation (Stateful for PageView swipe)
       StatefulShellRoute(
@@ -160,30 +178,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: '/expenses',
                 pageBuilder: (context, state) => _buildAdaptivePage(
                   child: const ExpensesScreen(),
-                  state: state,
-                  isMainTab: true,
-                ),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/playbook',
-                pageBuilder: (context, state) => _buildAdaptivePage(
-                  child: const PlaybookScreen(),
-                  state: state,
-                  isMainTab: true,
-                ),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/settings',
-                pageBuilder: (context, state) => _buildAdaptivePage(
-                  child: const SettingsScreen(),
                   state: state,
                   isMainTab: true,
                 ),

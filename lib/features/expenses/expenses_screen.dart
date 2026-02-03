@@ -276,7 +276,13 @@ class ExpensesScreen extends ConsumerWidget {
                   decoration: const InputDecoration(labelText: 'Categorie'),
                   items: ExpenseCategory.values.map((c) => DropdownMenuItem(
                     value: c,
-                    child: Text(c.label),
+                    child: Row(
+                      children: [
+                        Icon(c.icon, size: 18, color: context.colors.onSurface),
+                        const SizedBox(width: 8),
+                        Text(c.label),
+                      ],
+                    ),
                   )).toList(),
                   onChanged: (v) => category = v!,
                 ),
@@ -516,7 +522,7 @@ class _ExpenseTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
-                child: Text(expense.category.icon, style: const TextStyle(fontSize: 24)),
+                child: Icon(expense.category.icon, size: 24, color: context.colors.onSurfaceVariant),
               ),
             ),
             const SizedBox(width: 16),

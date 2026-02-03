@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum ShoppingStatus {
   needed,
   searching,
@@ -19,16 +21,16 @@ extension ShoppingStatusExtension on ShoppingStatus {
     }
   }
 
-  String get icon {
+  IconData get icon {
     switch (this) {
       case ShoppingStatus.needed:
-        return '📝';
+        return Icons.format_list_bulleted_rounded;
       case ShoppingStatus.searching:
-        return '🔍';
+        return Icons.search_rounded;
       case ShoppingStatus.found:
-        return '✨';
+        return Icons.bookmark_rounded;
       case ShoppingStatus.purchased:
-        return '✅';
+        return Icons.check_circle_rounded;
     }
   }
 }
@@ -106,6 +108,9 @@ class ShoppingItem {
   final String? assigneeId;
   final String notes;
   final MarketplaceData? marketplace;
+  final String? marktplaatsQuery;
+  final bool isMarktplaatsTracked;
+  final double? targetPrice;
   final DateTime createdAt;
 
   ShoppingItem({
@@ -120,6 +125,9 @@ class ShoppingItem {
     this.assigneeId,
     this.notes = '',
     this.marketplace,
+    this.marktplaatsQuery,
+    this.isMarktplaatsTracked = false,
+    this.targetPrice,
     required this.createdAt,
   });
 
@@ -134,6 +142,9 @@ class ShoppingItem {
     String? assigneeId,
     String? notes,
     MarketplaceData? marketplace,
+    String? marktplaatsQuery,
+    bool? isMarktplaatsTracked,
+    double? targetPrice,
   }) {
     return ShoppingItem(
       id: id,
@@ -147,6 +158,9 @@ class ShoppingItem {
       assigneeId: assigneeId ?? this.assigneeId,
       notes: notes ?? this.notes,
       marketplace: marketplace ?? this.marketplace,
+      marktplaatsQuery: marktplaatsQuery ?? this.marktplaatsQuery,
+      isMarktplaatsTracked: isMarktplaatsTracked ?? this.isMarktplaatsTracked,
+      targetPrice: targetPrice ?? this.targetPrice,
       createdAt: createdAt,
     );
   }
@@ -164,6 +178,9 @@ class ShoppingItem {
       'assigneeId': assigneeId,
       'notes': notes,
       'marketplace': marketplace?.toJson(),
+      'marktplaatsQuery': marktplaatsQuery,
+      'isMarktplaatsTracked': isMarktplaatsTracked,
+      'targetPrice': targetPrice,
       'createdAt': createdAt.toIso8601String(),
     };
   }

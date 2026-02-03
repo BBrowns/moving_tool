@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 // Domain Models - Expense & Settlement (simplified, no Hive)
 enum ExpenseCategory {
   verhuizing,
@@ -12,34 +14,34 @@ extension ExpenseCategoryExtension on ExpenseCategory {
   String get label {
     switch (this) {
       case ExpenseCategory.verhuizing:
-        return '🚚 Verhuizing';
+        return 'Verhuizing';
       case ExpenseCategory.inrichting:
-        return '🛋️ Inrichting';
+        return 'Inrichting';
       case ExpenseCategory.reparaties:
-        return '🔧 Reparaties';
+        return 'Reparaties';
       case ExpenseCategory.nutsvoorzieningen:
-        return '💡 Nutsvoorzieningen';
+        return 'Nutsvoorzieningen';
       case ExpenseCategory.administratie:
-        return '📋 Administratie';
+        return 'Administratie';
       case ExpenseCategory.overig:
-        return '📌 Overig';
+        return 'Overig';
     }
   }
 
-  String get icon {
+  IconData get icon {
     switch (this) {
       case ExpenseCategory.verhuizing:
-        return '🚚';
+        return Icons.local_shipping_rounded;
       case ExpenseCategory.inrichting:
-        return '🛋️';
+        return Icons.chair_rounded;
       case ExpenseCategory.reparaties:
-        return '🔧';
+        return Icons.build_rounded;
       case ExpenseCategory.nutsvoorzieningen:
-        return '💡';
+        return Icons.lightbulb_rounded;
       case ExpenseCategory.administratie:
-        return '📋';
+        return Icons.receipt_long_rounded;
       case ExpenseCategory.overig:
-        return '📌';
+        return Icons.push_pin_rounded;
     }
   }
 }

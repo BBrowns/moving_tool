@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum JournalEventType {
   taskCompleted,
   boxPacked,
@@ -9,22 +11,22 @@ enum JournalEventType {
 }
 
 extension JournalEventTypeExtension on JournalEventType {
-  String get icon {
+  IconData get icon {
     switch (this) {
       case JournalEventType.taskCompleted:
-        return '✅';
+        return Icons.check_circle_rounded;
       case JournalEventType.boxPacked:
-        return '📦';
+        return Icons.inventory_2_rounded;
       case JournalEventType.itemPurchased:
-        return '🛍️';
+        return Icons.shopping_bag_rounded;
       case JournalEventType.expenseAdded:
-        return '💰';
+        return Icons.euro_rounded;
       case JournalEventType.milestone:
-        return '🎯';
+        return Icons.flag_rounded;
       case JournalEventType.note:
-        return '📝';
+        return Icons.note_alt_rounded;
       case JournalEventType.custom:
-        return '📌';
+        return Icons.push_pin_rounded;
     }
   }
 

@@ -103,7 +103,7 @@ class _PlaybookScreenState extends ConsumerState<PlaybookScreen> with SingleTick
                 items: JournalEventType.values.map((t) => DropdownMenuItem(
                   value: t,
                   child: Row(children: [
-                    Text(t.icon),
+                    Icon(t.icon, size: 18),
                     const SizedBox(width: 8),
                     Text(t.label),
                   ]),
@@ -222,7 +222,7 @@ class _JournalTab extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('📔', style: TextStyle(fontSize: 64)),
+            Icon(Icons.menu_book_rounded, size: 80, color: context.colors.primary.withValues(alpha: 0.2)),
             const SizedBox(height: 16),
             Text('Nog geen activiteit', style: context.textTheme.titleLarge),
             const SizedBox(height: 8),
@@ -293,7 +293,7 @@ class _NotesTab extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('📝', style: TextStyle(fontSize: 64)),
+            Icon(Icons.note_alt_rounded, size: 80, color: context.colors.primary.withValues(alpha: 0.2)),
             const SizedBox(height: 16),
             Text('Nog geen notities', style: context.textTheme.titleLarge),
             const SizedBox(height: 24),

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 // Domain Models - Task (simplified, no Hive annotations)
 enum TaskCategory {
   administratie,
@@ -18,34 +20,34 @@ extension TaskCategoryExtension on TaskCategory {
   String get label {
     switch (this) {
       case TaskCategory.administratie:
-        return '📋 Administratie';
+        return 'Administratie';
       case TaskCategory.klussen:
-        return '🔧 Klussen';
+        return 'Klussen';
       case TaskCategory.inkopen:
-        return '🛒 Inkopen';
+        return 'Inkopen';
       case TaskCategory.schoonmaken:
-        return '🧹 Schoonmaken';
+        return 'Schoonmaken';
       case TaskCategory.verhuizing:
-        return '📦 Verhuizing';
+        return 'Verhuizing';
       case TaskCategory.overig:
-        return '📌 Overig';
+        return 'Overig';
     }
   }
 
-  String get icon {
+  IconData get icon {
     switch (this) {
       case TaskCategory.administratie:
-        return '📋';
+        return Icons.receipt_long_rounded;
       case TaskCategory.klussen:
-        return '🔧';
+        return Icons.build_rounded;
       case TaskCategory.inkopen:
-        return '🛒';
+        return Icons.shopping_cart_rounded;
       case TaskCategory.schoonmaken:
-        return '🧹';
+        return Icons.cleaning_services_rounded;
       case TaskCategory.verhuizing:
-        return '📦';
+        return Icons.local_shipping_rounded;
       case TaskCategory.overig:
-        return '📌';
+        return Icons.push_pin_rounded;
     }
   }
 }

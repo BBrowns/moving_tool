@@ -76,7 +76,7 @@ class PackingScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text('🏠', style: TextStyle(fontSize: 64)),
+          Icon(Icons.house_rounded, size: 64, color: context.colors.primary.withValues(alpha: 0.2)),
           const SizedBox(height: 16),
           Text('Nog geen kamers', style: context.textTheme.titleLarge),
           const SizedBox(height: 8),
@@ -308,7 +308,7 @@ class _ShowDialogs {
                           ? Border.all(color: AppTheme.primary, width: 2)
                           : null,
                     ),
-                    child: Text(icon, style: const TextStyle(fontSize: 24)),
+                  child: Icon(_getIconData(icon), size: 24, color: selectedIcon == icon ? AppTheme.primary : context.colors.onSurfaceVariant),
                   ),
                 )).toList(),
               ),
@@ -442,5 +442,18 @@ class _ShowDialogs {
         ],
       ),
     );
+  }
+  static IconData _getIconData(String icon) {
+    switch (icon) {
+      case '🛋️': return Icons.chair_rounded;
+      case '🛏️': return Icons.bed_rounded;
+      case '🍳': return Icons.kitchen_rounded;
+      case '🚿': return Icons.shower_rounded;
+      case '👶': return Icons.child_care_rounded;
+      case '🧑‍💻': return Icons.computer_rounded;
+      case '📦': return Icons.inventory_2_rounded;
+      case '🔧': return Icons.build_rounded;
+      default: return Icons.weekend_rounded;
+    }
   }
 }

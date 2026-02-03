@@ -110,7 +110,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text('📝', style: TextStyle(fontSize: 64)),
+          Icon(Icons.assignment_rounded, size: 80, color: context.colors.primary.withValues(alpha: 0.2)),
           const SizedBox(height: 16),
           Text(
             'Nog geen taken',
@@ -188,7 +188,13 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
               decoration: const InputDecoration(labelText: 'Categorie'),
               items: TaskCategory.values.map((c) => DropdownMenuItem(
                 value: c,
-                child: Text(c.label),
+                child: Row(
+                  children: [
+                    Icon(c.icon, size: 18, color: context.colors.onSurface),
+                    const SizedBox(width: 8),
+                    Text(c.label),
+                  ],
+                ),
               )).toList(),
               onChanged: (value) => category = value!,
             ),
@@ -401,7 +407,7 @@ class _CategorySection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Row(
             children: [
-              Text(category.icon, style: const TextStyle(fontSize: 20)),
+              Icon(category.icon, size: 24, color: context.colors.primary),
               const SizedBox(width: 8),
               Flexible(
                 child: Text(

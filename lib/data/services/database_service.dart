@@ -483,6 +483,9 @@ class DatabaseService {
     'actualPrice': i.actualPrice,
     'assigneeId': i.assigneeId,
     'notes': i.notes,
+    'marktplaatsQuery': i.marktplaatsQuery,
+    'isMarktplaatsTracked': i.isMarktplaatsTracked,
+    'targetPrice': i.targetPrice,
     'createdAt': i.createdAt.toIso8601String(),
   });
   
@@ -499,6 +502,16 @@ class DatabaseService {
       actualPrice: m['actualPrice']?.toDouble(),
       assigneeId: m['assigneeId'],
       notes: m['notes'] ?? '',
+      marketplace: m['marketplace'] != null ? MarketplaceData(
+        url: m['marketplace']['url'],
+        askingPrice: m['marketplace']['askingPrice'],
+        sellerName: m['marketplace']['sellerName'],
+        notes: m['marketplace']['notes'],
+        savedAt: m['marketplace']['savedAt'] != null ? DateTime.parse(m['marketplace']['savedAt']) : null,
+      ) : null,
+      marktplaatsQuery: m['marktplaatsQuery'],
+      isMarktplaatsTracked: m['isMarktplaatsTracked'] ?? false,
+      targetPrice: m['targetPrice']?.toDouble(),
       createdAt: DateTime.parse(m['createdAt']),
     );
   }

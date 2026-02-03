@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum BoxStatus {
   empty,
   packing,
@@ -22,18 +24,18 @@ extension BoxStatusExtension on BoxStatus {
     }
   }
 
-  String get icon {
+  IconData get icon {
     switch (this) {
       case BoxStatus.empty:
-        return '📭';
+        return Icons.check_box_outline_blank_rounded;
       case BoxStatus.packing:
-        return '📦';
+        return Icons.hourglass_empty_rounded;
       case BoxStatus.packed:
-        return '✅';
+        return Icons.check_circle_rounded;
       case BoxStatus.moved:
-        return '🚚';
+        return Icons.local_shipping_rounded;
       case BoxStatus.unpacked:
-        return '🎉';
+        return Icons.celebration_rounded;
     }
   }
 }
