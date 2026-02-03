@@ -85,15 +85,7 @@ class MarketplaceData {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'url': url,
-      'askingPrice': askingPrice,
-      'sellerName': sellerName,
-      'notes': notes,
-      'savedAt': savedAt?.toIso8601String(),
-    };
-  }
+
 }
 
 class ShoppingItem {
@@ -165,23 +157,5 @@ class ShoppingItem {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'roomId': roomId,
-      'status': status.name,
-      'priority': priority.name,
-      'budgetMin': budgetMin,
-      'budgetMax': budgetMax,
-      'actualPrice': actualPrice,
-      'assigneeId': assigneeId,
-      'notes': notes,
-      'marketplace': marketplace?.toJson(),
-      'marktplaatsQuery': marktplaatsQuery,
-      'isMarktplaatsTracked': isMarktplaatsTracked,
-      'targetPrice': targetPrice,
-      'createdAt': createdAt.toIso8601String(),
-    };
-  }
+
 }

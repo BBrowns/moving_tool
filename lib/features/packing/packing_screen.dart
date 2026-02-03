@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moving_tool_flutter/core/models/models.dart';
@@ -135,7 +136,7 @@ class _RoomGridItem extends ConsumerWidget {
   }
 
   void _showRoomDetails(BuildContext context, WidgetRef ref, Room room) {
-     showModalBottomSheet(
+     unawaited(showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -194,16 +195,16 @@ class _RoomGridItem extends ConsumerWidget {
           ),
         ),
       ),
-    );
+    )); 
   }
 
   Future<void> _showAiSuggestions(BuildContext context, String roomName) async {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
       useRootNavigator: true,
       builder: (ctx) => const Center(child: CircularProgressIndicator()),
-    );
+    ));
 
     try {
       final apiKey = DatabaseService.getSetting('gemini_api_key');
@@ -212,7 +213,7 @@ class _RoomGridItem extends ConsumerWidget {
       if (context.mounted) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
 
-        showDialog(
+        unawaited(showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
             icon: const Icon(Icons.auto_awesome, color: AppTheme.primary, size: 32),
@@ -227,7 +228,7 @@ class _RoomGridItem extends ConsumerWidget {
               ),
             ],
           ),
-        );
+        ));
       }
     } catch (e) {
       if (context.mounted) {
@@ -269,7 +270,7 @@ class _ShowDialogs {
 
     final icons = ['🛋️', '🛏️', '🍳', '🚿', '👶', '🧑‍💻', '📦', '🔧'];
 
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) => StatefulBuilder(
@@ -278,10 +279,11 @@ class _ShowDialogs {
             bottom: MediaQuery.of(context).viewInsets.bottom + 16,
             left: 16, right: 16, top: 16,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               Text(
                 isEditing ? 'Kamer bewerken' : 'Nieuwe kamer', 
                 style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)
@@ -318,7 +320,7 @@ class _ShowDialogs {
                   if (nameController.text.isNotEmpty) {
                     if (isEditing) {
                       ref.read(roomProvider.notifier).update(
-                        room!.copyWith(
+                        room.copyWith(
                           name: nameController.text,
                           icon: selectedIcon,
                         )
@@ -335,10 +337,11 @@ class _ShowDialogs {
                 child: Text(isEditing ? 'Opslaan' : 'Toevoegen'),
               ),
             ],
+            ),
           ),
         ),
       ),
-    );
+    ));
   }
 
   static void showBoxDialog(BuildContext context, WidgetRef ref, String roomId, {PackingBox? box}) {
@@ -346,7 +349,7 @@ class _ShowDialogs {
     final labelController = TextEditingController(text: box?.label);
     bool isFragile = box?.isFragile ?? false;
 
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) => StatefulBuilder(
@@ -355,10 +358,11 @@ class _ShowDialogs {
             bottom: MediaQuery.of(context).viewInsets.bottom + 16,
             left: 16, right: 16, top: 16,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               Text(
                 isEditing ? 'Doos bewerken' : 'Nieuwe doos', 
                 style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)
@@ -382,7 +386,7 @@ class _ShowDialogs {
                   if (labelController.text.isNotEmpty) {
                     if (isEditing) {
                       ref.read(boxProvider.notifier).update(
-                        box!.copyWith(
+                        box.copyWith(
                           label: labelController.text,
                           isFragile: isFragile,
                         )
@@ -400,17 +404,18 @@ class _ShowDialogs {
                 child: Text(isEditing ? 'Opslaan' : 'Toevoegen'),
               ),
             ],
+            ),
           ),
         ),
       ),
-    );
+    ));
   }
 
   static void showItemDialog(BuildContext context, WidgetRef ref, String boxId, {BoxItem? item}) {
     final isEditing = item != null;
     final nameController = TextEditingController(text: item?.name);
 
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(isEditing ? 'Item bewerken' : 'Item toevoegen'),
@@ -426,7 +431,7 @@ class _ShowDialogs {
               if (nameController.text.isNotEmpty) {
                 if (isEditing) {
                   ref.read(boxItemProvider.notifier).update(
-                    item!.copyWith(name: nameController.text)
+                    item.copyWith(name: nameController.text)
                   );
                 } else {
                   ref.read(boxItemProvider.notifier).add(
@@ -441,7 +446,7 @@ class _ShowDialogs {
           ),
         ],
       ),
-    );
+    ));
   }
   static IconData _getIconData(String icon) {
     switch (icon) {

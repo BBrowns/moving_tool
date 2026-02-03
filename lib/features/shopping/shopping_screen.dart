@@ -5,6 +5,7 @@ import 'package:moving_tool_flutter/features/shopping/domain/entities/shopping_i
 import 'package:moving_tool_flutter/features/shopping/presentation/widgets/shopping_item_card.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/core/widgets/responsive_scaffold.dart';
+import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class ShoppingScreen extends ConsumerWidget {
@@ -13,7 +14,7 @@ class ShoppingScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final items = ref.watch(shoppingProvider);
-    final isWide = MediaQuery.of(context).size.width > 800;
+    final isWide = context.isDesktop;
 
     // Group by status
     final itemsByStatus = <ShoppingStatus, List<ShoppingItem>>{};
@@ -127,7 +128,7 @@ class ShoppingScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.shopping_cart_outlined, size: 64, color: context.colors.onSurfaceVariant.withOpacity(0.5)),
+            Icon(Icons.shopping_cart_outlined, size: 64, color: context.colors.onSurfaceVariant.withValues(alpha: 0.5)),
             const SizedBox(height: 16),
             Text('Nog geen items', style: context.textTheme.titleLarge),
           ],
@@ -177,10 +178,11 @@ class ShoppingScreen extends ConsumerWidget {
             bottom: MediaQuery.of(context).viewInsets.bottom + 16,
             left: 16, right: 16, top: 16,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               Text(
                 isEditing ? 'Item bewerken' : 'Nieuw item', 
                 style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)
@@ -199,7 +201,7 @@ class ShoppingScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<ShoppingPriority>(
-                value: priority,
+                initialValue: priority,
                 decoration: const InputDecoration(labelText: 'Prioriteit'),
                 items: ShoppingPriority.values.map((p) => DropdownMenuItem(
                   value: p,
@@ -275,7 +277,7 @@ class ShoppingScreen extends ConsumerWidget {
 
                     if (isEditing) {
                       ref.read(shoppingProvider.notifier).update(
-                        item!.copyWith(
+                        item.copyWith(
                           name: nameController.text,
                           priority: priority,
                           marktplaatsQuery: query,
@@ -298,6 +300,7 @@ class ShoppingScreen extends ConsumerWidget {
                 child: Text(isEditing ? 'Opslaan' : 'Toevoegen'),
               ),
             ],
+            ),
           ),
         ),
       ),

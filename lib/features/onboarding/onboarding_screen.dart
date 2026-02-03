@@ -109,12 +109,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ref.read(projectsProvider.notifier).load(); // Refresh projects list
       
       if (mounted) {
-        print('Onboarding: Navigating to Dashboard');
         context.go('/dashboard');
       }
-    } catch (e, stack) {
-      print('Onboarding Error: $e');
-      print(stack);
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),

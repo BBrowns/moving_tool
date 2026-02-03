@@ -5,6 +5,8 @@ class AppTheme {
   /// Set to true in tests to disable/bypass animations
   static bool isTestMode = false;
 
+
+
   // ===========================================================================
   // 🎨 Color Palettes
   // ===========================================================================
@@ -38,7 +40,7 @@ class AppTheme {
   // ===========================================================================
   // 📐 Shape & Geometry
   // ===========================================================================
-  static const double _borderRadiusSmall = 12.0;
+
   static const double _borderRadiusMedium = 16.0;
   static const double _borderRadiusLarge = 24.0;
 
@@ -60,8 +62,6 @@ class AppTheme {
         onError: Colors.white,
         surface: _lightSurface,
         onSurface: _lightText,
-        background: _lightBackground,
-        onBackground: _lightText,
       ),
       textTheme: GoogleFonts.outfitTextTheme().apply(
         bodyColor: _lightText,
@@ -82,7 +82,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: _lightSurface,
         elevation: 4,
-        shadowColor: Colors.black.withOpacity(0.05), // Soft, warm shadow
+        shadowColor: Colors.black.withValues(alpha: 0.05), // Soft, warm shadow
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(_borderRadiusMedium),
         ),
@@ -93,7 +93,7 @@ class AppTheme {
           backgroundColor: _lightPrimary,
           foregroundColor: _lightOnPrimary,
           elevation: 2,
-          shadowColor: _lightPrimary.withOpacity(0.4),
+          shadowColor: _lightPrimary.withValues(alpha: 0.4),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_borderRadiusLarge),
@@ -118,13 +118,13 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_borderRadiusMedium),
-          borderSide: BorderSide(color: _lightPrimary, width: 2),
+          borderSide: const BorderSide(color: _lightPrimary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_borderRadiusMedium),
-          borderSide: BorderSide(color: _lightError, width: 1.5),
+          borderSide: const BorderSide(color: _lightError, width: 1.5),
         ),
-        hintStyle: TextStyle(color: _lightTextSecondary),
+        hintStyle: const TextStyle(color: _lightTextSecondary),
       ),
       iconTheme: const IconThemeData(
         color: _lightPrimary,
@@ -137,7 +137,7 @@ class AppTheme {
         },
       ),
       dividerTheme: DividerThemeData(
-        color: _lightTextSecondary.withOpacity(0.1),
+        color: _lightTextSecondary.withValues(alpha: 0.1),
         thickness: 1,
       ),
     );
@@ -161,8 +161,6 @@ class AppTheme {
         onError: _darkBackground,
         surface: _darkSurface,
         onSurface: _darkText,
-        background: _darkBackground,
-        onBackground: _darkText,
       ),
       textTheme: GoogleFonts.outfitTextTheme().apply(
         bodyColor: _darkText,
@@ -191,7 +189,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: _darkPrimary.withOpacity(0.9), // Slightly muted fill
+          backgroundColor: _darkPrimary.withValues(alpha: 0.9), // Slightly muted fill
           foregroundColor: _darkOnPrimary,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -218,19 +216,19 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_borderRadiusMedium),
-          borderSide: BorderSide(color: _darkPrimary, width: 1), // Thinner border in dark mode
+          borderSide: const BorderSide(color: _darkPrimary, width: 1), // Thinner border in dark mode
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_borderRadiusMedium),
-          borderSide: BorderSide(color: _darkError, width: 1.5),
+          borderSide: const BorderSide(color: _darkError, width: 1.5),
         ),
-        hintStyle: TextStyle(color: _darkTextSecondary),
+        hintStyle: const TextStyle(color: _darkTextSecondary),
       ),
       iconTheme: const IconThemeData(
         color: _darkPrimary,
       ),
       dividerTheme: DividerThemeData(
-        color: _darkTextSecondary.withOpacity(0.2),
+        color: _darkTextSecondary.withValues(alpha: 0.2),
         thickness: 1,
       ),
     );

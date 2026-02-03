@@ -22,16 +22,20 @@ class DashboardScreen extends ConsumerWidget {
 
     if (project == null) {
       return Center(
-        child: AppTheme.isTestMode 
-          ? const Text('Loading...')  // Static for tests
-          : const CircularProgressIndicator(),
+        child: AppTheme.isTestMode
+            ? const Text('Loading...') // Static for tests
+            : const CircularProgressIndicator(),
       );
     }
 
     // Stats
     final completedTasks = tasks.where((t) => t.status.name == 'done').length;
-    final packedBoxes = boxes.where((b) => b.status.name == 'packed' || b.status.name == 'moved').length;
-    final purchasedItems = shopping.where((s) => s.status.name == 'purchased').length;
+    final packedBoxes = boxes
+        .where((b) => b.status.name == 'packed' || b.status.name == 'moved')
+        .length;
+    final purchasedItems = shopping
+        .where((s) => s.status.name == 'purchased')
+        .length;
     final totalExpenses = expenses.fold(0.0, (sum, e) => sum + e.amount);
 
     final isMobile = MediaQuery.of(context).size.width < 600;
@@ -42,172 +46,183 @@ class DashboardScreen extends ConsumerWidget {
           maxWidth: 1200,
           child: CustomScrollView(
             slivers: [
-// ... (skip lines)
-            SliverPadding(
-              padding: const EdgeInsets.all(24),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  // Header Section
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Hallo ${project.users.isNotEmpty ? project.users.first.name : "Verhuizer"}! 👋',
-                          style: context.textTheme.headlineLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: context.colors.onSurface,
+              // ... (skip lines)
+              SliverPadding(
+                padding: const EdgeInsets.all(24),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    // Header Section
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Hallo ${project.users.isNotEmpty ? project.users.first.name : "Verhuizer"}! 👋',
+                            style: context.textTheme.headlineLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: context.colors.onSurface,
+                            ),
                           ),
                         ),
+                        Row(
+                          children: [
+                            if (isMobile)
+                              IconButton(
+                                onPressed: () => context.push('/settings'),
+                                icon: const Icon(Icons.settings_rounded),
+                                tooltip: 'Instellingen',
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Nog ${project.daysUntilMove} dagen tot de grote dag.',
+                      style: context.textTheme.titleMedium?.copyWith(
+                        color: context.colors.onSurfaceVariant,
                       ),
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: () => context.push('/settings'),
-                            icon: const Icon(Icons.settings_rounded),
-                            tooltip: 'Instellingen',
-                          ),
-                          const SizedBox(width: 8),
-                          TextButton.icon(
-                            onPressed: () => context.push('/projects'),
-                            icon: const Icon(Icons.swap_horiz_rounded),
-                            label: const Text('Wissel'),
-                          ),
-                        ],
+                    ),
+                    const SizedBox(height: 32),
+                  ]),
+                ),
+              ),
+              // Playbook Hero Section
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 8,
+                ),
+                sliver: SliverToBoxAdapter(
+                  child: _PlaybookHeroCard(
+                    onTap: () => context.go('/playbook'),
+                  ),
+                ),
+              ),
+
+              // Bento Grid - Stats & Actions
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: isMobile ? 2 : 4,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 0.85, // Taller tiles for better look
+                  ),
+                  delegate: SliverChildListDelegate(
+                    AppTheme.isTestMode
+                        ? [
+                            _BentoCard(
+                              title: 'Taken',
+                              value: '$completedTasks/${tasks.length}',
+                              subtitle: 'Afgerond',
+                              icon: Icons.check_circle_rounded,
+                              color: const Color(0xFF4CAF50), // Vibrant Green
+                              onTap: () => context.go('/tasks'),
+                            ),
+                            _BentoCard(
+                              title: 'Inpakken',
+                              value: '$packedBoxes/${boxes.length}',
+                              subtitle: 'Dozen Klaar',
+                              icon: Icons.inventory_2_rounded,
+                              color: const Color(0xFF2196F3), // Vibrant Blue
+                              onTap: () => context.go('/packing'),
+                            ),
+                            _BentoCard(
+                              title: 'Shopping',
+                              value: '$purchasedItems/${shopping.length}',
+                              subtitle: 'Gekocht',
+                              icon: Icons.shopping_bag_rounded,
+                              color: const Color(0xFFFF9800), // Vibrant Orange
+                              onTap: () => context.go('/shopping'),
+                            ),
+                            _BentoCard(
+                              title: 'Budget',
+                              value: '€${totalExpenses.toStringAsFixed(0)}',
+                              subtitle: 'Uitgegeven',
+                              icon: Icons.euro_rounded,
+                              color: const Color(0xFF9C27B0), // Vibrant Purple
+                              onTap: () => context.go('/expenses'),
+                            ),
+                          ]
+                        : [
+                                _BentoCard(
+                                  title: 'Taken',
+                                  value: '$completedTasks/${tasks.length}',
+                                  subtitle: 'Afgerond',
+                                  icon: Icons.check_circle_rounded,
+                                  color: const Color(0xFF4CAF50),
+                                  onTap: () => context.go('/tasks'),
+                                ),
+                                _BentoCard(
+                                  title: 'Inpakken',
+                                  value: '$packedBoxes/${boxes.length}',
+                                  subtitle: 'Dozen Klaar',
+                                  icon: Icons.inventory_2_rounded,
+                                  color: const Color(0xFF2196F3),
+                                  onTap: () => context.go('/packing'),
+                                ),
+                                _BentoCard(
+                                  title: 'Shopping',
+                                  value: '$purchasedItems/${shopping.length}',
+                                  subtitle: 'Gekocht',
+                                  icon: Icons.shopping_bag_rounded,
+                                  color: const Color(0xFFFF9800),
+                                  onTap: () => context.go('/shopping'),
+                                ),
+                                _BentoCard(
+                                  title: 'Budget',
+                                  value: '€${totalExpenses.toStringAsFixed(0)}',
+                                  subtitle: 'Uitgegeven',
+                                  icon: Icons.euro_rounded,
+                                  color: const Color(0xFF9C27B0),
+                                  onTap: () => context.go('/expenses'),
+                                ),
+                              ]
+                              .animate(interval: 50.ms)
+                              .fade(duration: 400.ms)
+                              .scaleXY(
+                                begin: 0.9,
+                                end: 1.0,
+                                curve: Curves.easeOutBack,
+                              ),
+                  ),
+                ),
+              ),
+
+              // Recent Activity Section
+              SliverPadding(
+                padding: const EdgeInsets.all(24),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Recente Activiteit',
+                        style: context.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
+                      const SizedBox(height: 16),
+                      if (journal.isEmpty)
+                        _EmptyState()
+                      else
+                        ...journal
+                            .take(5)
+                            .map(
+                              (entry) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: _ActivityTile(entry: entry),
+                              ),
+                            ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Nog ${project.daysUntilMove} dagen tot de grote dag.',
-                    style: context.textTheme.titleMedium?.copyWith(
-                      color: context.colors.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                ]),
-              ),
-            ),
-            // Playbook Hero Section
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              sliver: SliverToBoxAdapter(
-                child: _PlaybookHeroCard(
-                  onTap: () => context.push('/playbook'),
                 ),
               ),
-            ),
-            
-            // Bento Grid - Stats & Actions
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-              sliver: SliverGrid(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: isMobile ? 2 : 4,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 0.85, // Taller tiles for better look
-                ),
-                delegate: SliverChildListDelegate(
-                  AppTheme.isTestMode 
-                    ? [
-                        _BentoCard(
-                          title: 'Taken',
-                          value: '$completedTasks/${tasks.length}',
-                          subtitle: 'Afgerond',
-                          icon: Icons.check_circle_rounded,
-                          color: const Color(0xFF4CAF50), // Vibrant Green
-                          onTap: () => context.go('/tasks'),
-                        ),
-                        _BentoCard(
-                          title: 'Inpakken',
-                          value: '$packedBoxes/${boxes.length}',
-                          subtitle: 'Dozen Klaar',
-                          icon: Icons.inventory_2_rounded,
-                          color: const Color(0xFF2196F3), // Vibrant Blue
-                          onTap: () => context.go('/packing'),
-                        ),
-                        _BentoCard(
-                          title: 'Shopping',
-                          value: '$purchasedItems/${shopping.length}',
-                          subtitle: 'Gekocht',
-                          icon: Icons.shopping_bag_rounded,
-                          color: const Color(0xFFFF9800), // Vibrant Orange
-                          onTap: () => context.go('/shopping'),
-                        ),
-                        _BentoCard(
-                          title: 'Budget',
-                          value: '€${totalExpenses.toStringAsFixed(0)}',
-                          subtitle: 'Uitgegeven',
-                          icon: Icons.euro_rounded,
-                          color: const Color(0xFF9C27B0), // Vibrant Purple
-                          onTap: () => context.go('/expenses'),
-                        ),
-                      ]
-                    : [
-                        _BentoCard(
-                          title: 'Taken',
-                          value: '$completedTasks/${tasks.length}',
-                          subtitle: 'Afgerond',
-                          icon: Icons.check_circle_rounded,
-                          color: const Color(0xFF4CAF50),
-                          onTap: () => context.go('/tasks'),
-                        ),
-                        _BentoCard(
-                          title: 'Inpakken',
-                          value: '$packedBoxes/${boxes.length}',
-                          subtitle: 'Dozen Klaar',
-                          icon: Icons.inventory_2_rounded,
-                          color: const Color(0xFF2196F3),
-                          onTap: () => context.go('/packing'),
-                        ),
-                        _BentoCard(
-                          title: 'Shopping',
-                          value: '$purchasedItems/${shopping.length}',
-                          subtitle: 'Gekocht',
-                          icon: Icons.shopping_bag_rounded,
-                          color: const Color(0xFFFF9800),
-                          onTap: () => context.go('/shopping'),
-                        ),
-                        _BentoCard(
-                          title: 'Budget',
-                          value: '€${totalExpenses.toStringAsFixed(0)}',
-                          subtitle: 'Uitgegeven',
-                          icon: Icons.euro_rounded,
-                          color: const Color(0xFF9C27B0),
-                          onTap: () => context.go('/expenses'),
-                        ),
-                      ].animate(interval: 50.ms).fade(duration: 400.ms).scaleXY(begin: 0.9, end: 1.0, curve: Curves.easeOutBack),
-                ),
-              ),
-            ),
-
-            // Recent Activity Section
-             SliverPadding(
-              padding: const EdgeInsets.all(24),
-              sliver: SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Recente Activiteit',
-                      style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 16),
-                    if (journal.isEmpty)
-                      _EmptyState()
-                    else
-                      ...journal.take(5).map((entry) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: _ActivityTile(entry: entry),
-                      )),
-                  ],
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -228,10 +243,7 @@ class _PlaybookHeroCard extends StatelessWidget {
         height: 160, // Increased height to prevent overflow
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              context.colors.primary,
-              context.colors.primaryContainer,
-            ],
+            colors: [context.colors.primary, context.colors.primaryContainer],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -257,7 +269,10 @@ class _PlaybookHeroCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
@@ -265,7 +280,11 @@ class _PlaybookHeroCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.star_rounded, color: Colors.white, size: 16),
+                          const Icon(
+                            Icons.star_rounded,
+                            color: Colors.white,
+                            size: 16,
+                          ),
                           const SizedBox(width: 6),
                           Flexible(
                             child: Text(
@@ -330,7 +349,7 @@ class _BentoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDark;
-    
+
     return Container(
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
@@ -370,7 +389,9 @@ class _BentoCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.shade50,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.05)
+                            : Colors.grey.shade50,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -381,7 +402,7 @@ class _BentoCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 // Content with scale-down protection
                 Flexible(
                   child: FittedBox(
@@ -404,13 +425,17 @@ class _BentoCard extends StatelessWidget {
                           title,
                           style: context.textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: isDark ? Colors.white70 : Colors.grey.shade700,
+                            color: isDark
+                                ? Colors.white70
+                                : Colors.grey.shade700,
                           ),
                         ),
                         Text(
                           subtitle,
                           style: context.textTheme.bodySmall?.copyWith(
-                            color: isDark ? Colors.white38 : Colors.grey.shade500,
+                            color: isDark
+                                ? Colors.white38
+                                : Colors.grey.shade500,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -449,10 +474,16 @@ class _ActivityTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: context.colors.surfaceContainerHighest.withValues(alpha: 0.5),
+              color: context.colors.surfaceContainerHighest.withValues(
+                alpha: 0.5,
+              ),
               shape: BoxShape.circle,
             ),
-            child: Icon(entry.type.icon, size: 20, color: context.colors.onSurfaceVariant),
+            child: Icon(
+              entry.type.icon,
+              size: 20,
+              color: context.colors.onSurfaceVariant,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -461,7 +492,9 @@ class _ActivityTile extends StatelessWidget {
               children: [
                 Text(
                   entry.title,
-                  style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+                  style: context.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 Text(
                   _formatDate(entry.timestamp),
@@ -495,7 +528,6 @@ class _EmptyState extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colors.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
-
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

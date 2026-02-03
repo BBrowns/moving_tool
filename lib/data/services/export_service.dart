@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -7,17 +8,9 @@ import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'database_service.dart';
 import 'llm_service.dart';
+import 'package:moving_tool_flutter/core/models/models.dart';
+import 'package:moving_tool_flutter/features/projects/data/models/project_model.dart';
 
-// Explicit Imports for Entities
-import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
-import 'package:moving_tool_flutter/features/tasks/domain/entities/task.dart';
-import 'package:moving_tool_flutter/features/expenses/domain/entities/expense.dart';
-import 'package:moving_tool_flutter/features/playbook/domain/entities/journal_entry.dart';
-import 'package:moving_tool_flutter/features/playbook/domain/entities/playbook_note.dart';
-import 'package:moving_tool_flutter/features/packing/domain/entities/packing_box.dart';
-import 'package:moving_tool_flutter/features/packing/domain/entities/box_item.dart';
-import 'package:moving_tool_flutter/features/packing/domain/entities/room.dart';
-import 'package:moving_tool_flutter/features/shopping/domain/entities/shopping_item.dart';
 
 class ExportService {
   /// Exports all data for the current project to a JSON file and shares it
@@ -44,9 +37,11 @@ class ExportService {
     }
   }
 
+
+
   static String generateProjectJson(Project project) {
     final data = {
-      'project': project.toJson(),
+      'project': ProjectModel.fromEntity(project).toJson(),
       'tasks': _jsonList(DatabaseService.getAllTasks()),
       'rooms': _jsonList(DatabaseService.getAllRooms()),
       'boxes': _jsonList(DatabaseService.getAllBoxes()),
@@ -65,7 +60,7 @@ class ExportService {
     final expenses = DatabaseService.getAllExpenses();
     final users = project.users;
 
-    List<List<dynamic>> rows = [];
+    final List<List<dynamic>> rows = [];
     rows.add(['Datum', 'Beschrijving', 'Bedrag', 'Categorie', 'Betaald door', 'Gedeeld met']);
 
     final dateFormat = DateFormat('yyyy-MM-dd');
@@ -279,14 +274,12 @@ class ExportService {
         directory = await getApplicationDocumentsDirectory();
       }
 
-      if (directory != null) {
-        final path = '${directory.path}/$fileName';
-        final file = File(path);
-        await file.writeAsString(content);
-        debugPrint('File saved to: $path');
-        return path;
-      }
-    } catch (e) {
+      final path = '${directory.path}/$fileName';
+      final file = File(path);
+      await file.writeAsString(content);
+      debugPrint('File saved to: $path');
+      return path;
+        } catch (e) {
       debugPrint('Error saving to downloads: $e');
     }
     return null;

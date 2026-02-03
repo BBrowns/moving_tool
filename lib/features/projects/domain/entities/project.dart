@@ -17,13 +17,7 @@ class User {
       color: color ?? this.color,
     );
   }
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'color': color,
-    };
-  }
+  // toJson() removed
 }
 
 class Address {
@@ -60,15 +54,7 @@ class Address {
       city: city ?? this.city,
     );
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'street': street,
-      'houseNumber': houseNumber,
-      'postalCode': postalCode,
-      'city': city,
-    };
-  }
+  // toJson() removed
 }
 
 class Project {
@@ -111,17 +97,5 @@ class Project {
       users: users ?? this.users,
       createdAt: createdAt,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'movingDate': movingDate.toIso8601String(),
-      'fromAddress': fromAddress.toJson(),
-      'toAddress': toAddress.toJson(),
-      'users': users.map((u) => u.toJson()).toList(),
-      'createdAt': createdAt.toIso8601String(),
-    };
   }
 }

@@ -5,8 +5,6 @@ import 'package:moving_tool_flutter/data/providers/providers.dart';
 import 'package:moving_tool_flutter/core/models/models.dart';
 import 'package:moving_tool_flutter/features/expenses/expenses_screen.dart';
 
-import 'package:moving_tool_flutter/features/expenses/presentation/providers/expense_providers.dart';
-import 'package:moving_tool_flutter/features/projects/presentation/providers/project_providers.dart';
 
 // Fake Expect Notifier
 class FakeExpenseNotifier extends ExpenseNotifier {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:moving_tool_flutter/features/expenses/domain/entities/expense.dart';
 import 'package:moving_tool_flutter/features/expenses/presentation/providers/expense_providers.dart';
 import 'package:moving_tool_flutter/features/projects/presentation/providers/project_providers.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
@@ -67,8 +66,8 @@ class SettlementHistoryScreen extends ConsumerWidget {
                             const Text('Geen betalingen nodig.')
                           else
                             ...batch.settlements.map((s) {
-                              final fromUser = users.firstWhere((u) => u.id == s.fromUserId, orElse: () => User(id: '', name: '?', color: 'Grey'));
-                              final toUser = users.firstWhere((u) => u.id == s.toUserId, orElse: () => User(id: '', name: '?', color: 'Grey'));
+                              final fromUser = users.cast<User>().firstWhere((u) => u.id == s.fromUserId, orElse: () => User(id: '', name: '?', color: 'Grey'));
+                              final toUser = users.cast<User>().firstWhere((u) => u.id == s.toUserId, orElse: () => User(id: '', name: '?', color: 'Grey'));
                               
                               return Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 4),
@@ -99,7 +98,7 @@ class SettlementHistoryScreen extends ConsumerWidget {
                              const Text('Geen uitgaven gevonden voor deze verrekening.', style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey))
                           else
                             ...ref.read(expenseProvider).where((e) => batch.expenseIds.contains(e.id)).map((expense) {
-                              final payer = users.firstWhere((u) => u.id == expense.paidById, orElse: () => User(id: '', name: '?', color: 'Grey'));
+                              final payer = users.cast<User>().firstWhere((u) => u.id == expense.paidById, orElse: () => User(id: '', name: '?', color: 'Grey'));
                               return Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 4),
                                 child: Row(

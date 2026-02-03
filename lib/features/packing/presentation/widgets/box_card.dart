@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/features/packing/domain/entities/packing_box.dart';
 import 'package:moving_tool_flutter/features/packing/domain/entities/box_item.dart';
-import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart'; // Assuming responsive extensions are here or in app_theme
+
 
 class BoxCard extends StatelessWidget {
   final PackingBox box;

@@ -94,11 +94,14 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
     ref.read(projectsProvider.notifier).load();
     
     // Reload all data for the new project
-    ref.read(taskProvider.notifier).load();
-    ref.read(roomProvider.notifier).load();
-    ref.read(boxProvider.notifier).load();
-    ref.read(shoppingProvider.notifier).load();
-    ref.read(expenseProvider.notifier).load();
+    // Reload all data for the new project
+    await Future.wait([
+      ref.read(taskProvider.notifier).load(),
+      ref.read(roomProvider.notifier).load(),
+      ref.read(boxProvider.notifier).load(),
+      ref.read(shoppingProvider.notifier).load(),
+      ref.read(expenseProvider.notifier).load(),
+    ]);
     
     if (context.mounted) {
       if (context.canPop()) {
@@ -187,7 +190,7 @@ class _ProjectCard extends StatelessWidget {
       shape: isActive
           ? RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppTheme.primary, width: 2),
+              side: const BorderSide(color: AppTheme.primary, width: 2),
             )
           : null,
       child: InkWell(

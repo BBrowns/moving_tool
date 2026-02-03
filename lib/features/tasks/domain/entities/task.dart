@@ -117,16 +117,5 @@ class Task {
     }
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'category': category.name,
-      'status': status.name,
-      'assigneeId': assigneeId,
-      'deadline': deadline?.toIso8601String(),
-      'createdAt': createdAt.toIso8601String(),
-    };
-  }
+  // toJson() removed
 }

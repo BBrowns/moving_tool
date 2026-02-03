@@ -7,7 +7,7 @@ class BoxItem {
   final bool isPacked;
   final DateTime createdAt;
 
-  BoxItem({
+  const BoxItem({
     required this.id,
     required this.boxId,
     required this.name,

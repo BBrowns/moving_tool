@@ -1,8 +1,6 @@
 // Responsive Scaffold
 // Automatically manages FloatingActionButton vs AppBar Action based on screen size
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/providers/providers.dart';
 import '../widgets/responsive_wrapper.dart';
 
 class ResponsiveScaffold extends StatelessWidget {

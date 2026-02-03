@@ -4,6 +4,14 @@ import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:moving_tool_flutter/core/models/models.dart';
 import 'package:moving_tool_flutter/features/expenses/domain/entities/settlement_batch.dart';
+import 'package:moving_tool_flutter/features/shopping/data/models/shopping_item_model.dart';
+import 'package:moving_tool_flutter/features/packing/data/models/room_model.dart';
+import 'package:moving_tool_flutter/features/packing/data/models/packing_box_model.dart';
+import 'package:moving_tool_flutter/features/packing/data/models/box_item_model.dart';
+import 'package:moving_tool_flutter/features/projects/data/models/project_model.dart';
+import 'package:moving_tool_flutter/features/tasks/data/models/task_model.dart';
+import 'package:moving_tool_flutter/features/expenses/data/models/expense_model.dart';
+import 'package:moving_tool_flutter/features/expenses/data/models/settlement_batch_model.dart';
 
 /// Hive-based database service with persistent storage
 class DatabaseService {
@@ -44,10 +52,13 @@ class DatabaseService {
   }
 
   // ... (Add JSON helpers)
-  static String _settlementBatchToJson(SettlementBatch b) => jsonEncode(b.toJson());
+  static String _settlementBatchToJson(SettlementBatch b) {
+    final model = b is SettlementBatchModel ? b : SettlementBatchModel.fromEntity(b);
+    return jsonEncode(model.toJson());
+  }
   
   static SettlementBatch _settlementBatchFromJson(String json) {
-    return SettlementBatch.fromJson(jsonDecode(json));
+    return SettlementBatchModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
 
 
@@ -337,214 +348,67 @@ class DatabaseService {
   // JSON Serialization helpers
   // ============================================================================
   
-  static String _projectToJson(Project p) => jsonEncode({
-    'id': p.id,
-    'name': p.name,
-    'movingDate': p.movingDate.toIso8601String(),
-    'fromAddress': {
-      'street': p.fromAddress.street,
-      'houseNumber': p.fromAddress.houseNumber,
-      'postalCode': p.fromAddress.postalCode,
-      'city': p.fromAddress.city,
-    },
-    'toAddress': {
-      'street': p.toAddress.street,
-      'houseNumber': p.toAddress.houseNumber,
-      'postalCode': p.toAddress.postalCode,
-      'city': p.toAddress.city,
-    },
-    'users': p.users.map((u) => {'id': u.id, 'name': u.name, 'color': u.color}).toList(),
-    'createdAt': p.createdAt.toIso8601String(),
-  });
+  static String _projectToJson(Project p) {
+    final model = p is ProjectModel ? p : ProjectModel.fromEntity(p);
+    return jsonEncode(model.toJson());
+  }
   
   static Project _projectFromJson(String json) {
-    final m = jsonDecode(json) as Map<String, dynamic>;
-    return Project(
-      id: m['id'],
-      name: m['name'],
-      movingDate: DateTime.parse(m['movingDate']),
-      fromAddress: Address(
-        street: m['fromAddress']['street'] ?? '',
-        houseNumber: m['fromAddress']['houseNumber'] ?? '',
-        postalCode: m['fromAddress']['postalCode'] ?? '',
-        city: m['fromAddress']['city'] ?? '',
-      ),
-      toAddress: Address(
-        street: m['toAddress']['street'] ?? '',
-        houseNumber: m['toAddress']['houseNumber'] ?? '',
-        postalCode: m['toAddress']['postalCode'] ?? '',
-        city: m['toAddress']['city'] ?? '',
-      ),
-      users: (m['users'] as List).map((u) => User(
-        id: u['id'],
-        name: u['name'],
-        color: u['color'],
-      )).toList(),
-      createdAt: DateTime.parse(m['createdAt']),
-    );
+    return ProjectModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
 
-  static String _taskToJson(Task t) => jsonEncode({
-    'id': t.id,
-    'title': t.title,
-    'description': t.description,
-    'category': t.category.index,
-    'status': t.status.index,
-    'assigneeId': t.assigneeId,
-    'deadline': t.deadline?.toIso8601String(),
-    'createdAt': t.createdAt.toIso8601String(),
-  });
+  static String _taskToJson(Task t) {
+    final model = t is TaskModel ? t : TaskModel.fromEntity(t);
+    return jsonEncode(model.toJson());
+  }
   
   static Task _taskFromJson(String json) {
-    final m = jsonDecode(json) as Map<String, dynamic>;
-    return Task(
-      id: m['id'],
-      title: m['title'],
-      description: m['description'] ?? '',
-      category: TaskCategory.values[m['category']],
-      status: TaskStatus.values[m['status']],
-      assigneeId: m['assigneeId'],
-      deadline: m['deadline'] != null ? DateTime.parse(m['deadline']) : null,
-      createdAt: DateTime.parse(m['createdAt']),
-    );
+    return TaskModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
 
-  static String _roomToJson(Room r) => jsonEncode({
-    'id': r.id,
-    'name': r.name,
-    'icon': r.icon,
-    'color': r.color,
-    'createdAt': r.createdAt.toIso8601String(),
-  });
+  static String _roomToJson(Room r) {
+    final model = r is RoomModel ? r : RoomModel.fromEntity(r);
+    return jsonEncode(model.toJson());
+  }
   
   static Room _roomFromJson(String json) {
-    final m = jsonDecode(json) as Map<String, dynamic>;
-    return Room(
-      id: m['id'],
-      name: m['name'],
-      icon: m['icon'],
-      color: m['color'],
-      createdAt: DateTime.parse(m['createdAt']),
-    );
+    return RoomModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
 
-  static String _boxToJson(PackingBox b) => jsonEncode({
-    'id': b.id,
-    'roomId': b.roomId,
-    'label': b.label,
-    'notes': b.notes,
-    'status': b.status.index,
-    'isFragile': b.isFragile,
-    'createdAt': b.createdAt.toIso8601String(),
-  });
+  static String _boxToJson(PackingBox b) {
+    final model = b is PackingBoxModel ? b : PackingBoxModel.fromEntity(b);
+    return jsonEncode(model.toJson());
+  }
   
   static PackingBox _boxFromJson(String json) {
-    final m = jsonDecode(json) as Map<String, dynamic>;
-    return PackingBox(
-      id: m['id'],
-      roomId: m['roomId'],
-      label: m['label'],
-      notes: m['notes'] ?? '',
-      status: BoxStatus.values[m['status']],
-      isFragile: m['isFragile'] ?? false,
-      createdAt: DateTime.parse(m['createdAt']),
-    );
+    return PackingBoxModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
 
-  static String _boxItemToJson(BoxItem i) => jsonEncode({
-    'id': i.id,
-    'boxId': i.boxId,
-    'name': i.name,
-    'quantity': i.quantity,
-    'isPacked': i.isPacked,
-    'createdAt': i.createdAt.toIso8601String(),
-  });
+  static String _boxItemToJson(BoxItem i) {
+    final model = i is BoxItemModel ? i : BoxItemModel.fromEntity(i);
+    return jsonEncode(model.toJson());
+  }
   
   static BoxItem _boxItemFromJson(String json) {
-    final m = jsonDecode(json) as Map<String, dynamic>;
-    return BoxItem(
-      id: m['id'],
-      boxId: m['boxId'],
-      name: m['name'],
-      quantity: m['quantity'] ?? 1,
-      isPacked: m['isPacked'] ?? false,
-      createdAt: DateTime.parse(m['createdAt']),
-    );
+    return BoxItemModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
 
-  static String _shoppingItemToJson(ShoppingItem i) => jsonEncode({
-    'id': i.id,
-    'name': i.name,
-    'roomId': i.roomId,
-    'status': i.status.index,
-    'priority': i.priority.index,
-    'budgetMin': i.budgetMin,
-    'budgetMax': i.budgetMax,
-    'actualPrice': i.actualPrice,
-    'assigneeId': i.assigneeId,
-    'notes': i.notes,
-    'marktplaatsQuery': i.marktplaatsQuery,
-    'isMarktplaatsTracked': i.isMarktplaatsTracked,
-    'targetPrice': i.targetPrice,
-    'createdAt': i.createdAt.toIso8601String(),
-  });
+  static String _shoppingItemToJson(ShoppingItem i) {
+    final model = i is ShoppingItemModel ? i : ShoppingItemModel.fromEntity(i);
+    return jsonEncode(model.toJson());
+  }
   
   static ShoppingItem _shoppingItemFromJson(String json) {
-    final m = jsonDecode(json) as Map<String, dynamic>;
-    return ShoppingItem(
-      id: m['id'],
-      name: m['name'],
-      roomId: m['roomId'],
-      status: ShoppingStatus.values[m['status']],
-      priority: ShoppingPriority.values[m['priority']],
-      budgetMin: m['budgetMin']?.toDouble(),
-      budgetMax: m['budgetMax']?.toDouble(),
-      actualPrice: m['actualPrice']?.toDouble(),
-      assigneeId: m['assigneeId'],
-      notes: m['notes'] ?? '',
-      marketplace: m['marketplace'] != null ? MarketplaceData(
-        url: m['marketplace']['url'],
-        askingPrice: m['marketplace']['askingPrice'],
-        sellerName: m['marketplace']['sellerName'],
-        notes: m['marketplace']['notes'],
-        savedAt: m['marketplace']['savedAt'] != null ? DateTime.parse(m['marketplace']['savedAt']) : null,
-      ) : null,
-      marktplaatsQuery: m['marktplaatsQuery'],
-      isMarktplaatsTracked: m['isMarktplaatsTracked'] ?? false,
-      targetPrice: m['targetPrice']?.toDouble(),
-      createdAt: DateTime.parse(m['createdAt']),
-    );
+    return ShoppingItemModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
 
-  static String _expenseToJson(Expense e) => jsonEncode({
-    'id': e.id,
-    'description': e.description,
-    'amount': e.amount,
-    'category': e.category.index,
-    'paidById': e.paidById,
-    'splitBetweenIds': e.splitBetweenIds,
-    'date': e.date.toIso8601String(),
-    'receiptUrl': e.receiptUrl,
-    'notes': e.notes,
-    'createdAt': e.createdAt.toIso8601String(),
-    'settlementId': e.settlementId,
-  });
+  static String _expenseToJson(Expense e) {
+    final model = e is ExpenseModel ? e : ExpenseModel.fromEntity(e);
+    return jsonEncode(model.toJson());
+  }
   
   static Expense _expenseFromJson(String json) {
-    final m = jsonDecode(json) as Map<String, dynamic>;
-    return Expense(
-      id: m['id'],
-      description: m['description'],
-      amount: m['amount'].toDouble(),
-      category: ExpenseCategory.values[m['category']],
-      paidById: m['paidById'],
-      splitBetweenIds: List<String>.from(m['splitBetweenIds']),
-      date: DateTime.parse(m['date']),
-      receiptUrl: m['receiptUrl'],
-      notes: m['notes'] ?? '',
-      createdAt: DateTime.parse(m['createdAt']),
-      settlementId: m['settlementId'],
-    );
+    return ExpenseModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
 
   static String _journalEntryToJson(JournalEntry e) => jsonEncode({

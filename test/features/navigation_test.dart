@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moving_tool_flutter/main.dart';
@@ -119,7 +118,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Mijn Verhuizingen'), findsNothing); 
-      expect(find.text('Nieuwe taak'), findsOneWidget); 
+      expect(find.text('Wissel'), findsOneWidget); 
     });
 
     testWidgets('Can navigate to Projects screen even if project active', (tester) async {
@@ -134,7 +133,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       
-      final context = tester.element(find.text('Nieuwe taak'));
+      final context = tester.element(find.text('Wissel'));
       GoRouter.of(context).go('/projects');
       await tester.pumpAndSettle();
       

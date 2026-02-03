@@ -13,7 +13,7 @@ import 'package:moving_tool_flutter/features/packing/packing_screen.dart';
 class MockPackingRepository implements PackingRepository {
   List<Room> _rooms = [];
   List<PackingBox> _boxes = [];
-  List<BoxItem> _items = [];
+  final List<BoxItem> _items = [];
 
   MockPackingRepository({List<Room>? rooms, List<PackingBox>? boxes}) {
     if (rooms != null) _rooms = rooms;
@@ -33,15 +33,21 @@ class MockPackingRepository implements PackingRepository {
   @override
   Future<void> saveItem(BoxItem item) async {
     final index = _items.indexWhere((i) => i.id == item.id);
-    if (index >= 0) _items[index] = item;
-    else _items.add(item);
+    if (index >= 0) {
+      _items[index] = item;
+    } else {
+      _items.add(item);
+    }
   }
 
   @override
   Future<void> saveRoom(Room room) async {
     final index = _rooms.indexWhere((r) => r.id == room.id);
-    if (index >= 0) _rooms[index] = room;
-    else _rooms.add(room);
+    if (index >= 0) {
+      _rooms[index] = room;
+    } else {
+      _rooms.add(room);
+    }
   }
 
   @override
@@ -61,8 +67,11 @@ class MockPackingRepository implements PackingRepository {
   @override
   Future<void> saveBox(PackingBox box) async {
     final index = _boxes.indexWhere((b) => b.id == box.id);
-    if (index >= 0) _boxes[index] = box;
-    else _boxes.add(box);
+    if (index >= 0) {
+      _boxes[index] = box;
+    } else {
+      _boxes.add(box);
+    }
   }
 }
 

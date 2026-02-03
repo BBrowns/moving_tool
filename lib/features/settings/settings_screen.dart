@@ -96,6 +96,61 @@ class SettingsScreen extends ConsumerWidget {
             ),
             
             const SizedBox(height: 24),
+            Text('Uiterlijk', style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Card(
+              child: Column(
+                children: [
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final themeMode = ref.watch(themeModeProvider);
+                      return SwitchListTile(
+                        title: const Text('Donkere Modus'),
+                        subtitle: Text(
+                          themeMode == ThemeMode.system
+                              ? 'Systeem instelling volgen'
+                              : themeMode == ThemeMode.dark
+                                  ? 'Aan'
+                                  : 'Uit',
+                        ),
+                        secondary: Icon(
+                          themeMode == ThemeMode.dark ? Icons.dark_mode : Icons.light_mode,
+                        ),
+                        value: themeMode == ThemeMode.dark,
+                        onChanged: (bool value) {
+                          ref.read(themeModeProvider.notifier).set(
+                                value ? ThemeMode.dark : ThemeMode.light);
+                        },
+                      );
+                    }
+                  ),
+                  const Divider(height: 1),
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final themeMode = ref.watch(themeModeProvider);
+                      return ListTile(
+                        title: const Text('Systeem Thema'),
+                        subtitle: const Text('Volg instellingen van je apparaat'),
+                        leading: const Icon(Icons.brightness_auto),
+                        trailing: Switch(
+                          value: themeMode == ThemeMode.system,
+                          onChanged: (bool value) {
+                            if (value) {
+                              ref.read(themeModeProvider.notifier).set(ThemeMode.system);
+                            } else {
+                              // Default to light if turning off system mode
+                              ref.read(themeModeProvider.notifier).set(ThemeMode.light);
+                            }
+                          },
+                        ),
+                      );
+                    }
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
             Text('AI Instellingen', style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Card(
@@ -147,20 +202,20 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             Text('Over', style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Card(
+            const Card(
               child: Column(
                 children: [
-                  const ListTile(
+                  ListTile(
                     leading: Icon(Icons.info_outline),
                     title: Text('Versie'),
                     trailing: Text('1.0.0'),
                   ),
-                  const Divider(height: 1),
+                  Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Icons.code),
-                    title: const Text('Gebouwd met Flutter'),
-                    subtitle: const Text('Cross-platform app'),
-                    trailing: const FlutterLogo(size: 24),
+                    leading: Icon(Icons.code),
+                    title: Text('Gebouwd met Flutter'),
+                    subtitle: Text('Cross-platform app'),
+                    trailing: FlutterLogo(size: 24),
                   ),
                 ],
               ),

@@ -98,7 +98,7 @@ class _PlaybookScreenState extends ConsumerState<PlaybookScreen> with SingleTick
               Text('Logboek item', style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               DropdownButtonFormField<JournalEventType>(
-                value: selectedType,
+                initialValue: selectedType,
                 decoration: const InputDecoration(labelText: 'Type'),
                 items: JournalEventType.values.map((t) => DropdownMenuItem(
                   value: t,

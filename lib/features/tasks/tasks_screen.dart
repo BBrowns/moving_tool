@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moving_tool_flutter/features/tasks/presentation/providers/task_providers.dart';
-import 'package:moving_tool_flutter/features/tasks/domain/entities/task.dart';
 import 'package:moving_tool_flutter/core/models/models.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/core/widgets/responsive_scaffold.dart';
@@ -184,7 +182,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<TaskCategory>(
-              value: category,
+              initialValue: category,
               decoration: const InputDecoration(labelText: 'Categorie'),
               items: TaskCategory.values.map((c) => DropdownMenuItem(
                 value: c,
@@ -204,7 +202,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                 if (titleController.text.isNotEmpty) {
                   if (isEditing) {
                     ref.read(taskProvider.notifier).update(
-                      task!.copyWith(
+                      task.copyWith(
                         title: titleController.text,
                         category: category,
                       )
@@ -389,7 +387,6 @@ class _CategorySection extends StatelessWidget {
   final Function(Task) onEdit;
 
   const _CategorySection({
-    super.key,
     required this.category,
     required this.tasks,
     required this.users,

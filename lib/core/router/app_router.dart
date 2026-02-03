@@ -102,14 +102,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
 
-      GoRoute(
-        path: '/playbook',
-        pageBuilder: (context, state) => _buildAdaptivePage(
-          child: const PlaybookScreen(),
-          state: state,
-          isMainTab: false,
-        ),
-      ),
+
       
       // Main app shell with navigation
       // Main app shell with navigation (Stateful for PageView swipe)
@@ -178,6 +171,18 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: '/expenses',
                 pageBuilder: (context, state) => _buildAdaptivePage(
                   child: const ExpensesScreen(),
+                  state: state,
+                  isMainTab: true,
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/playbook',
+                pageBuilder: (context, state) => _buildAdaptivePage(
+                  child: const PlaybookScreen(),
                   state: state,
                   isMainTab: true,
                 ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moving_tool_flutter/features/expenses/presentation/providers/expense_providers.dart';
 import 'package:moving_tool_flutter/features/expenses/domain/entities/expense.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
@@ -73,7 +72,7 @@ class ExpensesScreen extends ConsumerWidget {
                       Icon(
                         Icons.savings_outlined,
                         size: 80, 
-                        color: context.colors.primary.withOpacity(0.2)
+                        color: context.colors.primary.withValues(alpha: 0.2)
                       ),
                       const SizedBox(height: 16),
                       Text('Nog geen uitgaven', style: context.textTheme.titleLarge),
@@ -138,7 +137,7 @@ class ExpensesScreen extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Column(
                   children: [
-                    Icon(Icons.check_circle_outline, size: 64, color: Colors.green.withOpacity(0.5)),
+                    Icon(Icons.check_circle_outline, size: 64, color: Colors.green.withValues(alpha: 0.5)),
                     const SizedBox(height: 16),
                     Text(
                       'Alles is verrekend!',
@@ -150,8 +149,8 @@ class ExpensesScreen extends ConsumerWidget {
               )
             else ...[
                ...settlements.map((settlement) {
-                final fromUser = users.firstWhere((u) => u.id == settlement.fromUserId, orElse: () => User(id: '', name: 'Onbekend', color: 'Grey'));
-                final toUser = users.firstWhere((u) => u.id == settlement.toUserId, orElse: () => User(id: '', name: 'Onbekend', color: 'Grey'));
+                final fromUser = users.cast<User>().firstWhere((u) => u.id == settlement.fromUserId, orElse: () => User(id: '', name: 'Onbekend', color: 'Grey'));
+                final toUser = users.cast<User>().firstWhere((u) => u.id == settlement.toUserId, orElse: () => User(id: '', name: 'Onbekend', color: 'Grey'));
                 
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -238,7 +237,7 @@ class ExpensesScreen extends ConsumerWidget {
     String? paidBy = expense?.paidById ?? (users.isNotEmpty ? users.first.id : null);
     
     // Default to all users if new, or existing split
-    List<String> splitBetween = expense?.splitBetweenIds ?? users.map((u) => u.id).toList();
+    final List<String> splitBetween = expense?.splitBetweenIds ?? users.map((u) => u.id).toList();
 
     showModalBottomSheet(
       context: context,
@@ -289,7 +288,7 @@ class ExpensesScreen extends ConsumerWidget {
                 if (users.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
-                    value: paidBy,
+                    initialValue: paidBy,
                     decoration: const InputDecoration(labelText: 'Betaald door'),
                     items: users.map((u) => DropdownMenuItem(
                       value: u.id,
@@ -332,7 +331,7 @@ class ExpensesScreen extends ConsumerWidget {
                     if (descController.text.isNotEmpty && amount != null && effectivePaidBy != null && effectiveSplit.isNotEmpty) {
                       if (isEditing) {
                          ref.read(expenseProvider.notifier).update(
-                          expense!.copyWith(
+                          expense.copyWith(
                             description: descController.text,
                             amount: amount,
                             category: category,
@@ -435,7 +434,7 @@ class _BalanceHeader extends StatelessWidget {
                         radius: 16,
                         child: Text(
                           user.name[0].toUpperCase(),
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: AppTheme.primary,
                             fontWeight: FontWeight.bold,
                           ),

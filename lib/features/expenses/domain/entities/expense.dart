@@ -104,21 +104,7 @@ class Expense {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'description': description,
-      'amount': amount,
-      'category': category.name,
-      'paidById': paidById,
-      'splitBetweenIds': splitBetweenIds,
-      'date': date.toIso8601String(),
-      'receiptUrl': receiptUrl,
-      'notes': notes,
-      'createdAt': createdAt.toIso8601String(),
-      'settlementId': settlementId,
-    };
-  }
+  // toJson() removed
 }
 
 class Settlement {
@@ -132,21 +118,7 @@ class Settlement {
     required this.amount,
   });
 
-  factory Settlement.fromJson(Map<String, dynamic> json) {
-    return Settlement(
-      fromUserId: json['fromUserId'] as String,
-      toUserId: json['toUserId'] as String,
-      amount: (json['amount'] as num).toDouble(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'fromUserId': fromUserId,
-      'toUserId': toUserId,
-      'amount': amount,
-    };
-  }
+  // fromJson and toJson removed
 }
 
 List<Settlement> calculateSettlements(

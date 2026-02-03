@@ -44,12 +44,12 @@ void main() {
 
     testWidgets('centers content', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ResponsiveWrapper(
               maxWidth: 400,
               child: SizedBox(
-                key: const Key('content'),
+                key: Key('content'),
                 width: 100,
                 height: 100,
               ),
@@ -66,12 +66,12 @@ void main() {
       const testPadding = EdgeInsets.all(24);
       
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ResponsiveWrapper(
               maxWidth: 800,
               padding: testPadding,
-              child: const Text('Test'),
+              child: Text('Test'),
             ),
           ),
         ),

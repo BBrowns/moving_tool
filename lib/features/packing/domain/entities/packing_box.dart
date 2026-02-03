@@ -50,7 +50,7 @@ class PackingBox {
   final String notes;
   final DateTime createdAt;
 
-  PackingBox({
+  const PackingBox({
     required this.id,
     required this.roomId,
     required this.label,

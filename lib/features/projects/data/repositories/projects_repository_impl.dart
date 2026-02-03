@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:moving_tool_flutter/core/error/exceptions.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
 import 'package:moving_tool_flutter/features/projects/domain/repositories/projects_repository.dart';
 import 'package:moving_tool_flutter/data/services/database_service.dart';
@@ -5,18 +7,16 @@ import 'package:moving_tool_flutter/data/services/database_service.dart';
 class ProjectsRepositoryImpl implements ProjectsRepository {
   @override
   List<Project> getAllProjects() {
-    return DatabaseService.getAllProjects();
+    try {
+      return DatabaseService.getAllProjects();
+    } catch (e) {
+      debugPrint('Error getting projects: $e');
+      throw FetchFailure('Failed to load projects', e);
+    }
   }
 
   @override
   Project? getProject(String id) {
-    // DatabaseService doesn't have explicit getById, but getProject() gets active, or we can find in list
-    // Or we can rely on getAllProjects().firstWhere... 
-    // Actually DatabaseService.getAllProjects() returns all. Hive box.get(id) works.
-    // DatabaseService implementation details are static.
-    // Let's implement using what DatabaseService exposes or expand DatabaseService if needed.
-    // DatabaseService.getProject() gets active.
-    // We can filter from getAllProjects().
     try {
       return getAllProjects().firstWhere((p) => p.id == id);
     } catch (e) {
@@ -26,26 +26,51 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
 
   @override
   Project? getActiveProject() {
-    return DatabaseService.getProject();
+    try {
+      return DatabaseService.getProject();
+    } catch (e) {
+      debugPrint('Error getting active project: $e');
+      throw FetchFailure('Failed to load active project', e);
+    }
   }
 
   @override
   String? getActiveProjectId() {
-    return DatabaseService.getActiveProjectId();
+    try {
+      return DatabaseService.getActiveProjectId();
+    } catch (e) {
+      debugPrint('Error getting active project ID: $e');
+      return null;
+    }
   }
 
   @override
   Future<void> saveProject(Project project) async {
-    await DatabaseService.saveProject(project);
+    try {
+      await DatabaseService.saveProject(project);
+    } catch (e) {
+      debugPrint('Error saving project: $e');
+      throw SaveFailure('Failed to save project', e);
+    }
   }
 
   @override
   Future<void> deleteProject(String id) async {
-    await DatabaseService.deleteProject(id);
+    try {
+      await DatabaseService.deleteProject(id);
+    } catch (e) {
+      debugPrint('Error deleting project: $e');
+      throw DeleteFailure('Failed to delete project', e);
+    }
   }
 
   @override
   Future<void> setActiveProject(String id) async {
-    await DatabaseService.setActiveProject(id);
+    try {
+      await DatabaseService.setActiveProject(id);
+    } catch (e) {
+      debugPrint('Error setting active project: $e');
+      throw SaveFailure('Failed to set active project', e);
+    }
   }
 }

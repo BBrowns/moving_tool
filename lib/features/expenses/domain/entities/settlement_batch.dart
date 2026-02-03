@@ -18,27 +18,5 @@ class SettlementBatch {
     required this.createdByUserId,
   });
 
-  factory SettlementBatch.fromJson(Map<String, dynamic> json) {
-    return SettlementBatch(
-      id: json['id'] as String,
-      date: DateTime.parse(json['date'] as String),
-      totalAmount: (json['totalAmount'] as num).toDouble(),
-      settlements: (json['settlements'] as List<dynamic>)
-          .map((e) => Settlement.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      expenseIds: List<String>.from(json['expenseIds'] as List),
-      createdByUserId: json['createdByUserId'] as String,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'date': date.toIso8601String(),
-      'totalAmount': totalAmount,
-      'settlements': settlements.map((e) => e.toJson()).toList(),
-      'expenseIds': expenseIds,
-      'createdByUserId': createdByUserId,
-    };
-  }
+  // fromJson and toJson removed
 }
