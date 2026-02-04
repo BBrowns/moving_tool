@@ -7,9 +7,10 @@ import 'package:moving_tool_flutter/features/expenses/domain/repositories/expens
 
 class ExpensesRepositoryImpl implements ExpensesRepository {
   @override
-  Future<List<Expense>> getExpenses() async {
+  Future<List<Expense>> getExpenses(String projectId) async {
     try {
-      return DatabaseService.getAllExpenses();
+      final allExpenses = await DatabaseService.getAllExpenses();
+      return allExpenses.where((e) => e.projectId == projectId).toList();
     } catch (e) {
       debugPrint('Error getting expenses: $e');
       throw FetchFailure('Failed to load expenses', e);
@@ -37,9 +38,10 @@ class ExpensesRepositoryImpl implements ExpensesRepository {
   }
 
   @override
-  Future<List<SettlementBatch>> getSettlementBatches() async {
+  Future<List<SettlementBatch>> getSettlementBatches(String projectId) async {
     try {
-      return DatabaseService.getAllSettlementBatches();
+      final allBatches = await DatabaseService.getAllSettlementBatches();
+      return allBatches.where((b) => b.projectId == projectId).toList();
     } catch (e) {
       debugPrint('Error getting settlement batches: $e');
       throw FetchFailure('Failed to load settlement batches', e);

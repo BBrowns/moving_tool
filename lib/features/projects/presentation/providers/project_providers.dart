@@ -38,8 +38,9 @@ class ProjectsNotifier extends Notifier<List<Project>> {
   }
 }
 
-final projectsProvider = NotifierProvider<ProjectsNotifier, List<Project>>(ProjectsNotifier.new);
-
+final projectsProvider = NotifierProvider<ProjectsNotifier, List<Project>>(
+  ProjectsNotifier.new,
+);
 
 // ============================================================================
 // Single Active Project Notifier
@@ -68,20 +69,31 @@ class ProjectNotifier extends Notifier<Project?> {
     load();
   }
 
-  Future<void> addUser(String name, String color) async {
+  Future<void> addMember(
+    String name,
+    ProjectRole role, {
+    String color = '#6366F1',
+  }) async {
     if (state == null) return;
-    final user = User(id: _uuid.v4(), name: name, color: color);
-    final updated = state!.copyWith(users: [...state!.users, user]);
+    final member = ProjectMember(
+      id: _uuid.v4(),
+      name: name,
+      role: role,
+      color: color,
+    );
+    final updated = state!.copyWith(members: [...state!.members, member]);
     await save(updated);
   }
 
-  Future<void> removeUser(String userId) async {
+  Future<void> removeMember(String memberId) async {
     if (state == null) return;
     final updated = state!.copyWith(
-      users: state!.users.where((u) => u.id != userId).toList(),
+      members: state!.members.where((m) => m.id != memberId).toList(),
     );
     await save(updated);
   }
 }
 
-final projectProvider = NotifierProvider<ProjectNotifier, Project?>(ProjectNotifier.new);
+final projectProvider = NotifierProvider<ProjectNotifier, Project?>(
+  ProjectNotifier.new,
+);

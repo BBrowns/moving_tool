@@ -95,18 +95,18 @@ class SettingsScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   if (project != null)
-                    ...project.users.map(
-                      (user) => ListTile(
+                    ...project.members.map(
+                      (member) => ListTile(
                         leading: CircleAvatar(
                           backgroundColor: Color(
-                            int.parse(user.color.replaceFirst('#', '0xFF')),
+                            int.parse(member.color.replaceFirst('#', '0xFF')),
                           ),
                           child: Text(
-                            user.name[0].toUpperCase(),
+                            member.name[0].toUpperCase(),
                             style: const TextStyle(color: Colors.white),
                           ),
                         ),
-                        title: Text(user.name),
+                        title: Text(member.name),
                         trailing: IconButton(
                           icon: const Icon(
                             Icons.remove_circle_outline,
@@ -114,7 +114,7 @@ class SettingsScreen extends ConsumerWidget {
                           ),
                           onPressed: () => ref
                               .read(projectProvider.notifier)
-                              .removeUser(user.id),
+                              .removeMember(member.id),
                           tooltip: 'Verwijder gebruiker',
                         ),
                       ),
@@ -608,7 +608,11 @@ class SettingsScreen extends ConsumerWidget {
                   if (nameController.text.isNotEmpty) {
                     ref
                         .read(projectProvider.notifier)
-                        .addUser(nameController.text, selectedColor);
+                        .addMember(
+                          nameController.text,
+                          ProjectRole.editor,
+                          color: selectedColor,
+                        );
                     Navigator.pop(context);
                   }
                 },

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:moving_tool_flutter/core/router/app_router.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/data/providers/providers.dart';
@@ -65,6 +67,15 @@ class _MovingToolAppState extends ConsumerState<MovingToolApp> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        ...GlobalMaterialLocalizations.delegates,
+      ],
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('nl'), // Dutch
+      ],
+      // locale: const Locale('nl'), // Force Dutch for testing if needed
       routerConfig: router,
     );
   }

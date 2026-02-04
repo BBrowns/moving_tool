@@ -17,7 +17,7 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _pageController = PageController();
   int _currentPage = 0;
-  
+
   // Form data
   final _nameController = TextEditingController();
   final _user1Controller = TextEditingController();
@@ -69,53 +69,61 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Future<void> _completeOnboarding() async {
     try {
       final uuid = const Uuid();
-      
+
       // Create users
-      final users = <User>[];
+      final members = <ProjectMember>[];
       if (_user1Controller.text.isNotEmpty) {
-        users.add(User(
-          id: uuid.v4(),
-          name: _user1Controller.text,
-          color: '#6366F1',
-        ));
+        members.add(
+          ProjectMember(
+            id: uuid.v4(),
+            name: _user1Controller.text,
+            role: ProjectRole.admin,
+            color: '#6366F1',
+          ),
+        );
       }
       if (_user2Controller.text.isNotEmpty) {
-        users.add(User(
-          id: uuid.v4(),
-          name: _user2Controller.text,
-          color: '#8B5CF6',
-        ));
+        members.add(
+          ProjectMember(
+            id: uuid.v4(),
+            name: _user2Controller.text,
+            role: ProjectRole.editor,
+            color: '#8B5CF6',
+          ),
+        );
       }
-      
+
       // Create project
       final project = Project(
         id: uuid.v4(),
-        name: _nameController.text.isEmpty ? 'Mijn Verhuizing' : _nameController.text,
+        name: _nameController.text.isEmpty
+            ? 'Mijn Verhuizing'
+            : _nameController.text,
         movingDate: _movingDate,
-        fromAddress: Address(),
-        toAddress: Address(),
-        users: users,
+        fromAddress: const Address(),
+        toAddress: const Address(),
+        members: members,
         createdAt: DateTime.now(),
       );
-      
+
       // Save project and update both providers
       if (!mounted) return;
       await ref.read(projectProvider.notifier).save(project);
-      
+
       if (!mounted) return;
       await ref.read(projectProvider.notifier).setActive(project.id);
-      
+
       if (!mounted) return;
       ref.read(projectsProvider.notifier).load(); // Refresh projects list
-      
+
       if (mounted) {
         context.go('/dashboard');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
   }
@@ -132,7 +140,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             // Top Bar with Close button for existing users
             if (hasProjects)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -155,26 +166,30 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             Padding(
               padding: const EdgeInsets.all(24),
               child: Row(
-                children: List.generate(3, (index) => Expanded(
-                  child: Container(
-                    height: 4,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      color: index <= _currentPage 
-                          ? AppTheme.primary 
-                          : context.colors.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(2),
+                children: List.generate(
+                  3,
+                  (index) => Expanded(
+                    child: Container(
+                      height: 4,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        color: index <= _currentPage
+                            ? AppTheme.primary
+                            : context.colors.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
                   ),
-                )),
+                ),
               ),
             ),
-            
+
             // Pages
             Expanded(
               child: PageView(
                 controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(), // Prevent swiping back to welcome if skipped
+                physics:
+                    const NeverScrollableScrollPhysics(), // Prevent swiping back to welcome if skipped
                 onPageChanged: (page) => setState(() => _currentPage = page),
                 children: [
                   _buildWelcomePage(),
@@ -183,7 +198,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ],
               ),
             ),
-            
+
             // Navigation buttons
             Padding(
               padding: const EdgeInsets.all(24),
@@ -196,7 +211,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ),
                   const Spacer(),
                   ElevatedButton(
-                    onPressed: _currentPage == 2 ? _completeOnboarding : _nextPage,
+                    onPressed: _currentPage == 2
+                        ? _completeOnboarding
+                        : _nextPage,
                     child: Text(_currentPage == 2 ? 'Starten!' : 'Volgende'),
                   ),
                 ],

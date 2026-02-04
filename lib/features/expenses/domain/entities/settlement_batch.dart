@@ -1,10 +1,9 @@
-
 import 'package:moving_tool_flutter/features/expenses/domain/entities/expense.dart';
 
 class SettlementBatch {
-
   SettlementBatch({
     required this.id,
+    required this.projectId,
     required this.date,
     required this.totalAmount,
     required this.settlements,
@@ -12,6 +11,7 @@ class SettlementBatch {
     required this.createdByUserId,
   });
   final String id;
+  final String projectId;
   final DateTime date;
   final double totalAmount;
   final List<Settlement> settlements;

@@ -11,14 +11,14 @@ import 'package:moving_tool_flutter/features/packing/presentation/providers/pack
 
 // Mock Repository
 class MockPackingRepository implements PackingRepository {
-  List<Room> _rooms = [];
-  List<PackingBox> _boxes = [];
-  final List<BoxItem> _items = [];
 
   MockPackingRepository({List<Room>? rooms, List<PackingBox>? boxes}) {
     if (rooms != null) _rooms = rooms;
     if (boxes != null) _boxes = boxes;
   }
+  List<Room> _rooms = [];
+  List<PackingBox> _boxes = [];
+  final List<BoxItem> _items = [];
 
   @override
   Future<void> deleteBox(String id) async {
@@ -77,8 +77,8 @@ class MockPackingRepository implements PackingRepository {
 
 // Test Notifiers
 class TestRoomNotifier extends RoomNotifier {
-  final List<Room> _initial;
   TestRoomNotifier(this._initial);
+  final List<Room> _initial;
   @override
   List<Room> build() {
     repository = ref.watch(packingRepositoryProvider);
@@ -87,8 +87,8 @@ class TestRoomNotifier extends RoomNotifier {
 }
 
 class TestBoxNotifier extends BoxNotifier {
-  final List<PackingBox> _initial;
   TestBoxNotifier(this._initial);
+  final List<PackingBox> _initial;
   @override
   List<PackingBox> build() {
     repository = ref.watch(packingRepositoryProvider);

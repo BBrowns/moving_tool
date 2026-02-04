@@ -10,8 +10,8 @@ import 'package:moving_tool_flutter/features/projects/domain/repositories/projec
 import 'package:moving_tool_flutter/features/projects/presentation/providers/project_providers.dart';
 
 class TestProjectNotifier extends ProjectNotifier {
-  final Project? _initialProject;
   TestProjectNotifier(this._initialProject);
+  final Project? _initialProject;
 
   @override
   Project? build() {
@@ -25,9 +25,16 @@ final mockProject = Project(
   id: 'test-project-id',
   name: 'Test Verhuizing',
   movingDate: DateTime.now().add(const Duration(days: 30)),
-  fromAddress: Address(),
-  toAddress: Address(),
-  users: [User(id: 'user-1', name: 'Test User', color: '#6366F1')],
+  fromAddress: const Address(),
+  toAddress: const Address(),
+  members: [
+    const ProjectMember(
+      id: 'user-1',
+      name: 'Test User',
+      role: ProjectRole.admin,
+      color: '#6366F1',
+    ),
+  ],
   createdAt: DateTime.now(),
 );
 

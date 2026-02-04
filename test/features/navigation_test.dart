@@ -12,8 +12,8 @@ import 'package:moving_tool_flutter/main.dart';
 
 // Fake Notifiers that do nothing on load to prevent crashes
 class FakeProjectNotifier extends ProjectNotifier {
-  final Project? _initial;
   FakeProjectNotifier(this._initial);
+  final Project? _initial;
   @override
   Project? build() => _initial;
   @override
@@ -90,10 +90,10 @@ void main() {
     id: '1',
     name: 'Test Move',
     movingDate: DateTime.now().add(const Duration(days: 30)),
-    fromAddress: Address(),
-    toAddress: Address(),
+    fromAddress: const Address(),
+    toAddress: const Address(),
     createdAt: DateTime.now(),
-    users: [],
+    members: [],
   );
 
   final overrides = [

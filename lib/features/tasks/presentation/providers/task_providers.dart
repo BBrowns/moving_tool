@@ -1,6 +1,7 @@
 import 'package:moving_tool_flutter/features/tasks/data/repositories/tasks_repository_impl.dart';
 import 'package:moving_tool_flutter/features/tasks/domain/entities/task.dart';
 import 'package:moving_tool_flutter/features/tasks/domain/repositories/tasks_repository.dart';
+import 'package:moving_tool_flutter/features/projects/presentation/providers/project_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -34,17 +35,24 @@ class TaskNotifier extends _$TaskNotifier {
   }
 
   Future<void> load() async {
-    state = await repository.getTasks(); // Update usage
+    final project = ref.read(projectProvider);
+    if (project == null) return;
+    state = await repository.getTasks(project.id);
   }
 
   Future<void> add({
     required String title,
-    required TaskCategory category, String description = '',
+    required TaskCategory category,
+    String description = '',
     String? assigneeId,
     DateTime? deadline,
   }) async {
+    final project = ref.read(projectProvider);
+    if (project == null) return;
+
     final task = Task(
       id: _uuid.v4(),
+      projectId: project.id,
       title: title,
       description: description,
       category: category,

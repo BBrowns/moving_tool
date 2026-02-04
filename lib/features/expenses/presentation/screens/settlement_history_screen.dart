@@ -13,7 +13,7 @@ class SettlementHistoryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final historyAsync = ref.watch(settlementHistoryProvider);
     final project = ref.read(projectProvider);
-    final users = project?.users ?? [];
+    final members = project?.members ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -69,16 +69,28 @@ class SettlementHistoryScreen extends ConsumerWidget {
                             const Text('Geen betalingen nodig.')
                           else
                             ...batch.settlements.map((s) {
-                              final fromUser = users.cast<User>().firstWhere(
-                                (u) => u.id == s.fromUserId,
-                                orElse: () =>
-                                    User(id: '', name: '?', color: 'Grey'),
-                              );
-                              final toUser = users.cast<User>().firstWhere(
-                                (u) => u.id == s.toUserId,
-                                orElse: () =>
-                                    User(id: '', name: '?', color: 'Grey'),
-                              );
+                              final fromUser = members
+                                  .cast<ProjectMember>()
+                                  .firstWhere(
+                                    (u) => u.id == s.fromUserId,
+                                    orElse: () => const ProjectMember(
+                                      id: '',
+                                      name: '?',
+                                      role: ProjectRole.viewer,
+                                      color: '#808080',
+                                    ),
+                                  );
+                              final toUser = members
+                                  .cast<ProjectMember>()
+                                  .firstWhere(
+                                    (u) => u.id == s.toUserId,
+                                    orElse: () => const ProjectMember(
+                                      id: '',
+                                      name: '?',
+                                      role: ProjectRole.viewer,
+                                      color: '#808080',
+                                    ),
+                                  );
 
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -138,11 +150,17 @@ class SettlementHistoryScreen extends ConsumerWidget {
                                 .read(expenseProvider)
                                 .where((e) => batch.expenseIds.contains(e.id))
                                 .map((expense) {
-                                  final payer = users.cast<User>().firstWhere(
-                                    (u) => u.id == expense.paidById,
-                                    orElse: () =>
-                                        User(id: '', name: '?', color: 'Grey'),
-                                  );
+                                  final payer = members
+                                      .cast<ProjectMember>()
+                                      .firstWhere(
+                                        (u) => u.id == expense.paidById,
+                                        orElse: () => const ProjectMember(
+                                          id: '',
+                                          name: '?',
+                                          role: ProjectRole.viewer,
+                                          color: '#808080',
+                                        ),
+                                      );
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 4,

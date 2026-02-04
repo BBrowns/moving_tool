@@ -7,9 +7,9 @@ import 'package:moving_tool_flutter/features/expenses/expenses_screen.dart';
 
 // Fake Expect Notifier
 class FakeExpenseNotifier extends ExpenseNotifier {
-  final List<Expense> _initial;
   FakeExpenseNotifier([List<Expense>? initialExpenses])
     : _initial = initialExpenses ?? [];
+  final List<Expense> _initial;
 
   @override
   List<Expense> build() => _initial;
@@ -22,11 +22,13 @@ class FakeExpenseNotifier extends ExpenseNotifier {
     required String paidById,
     required List<String> splitBetweenIds,
     DateTime? date,
+    String notes = '',
   }) async {
     state = [
       ...state,
       Expense(
         id: 'new',
+        projectId: 'p1',
         description: description,
         amount: amount,
         category: category,
@@ -46,8 +48,8 @@ class FakeExpenseNotifier extends ExpenseNotifier {
 
 // Fake Project Notifier
 class FakeProjectNotifier extends ProjectNotifier {
-  final Project? _initial;
   FakeProjectNotifier([this._initial]);
+  final Project? _initial;
 
   @override
   Project? build() => _initial;
@@ -55,19 +57,25 @@ class FakeProjectNotifier extends ProjectNotifier {
 
 void main() {
   group('CostsScreen', () {
-    final mockUser = User(id: 'u1', name: 'Julian', color: '#000000');
+    final mockUser = const ProjectMember(
+      id: 'u1',
+      name: 'Julian',
+      role: ProjectRole.admin,
+      color: '#000000',
+    );
     final mockProject = Project(
       id: 'p1',
       name: 'Test Move',
-      users: [mockUser],
+      members: [mockUser],
       createdAt: DateTime.now(),
       movingDate: DateTime.now(),
-      fromAddress: Address(),
-      toAddress: Address(),
+      fromAddress: const Address(),
+      toAddress: const Address(),
     );
 
     final mockExpense = Expense(
       id: 'e1',
+      projectId: 'p1',
       description: 'Moving Van',
       amount: 100.0,
       category: ExpenseCategory.verhuizing,

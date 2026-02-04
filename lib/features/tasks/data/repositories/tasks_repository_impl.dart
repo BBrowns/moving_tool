@@ -6,9 +6,10 @@ import 'package:moving_tool_flutter/features/tasks/domain/repositories/tasks_rep
 
 class TasksRepositoryImpl implements TasksRepository {
   @override
-  Future<List<Task>> getTasks() async {
+  Future<List<Task>> getTasks(String projectId) async {
     try {
-      return DatabaseService.getAllTasks();
+      final allTasks = await DatabaseService.getAllTasks();
+      return allTasks.where((t) => t.projectId == projectId).toList();
     } catch (e) {
       debugPrint('Error getting tasks: $e');
       throw FetchFailure('Failed to load tasks', e);

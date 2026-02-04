@@ -63,7 +63,7 @@ class ExportService {
 
   static String generateExpensesCsv(Project project) {
     final expenses = DatabaseService.getAllExpenses();
-    final users = project.users;
+    final members = project.members;
 
     final List<List<dynamic>> rows = [];
     rows.add([
@@ -77,18 +77,28 @@ class ExportService {
 
     final dateFormat = DateFormat('yyyy-MM-dd');
     for (final expense in expenses) {
-      final payer = users
+      final payer = members
           .firstWhere(
-            (u) => u.id == expense.paidById,
-            orElse: () => User(id: '', name: 'Onbekend', color: '#000000'),
+            (m) => m.id == expense.paidById,
+            orElse: () => const ProjectMember(
+              id: '',
+              name: 'Onbekend',
+              role: ProjectRole.viewer,
+              color: '#000000',
+            ),
           )
           .name;
       final splitNames = expense.splitBetweenIds
           .map((id) {
-            return users
+            return members
                 .firstWhere(
-                  (u) => u.id == id,
-                  orElse: () => User(id: '', name: '?', color: ''),
+                  (m) => m.id == id,
+                  orElse: () => const ProjectMember(
+                    id: '',
+                    name: '?',
+                    role: ProjectRole.viewer,
+                    color: '',
+                  ),
                 )
                 .name;
           })
@@ -193,7 +203,7 @@ Rapport:
       '**Verhuisdatum:** ${dateFormat.format(project.movingDate)} (${daysUntil >= 0 ? "nog $daysUntil dagen" : "voltooid"})',
     );
     buffer.writeln(
-      '**Gebruikers:** ${project.users.map((u) => u.name).join(", ")}',
+      '**Gebruikers:** ${project.members.map((m) => m.name).join(", ")}',
     );
     buffer.writeln('**Gegenereerd:** ${dateFormat.format(DateTime.now())}');
     buffer.writeln();

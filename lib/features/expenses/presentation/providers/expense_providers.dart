@@ -1,8 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moving_tool_flutter/features/projects/presentation/providers/project_providers.dart';
 import 'package:moving_tool_flutter/features/expenses/data/repositories/expenses_repository_impl.dart';
 import 'package:moving_tool_flutter/features/expenses/domain/entities/expense.dart';
 import 'package:moving_tool_flutter/features/expenses/domain/entities/settlement_batch.dart';
 import 'package:moving_tool_flutter/features/expenses/domain/repositories/expenses_repository.dart';
+import 'package:moving_tool_flutter/features/playbook/application/playbook_service.dart';
+import 'package:moving_tool_flutter/features/playbook/domain/entities/playbook_rule.dart';
 import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
@@ -29,7 +32,9 @@ class ExpenseNotifier extends Notifier<List<Expense>> {
   }
 
   Future<void> load() async {
-    state = await repository.getExpenses();
+    final project = ref.read(projectProvider);
+    if (project == null) return;
+    state = await repository.getExpenses(project.id);
   }
 
   Future<void> add({
@@ -39,9 +44,14 @@ class ExpenseNotifier extends Notifier<List<Expense>> {
     required String paidById,
     required List<String> splitBetweenIds,
     DateTime? date,
+    String notes = '',
   }) async {
+    final project = ref.read(projectProvider);
+    if (project == null) return;
+
     final expense = Expense(
       id: _uuid.v4(),
+      projectId: project.id,
       description: description,
       amount: amount,
       category: category,
@@ -52,6 +62,20 @@ class ExpenseNotifier extends Notifier<List<Expense>> {
     );
     await repository.saveExpense(expense);
     state = [...state, expense];
+
+    // Trigger Playbook Event
+    // We don't await this to keep UI snappy, unless critical
+    ref
+        .read(playbookServiceProvider)
+        .handleEvent(
+          trigger: EventTrigger.expenseAdded,
+          project: project,
+          context: {
+            'expenseId': expense.id,
+            'amount': expense.amount,
+            'category': expense.category.name,
+          },
+        );
   }
 
   Future<void> update(Expense expense) async {
@@ -68,25 +92,32 @@ class ExpenseNotifier extends Notifier<List<Expense>> {
       .where((e) => e.settlementId == null)
       .fold(0.0, (sum, e) => sum + e.amount);
 
-  Future<void> settleUp(List<String> userIds, {required String createdByUserId}) async {
+  Future<void> settleUp(
+    List<String> userIds, {
+    required String createdByUserId,
+  }) async {
     final openExpenses = state.where((e) => e.settlementId == null).toList();
     if (openExpenses.isEmpty) return;
 
     final batchId = _uuid.v4();
-    
+
     // Calculate final settlements for this batch
     final settlements = calculateSettlements(openExpenses, userIds);
-    
+
     // Create the batch
+    final project = ref.read(projectProvider);
+    if (project == null) return;
+
     final batch = SettlementBatch(
       id: batchId,
+      projectId: project.id,
       date: DateTime.now(),
       totalAmount: openExpenses.fold(0.0, (sum, e) => sum + e.amount),
       settlements: settlements,
       expenseIds: openExpenses.map((e) => e.id).toList(),
       createdByUserId: createdByUserId,
     );
-    
+
     // Save the batch
     await repository.saveSettlementBatch(batch);
 
@@ -95,13 +126,15 @@ class ExpenseNotifier extends Notifier<List<Expense>> {
       final updated = expense.copyWith(settlementId: batchId);
       await repository.saveExpense(updated);
     }
-    
+
     // Refresh state
-    state = await repository.getExpenses();
+    state = await repository.getExpenses(project.id);
   }
 }
 
-final expenseProvider = NotifierProvider<ExpenseNotifier, List<Expense>>(ExpenseNotifier.new);
+final expenseProvider = NotifierProvider<ExpenseNotifier, List<Expense>>(
+  ExpenseNotifier.new,
+);
 
 // ============================================================================
 // Settlement History Notifier
@@ -117,14 +150,18 @@ class SettlementHistoryNotifier extends AsyncNotifier<List<SettlementBatch>> {
   }
 
   Future<List<SettlementBatch>> _loadHistory() async {
-    return repository.getSettlementBatches();
+    final project = ref.read(projectProvider);
+    if (project == null) return [];
+    return repository.getSettlementBatches(project.id);
   }
-  
+
   Future<void> refresh() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _loadHistory());
   }
 }
 
-final settlementHistoryProvider = 
-    AsyncNotifierProvider<SettlementHistoryNotifier, List<SettlementBatch>>(SettlementHistoryNotifier.new);
+final settlementHistoryProvider =
+    AsyncNotifierProvider<SettlementHistoryNotifier, List<SettlementBatch>>(
+      SettlementHistoryNotifier.new,
+    );

@@ -57,7 +57,7 @@ class DashboardScreen extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            'Hallo ${project.users.isNotEmpty ? project.users.first.name : "Verhuizer"}! 👋',
+                            'Hallo ${project.members.isNotEmpty ? project.members.first.name : "Verhuizer"}! 👋',
                             style: context.textTheme.headlineLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: context.colors.onSurface,
@@ -229,7 +229,6 @@ class DashboardScreen extends ConsumerWidget {
 }
 
 class _PlaybookHeroCard extends StatelessWidget {
-
   const _PlaybookHeroCard({required this.onTap});
   final VoidCallback onTap;
 
@@ -330,7 +329,6 @@ class _PlaybookHeroCard extends StatelessWidget {
 }
 
 class _BentoCard extends StatelessWidget {
-
   const _BentoCard({
     required this.title,
     required this.value,
@@ -454,7 +452,6 @@ class _BentoCard extends StatelessWidget {
 }
 
 class _ActivityTile extends StatelessWidget {
-
   const _ActivityTile({required this.entry});
   final JournalEntry entry;
 

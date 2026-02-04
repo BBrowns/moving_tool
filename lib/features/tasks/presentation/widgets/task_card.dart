@@ -4,14 +4,16 @@ import 'package:moving_tool_flutter/features/projects/domain/entities/project.da
 import 'package:moving_tool_flutter/features/tasks/domain/entities/task.dart';
 
 class TaskCard extends StatelessWidget {
-
   const TaskCard({
-    required this.task, required this.onToggle, required this.onDelete, super.key,
+    required this.task,
+    required this.onToggle,
+    required this.onDelete,
+    super.key,
     this.assignee,
     this.onTap,
   });
   final Task task;
-  final User? assignee;
+  final ProjectMember? assignee;
   final VoidCallback onToggle;
   final VoidCallback onDelete;
   final VoidCallback? onTap;
@@ -26,12 +28,16 @@ class TaskCard extends StatelessWidget {
         onTap: onTap,
         leading: IconButton(
           icon: Icon(
-            isDone ? Icons.check_circle : 
-            task.status == TaskStatus.inProgress ? Icons.pending :
-            Icons.radio_button_unchecked,
-            color: isDone ? AppTheme.success : 
-                   task.status == TaskStatus.inProgress ? AppTheme.warning :
-                   context.colors.onSurfaceVariant,
+            isDone
+                ? Icons.check_circle
+                : task.status == TaskStatus.inProgress
+                ? Icons.pending
+                : Icons.radio_button_unchecked,
+            color: isDone
+                ? AppTheme.success
+                : task.status == TaskStatus.inProgress
+                ? AppTheme.warning
+                : context.colors.onSurfaceVariant,
           ),
           onPressed: onToggle,
         ),
@@ -44,19 +50,23 @@ class TaskCard extends StatelessWidget {
             color: isDone ? context.colors.onSurfaceVariant : null,
           ),
         ),
-        subtitle: task.deadline != null ? Text(
-          '📅 ${task.deadline!.day}-${task.deadline!.month}-${task.deadline!.year}',
-          style: context.textTheme.bodySmall,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ) : null,
+        subtitle: task.deadline != null
+            ? Text(
+                '📅 ${task.deadline!.day}-${task.deadline!.month}-${task.deadline!.year}',
+                style: context.textTheme.bodySmall,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              )
+            : null,
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (assignee != null)
               CircleAvatar(
                 radius: 14,
-                backgroundColor: Color(int.parse(assignee!.color.replaceFirst('#', '0xFF'))),
+                backgroundColor: Color(
+                  int.parse(assignee!.color.replaceFirst('#', '0xFF')),
+                ),
                 child: Text(
                   assignee!.name[0].toUpperCase(),
                   style: const TextStyle(fontSize: 12, color: Colors.white),

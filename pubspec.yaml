@@ -9,9 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
-  
-  # State Management
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2 # Explicitly listing intl though it's likely transitive
   flutter_riverpod: ^3.1.0
   
   # Local Database
@@ -23,7 +23,6 @@ dependencies:
   
   # Utilities
   uuid: ^4.5.1
-  intl: ^0.20.2
   
   # Export & Sharing
   csv: ^6.0.0
@@ -54,3 +53,4 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
