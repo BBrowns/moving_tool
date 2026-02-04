@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moving_tool_flutter/features/packing/domain/entities/room.dart';
-import 'package:moving_tool_flutter/features/packing/domain/entities/packing_box.dart';
-import 'package:moving_tool_flutter/features/packing/presentation/providers/packing_providers.dart';
-import 'package:moving_tool_flutter/features/packing/packing_screen.dart';
-import 'package:moving_tool_flutter/main.dart'; // To get the main App widget if available, or reconstruct
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 import 'package:moving_tool_flutter/features/dashboard/dashboard_screen.dart';
-import 'package:moving_tool_flutter/core/router/app_router.dart';
-
-// Reuse Mock Repository logic (simplified for integration test)
-import 'package:moving_tool_flutter/features/packing/domain/repositories/packing_repository.dart';
-import 'package:moving_tool_flutter/features/packing/domain/entities/box_item.dart';
-import 'package:moving_tool_flutter/features/projects/domain/repositories/projects_repository.dart';
-import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
-import 'package:moving_tool_flutter/features/projects/presentation/providers/project_providers.dart';
-import 'package:moving_tool_flutter/features/playbook/domain/repositories/playbook_repository.dart';
-import 'package:moving_tool_flutter/features/playbook/domain/entities/journal_entry.dart';
-import 'package:moving_tool_flutter/features/playbook/domain/entities/playbook_note.dart';
-import 'package:moving_tool_flutter/features/playbook/presentation/providers/playbook_providers.dart';
-import 'package:moving_tool_flutter/features/tasks/domain/repositories/tasks_repository.dart';
-import 'package:moving_tool_flutter/features/tasks/domain/entities/task.dart';
-import 'package:moving_tool_flutter/features/tasks/presentation/providers/task_providers.dart';
-import 'package:moving_tool_flutter/features/shopping/domain/repositories/shopping_repository.dart';
-import 'package:moving_tool_flutter/features/shopping/domain/entities/shopping_item.dart';
-import 'package:moving_tool_flutter/features/shopping/presentation/providers/shopping_providers.dart';
-import 'package:moving_tool_flutter/features/expenses/domain/repositories/expenses_repository.dart';
 import 'package:moving_tool_flutter/features/expenses/domain/entities/expense.dart';
 import 'package:moving_tool_flutter/features/expenses/domain/entities/settlement_batch.dart';
+import 'package:moving_tool_flutter/features/expenses/domain/repositories/expenses_repository.dart';
 import 'package:moving_tool_flutter/features/expenses/presentation/providers/expense_providers.dart';
-import 'package:mockito/mockito.dart';
+import 'package:moving_tool_flutter/features/packing/domain/entities/box_item.dart';
+import 'package:moving_tool_flutter/features/packing/domain/entities/packing_box.dart';
+import 'package:moving_tool_flutter/features/packing/domain/entities/room.dart';
+// Reuse Mock Repository logic (simplified for integration test)
+import 'package:moving_tool_flutter/features/packing/domain/repositories/packing_repository.dart';
+import 'package:moving_tool_flutter/features/packing/packing_screen.dart';
+import 'package:moving_tool_flutter/features/packing/presentation/providers/packing_providers.dart';
+import 'package:moving_tool_flutter/features/playbook/domain/entities/journal_entry.dart';
+import 'package:moving_tool_flutter/features/playbook/domain/entities/playbook_note.dart';
+import 'package:moving_tool_flutter/features/playbook/domain/repositories/playbook_repository.dart';
+import 'package:moving_tool_flutter/features/playbook/presentation/providers/playbook_providers.dart';
+import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
+import 'package:moving_tool_flutter/features/projects/domain/repositories/projects_repository.dart';
+import 'package:moving_tool_flutter/features/projects/presentation/providers/project_providers.dart';
+import 'package:moving_tool_flutter/features/shopping/domain/entities/shopping_item.dart';
+import 'package:moving_tool_flutter/features/shopping/domain/repositories/shopping_repository.dart';
+import 'package:moving_tool_flutter/features/shopping/presentation/providers/shopping_providers.dart';
+import 'package:moving_tool_flutter/features/tasks/domain/entities/task.dart';
+import 'package:moving_tool_flutter/features/tasks/domain/repositories/tasks_repository.dart';
+import 'package:moving_tool_flutter/features/tasks/presentation/providers/task_providers.dart';
+import 'package:moving_tool_flutter/main.dart'; // To get the main App widget if available, or reconstruct
 
 // Manual Mocks for All Repositories
 class MockTasksRepository extends Mock implements TasksRepository {

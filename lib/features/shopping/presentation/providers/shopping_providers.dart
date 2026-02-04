@@ -1,8 +1,10 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 import 'package:moving_tool_flutter/core/models/models.dart';
-import 'package:moving_tool_flutter/features/shopping/domain/repositories/shopping_repository.dart';
 import 'package:moving_tool_flutter/features/shopping/data/repositories/shopping_repository_impl.dart';
+import 'package:moving_tool_flutter/features/shopping/domain/repositories/shopping_repository.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
+
+part 'shopping_providers.g.dart';
 
 const _uuid = Uuid();
 
@@ -10,15 +12,19 @@ const _uuid = Uuid();
 // Repository Provider
 // ============================================================================
 
-final shoppingRepositoryProvider = Provider<ShoppingRepository>((ref) {
+@Riverpod(keepAlive: true)
+ShoppingRepository shoppingRepository(Ref ref) {
   return ShoppingRepositoryImpl();
-});
+}
+
+// Generated provider: shoppingRepositoryProvider
 
 // ============================================================================
 // Shopping Provider
 // ============================================================================
 
-class ShoppingNotifier extends Notifier<List<ShoppingItem>> {
+@Riverpod(keepAlive: true)
+class ShoppingNotifier extends _$ShoppingNotifier {
   late final ShoppingRepository repository;
 
   @override
@@ -28,7 +34,7 @@ class ShoppingNotifier extends Notifier<List<ShoppingItem>> {
   }
 
   Future<void> load() async {
-    state = await repository.getItems();
+    state = await repository.getItems(); // Update usage
   }
 
   Future<void> add({
@@ -53,12 +59,12 @@ class ShoppingNotifier extends Notifier<List<ShoppingItem>> {
       targetPrice: targetPrice,
       createdAt: DateTime.now(),
     );
-    await repository.saveItem(item);
+    await repository.saveItem(item); // Update usage
     state = [...state, item];
   }
 
   Future<void> update(ShoppingItem item) async {
-    await repository.saveItem(item);
+    await repository.saveItem(item); // Update usage
     state = state.map((i) => i.id == item.id ? item : i).toList();
   }
 
@@ -69,9 +75,7 @@ class ShoppingNotifier extends Notifier<List<ShoppingItem>> {
   }
 
   Future<void> delete(String id) async {
-    await repository.deleteItem(id);
+    await repository.deleteItem(id); // Update usage
     state = state.where((i) => i.id != id).toList();
   }
 }
-
-final shoppingProvider = NotifierProvider<ShoppingNotifier, List<ShoppingItem>>(ShoppingNotifier.new);

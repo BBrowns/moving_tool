@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:moving_tool_flutter/core/models/models.dart';
+import 'package:moving_tool_flutter/core/theme/app_theme.dart';
+import 'package:moving_tool_flutter/data/providers/providers.dart';
 import 'package:uuid/uuid.dart';
-import '../../core/models/models.dart';
-import '../../data/providers/providers.dart';
-import '../../core/theme/app_theme.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});

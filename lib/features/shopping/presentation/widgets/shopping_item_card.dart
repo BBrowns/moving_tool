@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/features/shopping/domain/entities/shopping_item.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 
 class ShoppingItemCard extends StatelessWidget {
   final ShoppingItem item;
-  final Function(ShoppingStatus) onStatusChange;
+  final void Function(ShoppingStatus) onStatusChange;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
 

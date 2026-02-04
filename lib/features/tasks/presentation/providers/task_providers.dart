@@ -1,8 +1,10 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
+import 'package:moving_tool_flutter/features/tasks/data/repositories/tasks_repository_impl.dart';
 import 'package:moving_tool_flutter/features/tasks/domain/entities/task.dart';
 import 'package:moving_tool_flutter/features/tasks/domain/repositories/tasks_repository.dart';
-import 'package:moving_tool_flutter/features/tasks/data/repositories/tasks_repository_impl.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
+
+part 'task_providers.g.dart';
 
 const _uuid = Uuid();
 
@@ -10,15 +12,19 @@ const _uuid = Uuid();
 // Repository Provider
 // ============================================================================
 
-final tasksRepositoryProvider = Provider<TasksRepository>((ref) {
+@Riverpod(keepAlive: true)
+TasksRepository tasksRepository(Ref ref) {
   return TasksRepositoryImpl();
-});
+}
+
+// Generated provider: tasksRepositoryProvider
 
 // ============================================================================
 // Task Notifier
 // ============================================================================
 
-class TaskNotifier extends Notifier<List<Task>> {
+@Riverpod(keepAlive: true)
+class TaskNotifier extends _$TaskNotifier {
   late final TasksRepository repository;
 
   @override
@@ -28,7 +34,7 @@ class TaskNotifier extends Notifier<List<Task>> {
   }
 
   Future<void> load() async {
-    state = await repository.getTasks();
+    state = await repository.getTasks(); // Update usage
   }
 
   Future<void> add({
@@ -47,12 +53,12 @@ class TaskNotifier extends Notifier<List<Task>> {
       deadline: deadline,
       createdAt: DateTime.now(),
     );
-    await repository.saveTask(task);
+    await repository.saveTask(task); // Update usage
     state = [...state, task];
   }
 
   Future<void> update(Task task) async {
-    await repository.saveTask(task);
+    await repository.saveTask(task); // Update usage
     state = state.map((t) => t.id == task.id ? task : t).toList();
   }
 
@@ -71,9 +77,7 @@ class TaskNotifier extends Notifier<List<Task>> {
   }
 
   Future<void> delete(String id) async {
-    await repository.deleteTask(id);
+    await repository.deleteTask(id); // Update usage
     state = state.where((t) => t.id != id).toList();
   }
 }
-
-final taskProvider = NotifierProvider<TaskNotifier, List<Task>>(TaskNotifier.new);

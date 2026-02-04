@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:moving_tool_flutter/features/playbook/domain/entities/playbook_note.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
+import 'package:moving_tool_flutter/features/playbook/domain/entities/playbook_note.dart';
 
 class NoteCard extends StatelessWidget {
   final PlaybookNote note;
@@ -26,10 +26,10 @@ class NoteCard extends StatelessWidget {
         subtitle: note.content.isNotEmpty 
             ? Text(note.content, maxLines: 2, overflow: TextOverflow.ellipsis)
             : null,
-        trailing: PopupMenuButton(
+        trailing: PopupMenuButton<void>(
           icon: const Icon(Icons.more_vert),
           itemBuilder: (context) => [
-            PopupMenuItem(
+            PopupMenuItem<void>(
               onTap: onTogglePin,
               child: Row(
                 children: [

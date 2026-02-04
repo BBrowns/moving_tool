@@ -70,12 +70,19 @@ lib/
 | GoRouter | Declarative routing |
 | Material 3 | Design system |
 
+## Configuration
+    
+### Environment Variables
+
+1. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+2. Add your API keys (e.g., specific keys for Gemini AI).
+
 ## Legacy React Version
 
-De originele React/Vite versie is beschikbaar in:
-- **Branch:** `react-archive`
-- **Lokaal:** `_archive/react-legacy/`
+De originele React/Vite versie is beschikbaar in de branch: `react-archive`.
 
----
 
 Built with ❤️ using Flutter

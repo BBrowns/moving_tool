@@ -1,67 +1,86 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moving_tool_flutter/main.dart';
-import 'package:moving_tool_flutter/core/models/models.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-
-import 'package:moving_tool_flutter/features/projects/presentation/providers/project_providers.dart';
-import 'package:moving_tool_flutter/features/tasks/presentation/providers/task_providers.dart';
-import 'package:moving_tool_flutter/features/shopping/presentation/providers/shopping_providers.dart';
-import 'package:moving_tool_flutter/features/packing/presentation/providers/packing_providers.dart';
+import 'package:moving_tool_flutter/core/models/models.dart';
 import 'package:moving_tool_flutter/features/expenses/presentation/providers/expense_providers.dart';
+import 'package:moving_tool_flutter/features/packing/presentation/providers/packing_providers.dart';
 import 'package:moving_tool_flutter/features/playbook/presentation/providers/playbook_providers.dart';
+import 'package:moving_tool_flutter/features/projects/presentation/providers/project_providers.dart';
+import 'package:moving_tool_flutter/features/shopping/presentation/providers/shopping_providers.dart';
+import 'package:moving_tool_flutter/features/tasks/presentation/providers/task_providers.dart';
+import 'package:moving_tool_flutter/main.dart';
 
 // Fake Notifiers that do nothing on load to prevent crashes
 class FakeProjectNotifier extends ProjectNotifier {
   final Project? _initial;
   FakeProjectNotifier(this._initial);
-  @override Project? build() => _initial;
-  @override Future<void> load() async {}
+  @override
+  Project? build() => _initial;
+  @override
+  Future<void> load() async {}
 }
 
 class FakeProjectsNotifier extends ProjectsNotifier {
-  @override List<Project> build() => [];
-  @override Future<void> load() async {}
+  @override
+  List<Project> build() => [];
+  @override
+  Future<void> load() async {}
 }
 
 class FakeTaskNotifier extends TaskNotifier {
-  @override List<Task> build() => [];
-  @override Future<void> load() async {}
+  @override
+  List<Task> build() => [];
+  @override
+  Future<void> load() async {}
 }
 
 class FakeShoppingNotifier extends ShoppingNotifier {
-  @override List<ShoppingItem> build() => [];
-  @override Future<void> load() async {}
+  @override
+  List<ShoppingItem> build() => [];
+  @override
+  Future<void> load() async {}
 }
 
 class FakeExpenseNotifier extends ExpenseNotifier {
-  @override List<Expense> build() => [];
-  @override Future<void> load() async {}
+  @override
+  List<Expense> build() => [];
+  @override
+  Future<void> load() async {}
 }
 
 class FakeRoomNotifier extends RoomNotifier {
-  @override List<Room> build() => [];
-  @override Future<void> load() async {}
+  @override
+  List<Room> build() => [];
+  @override
+  Future<void> load() async {}
 }
 
 class FakeBoxNotifier extends BoxNotifier {
-  @override List<PackingBox> build() => [];
-  @override Future<void> load() async {}
+  @override
+  List<PackingBox> build() => [];
+  @override
+  Future<void> load() async {}
 }
 
 class FakeBoxItemNotifier extends BoxItemNotifier {
-  @override List<BoxItem> build() => [];
-  @override Future<void> load() async {}
+  @override
+  List<BoxItem> build() => [];
+  @override
+  Future<void> load() async {}
 }
 
 class FakeJournalNotifier extends JournalNotifier {
-  @override List<JournalEntry> build() => [];
-  @override Future<void> load() async {}
+  @override
+  List<JournalEntry> build() => [];
+  @override
+  Future<void> load() async {}
 }
 
 class FakeNotesNotifier extends NotesNotifier {
-  @override List<PlaybookNote> build() => [];
-  @override Future<void> load() async {}
+  @override
+  List<PlaybookNote> build() => [];
+  @override
+  Future<void> load() async {}
 }
 
 void main() {
@@ -90,7 +109,9 @@ void main() {
   ];
 
   group('App Navigation', () {
-    testWidgets('Redirects to Onboarding when no project active', (tester) async {
+    testWidgets('Redirects to Onboarding when no project active', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -102,7 +123,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Welkom bij Verhuistool'), findsOneWidget); 
+      expect(find.text('Welkom bij Verhuistool'), findsOneWidget);
     });
 
     testWidgets('Redirects to Dashboard when project active', (tester) async {
@@ -110,33 +131,39 @@ void main() {
         ProviderScope(
           overrides: [
             ...overrides,
-            projectProvider.overrideWith(() => FakeProjectNotifier(mockProject)),
+            projectProvider.overrideWith(
+              () => FakeProjectNotifier(mockProject),
+            ),
           ],
           child: const MovingToolApp(),
         ),
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Mijn Verhuizingen'), findsNothing); 
-      expect(find.text('Wissel'), findsOneWidget); 
+      expect(find.text('Mijn Verhuizingen'), findsNothing);
+      expect(find.text('Recente Activiteit'), findsOneWidget);
     });
 
-    testWidgets('Can navigate to Projects screen even if project active', (tester) async {
-       await tester.pumpWidget(
+    testWidgets('Can navigate to Projects screen even if project active', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
         ProviderScope(
           overrides: [
             ...overrides,
-            projectProvider.overrideWith(() => FakeProjectNotifier(mockProject)),
+            projectProvider.overrideWith(
+              () => FakeProjectNotifier(mockProject),
+            ),
           ],
           child: const MovingToolApp(),
         ),
       );
       await tester.pumpAndSettle();
-      
-      final context = tester.element(find.text('Wissel'));
+
+      final context = tester.element(find.text('Recente Activiteit'));
       GoRouter.of(context).go('/projects');
       await tester.pumpAndSettle();
-      
+
       expect(find.text('Mijn Verhuizingen'), findsOneWidget);
     });
   });

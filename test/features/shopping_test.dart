@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moving_tool_flutter/data/providers/providers.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:moving_tool_flutter/core/models/models.dart';
-import 'package:moving_tool_flutter/features/shopping/shopping_screen.dart';
-
-import 'package:moving_tool_flutter/features/shopping/presentation/providers/shopping_providers.dart';
-
+import 'package:moving_tool_flutter/data/providers/providers.dart';
 // import 'package:mocktail/mocktail.dart'; // Removed
 import 'package:moving_tool_flutter/features/shopping/domain/repositories/shopping_repository.dart';
+import 'package:moving_tool_flutter/features/shopping/presentation/providers/shopping_providers.dart';
+import 'package:moving_tool_flutter/features/shopping/shopping_screen.dart';
 
 class MockShoppingRepository implements ShoppingRepository {
   List<ShoppingItem> _items = [];
@@ -50,7 +48,7 @@ class TestShoppingNotifier extends ShoppingNotifier {
 void main() {
   group('ShoppingScreen', () {
     testWidgets('Mobile: shows List View', (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(400, 800);
+      tester.view.physicalSize = const Size(480, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
@@ -66,7 +64,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            shoppingRepositoryProvider.overrideWithValue(MockShoppingRepository([item])),
+            shoppingRepositoryProvider.overrideWithValue(
+              MockShoppingRepository([item]),
+            ),
             shoppingProvider.overrideWith(() => TestShoppingNotifier([item])),
           ],
           child: const MaterialApp(home: ShoppingScreen()),
@@ -83,7 +83,7 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      
+
       final item = ShoppingItem(
         id: '1',
         name: 'Curtains',
@@ -95,7 +95,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            shoppingRepositoryProvider.overrideWithValue(MockShoppingRepository([item])),
+            shoppingRepositoryProvider.overrideWithValue(
+              MockShoppingRepository([item]),
+            ),
             shoppingProvider.overrideWith(() => TestShoppingNotifier([item])),
           ],
           child: const MaterialApp(home: ShoppingScreen()),
@@ -108,13 +110,13 @@ void main() {
       expect(find.text('Zoeken'), findsOneWidget);
       expect(find.text('Gevonden'), findsOneWidget);
       expect(find.text('Gekocht'), findsOneWidget);
-      
+
       // Verify Item exists
       expect(find.text('Curtains'), findsOneWidget);
     });
 
     testWidgets('Add Item Dialog works', (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(400, 800);
+      tester.view.physicalSize = const Size(480, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
@@ -122,7 +124,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            shoppingRepositoryProvider.overrideWithValue(MockShoppingRepository()),
+            shoppingRepositoryProvider.overrideWithValue(
+              MockShoppingRepository(),
+            ),
             shoppingProvider.overrideWith(() => TestShoppingNotifier([])),
           ],
           child: const MaterialApp(home: ShoppingScreen()),

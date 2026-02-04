@@ -1,12 +1,12 @@
 // Dashboard Screen - Bento Grid Layout (MovingOS)
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:moving_tool_flutter/data/providers/providers.dart';
 import 'package:moving_tool_flutter/core/models/models.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:moving_tool_flutter/data/providers/providers.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});

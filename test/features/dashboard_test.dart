@@ -1,18 +1,18 @@
 // Dashboard Screen Tests - Bento Grid Layout
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moving_tool_flutter/data/providers/providers.dart';
-import 'package:moving_tool_flutter/core/models/models.dart';
-import 'package:moving_tool_flutter/features/dashboard/dashboard_screen.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:moving_tool_flutter/core/models/models.dart';
+import 'package:moving_tool_flutter/data/providers/providers.dart';
+import 'package:moving_tool_flutter/features/dashboard/dashboard_screen.dart';
 import 'package:moving_tool_flutter/features/projects/domain/repositories/projects_repository.dart';
 import 'package:moving_tool_flutter/features/projects/presentation/providers/project_providers.dart';
 
 class TestProjectNotifier extends ProjectNotifier {
   final Project? _initialProject;
   TestProjectNotifier(this._initialProject);
-  
+
   @override
   Project? build() {
     repository = ref.watch(projectsRepositoryProvider);
@@ -27,12 +27,9 @@ final mockProject = Project(
   movingDate: DateTime.now().add(const Duration(days: 30)),
   fromAddress: Address(),
   toAddress: Address(),
-  users: [
-    User(id: 'user-1', name: 'Test User', color: '#6366F1'),
-  ],
+  users: [User(id: 'user-1', name: 'Test User', color: '#6366F1')],
   createdAt: DateTime.now(),
 );
-
 
 // Mock Repository
 class MockProjectsRepository implements ProjectsRepository {
@@ -54,11 +51,16 @@ class MockProjectsRepository implements ProjectsRepository {
 
 void main() {
   group('DashboardScreen', () {
-    testWidgets('shows loading indicator when project is null', (WidgetTester tester) async {
+    testWidgets('shows loading indicator when project is null', (
+      WidgetTester tester,
+    ) async {
       await tester.binding.setSurfaceSize(const Size(1200, 800));
-      
+
       await tester.pumpWidget(
         ProviderScope(
+          overrides: [
+            projectProvider.overrideWith(() => TestProjectNotifier(null)),
+          ],
           child: MaterialApp.router(
             routerConfig: GoRouter(
               routes: [
@@ -75,12 +77,18 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('renders dashboard headers when project exists', (WidgetTester tester) async {
+    testWidgets('renders dashboard headers when project exists', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            projectsRepositoryProvider.overrideWithValue(MockProjectsRepository()),
-            projectProvider.overrideWith(() => TestProjectNotifier(mockProject)),
+            projectsRepositoryProvider.overrideWithValue(
+              MockProjectsRepository(),
+            ),
+            projectProvider.overrideWith(
+              () => TestProjectNotifier(mockProject),
+            ),
           ],
           child: MaterialApp.router(
             routerConfig: GoRouter(
@@ -99,17 +107,23 @@ void main() {
 
       // Should show the greeting
       expect(find.textContaining('Hallo Test User!'), findsOneWidget);
-      
+
       // Should show days until move
       expect(find.textContaining('dagen tot de grote dag'), findsOneWidget);
     });
 
-    testWidgets('displays bento grid cards with correct info', (WidgetTester tester) async {
+    testWidgets('displays bento grid cards with correct info', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            projectsRepositoryProvider.overrideWithValue(MockProjectsRepository()),
-            projectProvider.overrideWith(() => TestProjectNotifier(mockProject)),
+            projectsRepositoryProvider.overrideWithValue(
+              MockProjectsRepository(),
+            ),
+            projectProvider.overrideWith(
+              () => TestProjectNotifier(mockProject),
+            ),
           ],
           child: MaterialApp.router(
             routerConfig: GoRouter(
@@ -133,19 +147,24 @@ void main() {
       expect(find.text('Budget'), findsOneWidget);
 
       // Verify Action Labels (which imply the cards are fully rendered)
-      expect(find.text('Nieuwe taak'), findsOneWidget);
-      expect(find.text('Nieuwe doos'), findsOneWidget);
-      expect(find.text('Toevoegen'), findsOneWidget);
-      expect(find.text('Bonnetje'), findsOneWidget);
+      // Verify Subtitles
+      expect(find.text('Afgerond'), findsOneWidget);
+      expect(find.text('Dozen Klaar'), findsOneWidget);
+      expect(find.text('Gekocht'), findsOneWidget);
+      expect(find.text('Uitgegeven'), findsOneWidget);
     });
 
-    testWidgets('tapping a bento card navigates to correct route', (WidgetTester tester) async {
+    testWidgets('tapping a bento card navigates to correct route', (
+      WidgetTester tester,
+    ) async {
       String? lastRoute;
 
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            projectProvider.overrideWith(() => TestProjectNotifier(mockProject)),
+            projectProvider.overrideWith(
+              () => TestProjectNotifier(mockProject),
+            ),
           ],
           child: MaterialApp.router(
             routerConfig: GoRouter(
@@ -169,8 +188,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Find and tap the "Taken" card (we tap the text "Nieuwe taak" as it's part of the inkwell)
-      await tester.tap(find.text('Nieuwe taak'));
+      // Find and tap the "Taken" card (we tap the text "Taken" instead of "Nieuwe taak")
+      await tester.tap(find.text('Taken'));
       await tester.pumpAndSettle();
 
       expect(lastRoute, '/tasks');

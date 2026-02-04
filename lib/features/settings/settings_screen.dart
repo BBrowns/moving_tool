@@ -2,12 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../data/providers/providers.dart';
-import '../../data/services/database_service.dart';
-import '../../data/services/export_service.dart';
+import 'package:moving_tool_flutter/core/theme/app_theme.dart';
+import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
+import 'package:moving_tool_flutter/data/providers/providers.dart';
+import 'package:moving_tool_flutter/data/services/database_service.dart';
+import 'package:moving_tool_flutter/data/services/export_service.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/widgets/responsive_wrapper.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -29,16 +29,23 @@ class SettingsScreen extends ConsumerWidget {
               child: ListTile(
                 leading: const Text('📦', style: TextStyle(fontSize: 32)),
                 title: const Text('Mijn Verhuizingen'),
-                subtitle: Text('${projects.length} verhuizing${projects.length == 1 ? '' : 'en'}'),
+                subtitle: Text(
+                  '${projects.length} verhuizing${projects.length == 1 ? '' : 'en'}',
+                ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.push('/projects'),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            Text('Huidige verhuizing', style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              'Huidige verhuizing',
+              style: context.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
-            
+
             // Project info
             Card(
               child: Column(
@@ -46,8 +53,10 @@ class SettingsScreen extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.home_rounded),
                     title: Text(project?.name ?? 'Geen verhuizing'),
-                    subtitle: project != null 
-                        ? Text('Verhuisdatum: ${project.movingDate.day}-${project.movingDate.month}-${project.movingDate.year}')
+                    subtitle: project != null
+                        ? Text(
+                            'Verhuisdatum: ${project.movingDate.day}-${project.movingDate.month}-${project.movingDate.year}',
+                          )
                         : null,
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
@@ -57,34 +66,58 @@ class SettingsScreen extends ConsumerWidget {
                   if (project != null) ...[
                     const Divider(height: 1),
                     ListTile(
-                      leading: const Icon(Icons.delete_outline, color: AppTheme.error),
-                      title: const Text('Verhuizing verwijderen', style: TextStyle(color: AppTheme.error)),
-                      onTap: () => _showDeleteProjectConfirmation(context, ref, project),
+                      leading: const Icon(
+                        Icons.delete_outline,
+                        color: AppTheme.error,
+                      ),
+                      title: const Text(
+                        'Verhuizing verwijderen',
+                        style: TextStyle(color: AppTheme.error),
+                      ),
+                      onTap: () =>
+                          _showDeleteProjectConfirmation(context, ref, project),
                     ),
                   ],
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            Text('Gebruikers', style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              'Gebruikers',
+              style: context.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
             Card(
               child: Column(
                 children: [
                   if (project != null)
-                    ...project.users.map((user) => ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Color(int.parse(user.color.replaceFirst('#', '0xFF'))),
-                        child: Text(user.name[0].toUpperCase(), style: const TextStyle(color: Colors.white)),
+                    ...project.users.map(
+                      (user) => ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Color(
+                            int.parse(user.color.replaceFirst('#', '0xFF')),
+                          ),
+                          child: Text(
+                            user.name[0].toUpperCase(),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        title: Text(user.name),
+                        trailing: IconButton(
+                          icon: const Icon(
+                            Icons.remove_circle_outline,
+                            color: AppTheme.error,
+                          ),
+                          onPressed: () => ref
+                              .read(projectProvider.notifier)
+                              .removeUser(user.id),
+                          tooltip: 'Verwijder gebruiker',
+                        ),
                       ),
-                      title: Text(user.name),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.remove_circle_outline, color: AppTheme.error),
-                        onPressed: () => ref.read(projectProvider.notifier).removeUser(user.id),
-                        tooltip: 'Verwijder gebruiker',
-                      ),
-                    )),
+                    ),
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.person_add),
@@ -94,9 +127,14 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            Text('Uiterlijk', style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              'Uiterlijk',
+              style: context.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
             Card(
               child: Column(
@@ -110,19 +148,22 @@ class SettingsScreen extends ConsumerWidget {
                           themeMode == ThemeMode.system
                               ? 'Systeem instelling volgen'
                               : themeMode == ThemeMode.dark
-                                  ? 'Aan'
-                                  : 'Uit',
+                              ? 'Aan'
+                              : 'Uit',
                         ),
                         secondary: Icon(
-                          themeMode == ThemeMode.dark ? Icons.dark_mode : Icons.light_mode,
+                          themeMode == ThemeMode.dark
+                              ? Icons.dark_mode
+                              : Icons.light_mode,
                         ),
                         value: themeMode == ThemeMode.dark,
                         onChanged: (bool value) {
-                          ref.read(themeModeProvider.notifier).set(
-                                value ? ThemeMode.dark : ThemeMode.light);
+                          ref
+                              .read(themeModeProvider.notifier)
+                              .set(value ? ThemeMode.dark : ThemeMode.light);
                         },
                       );
-                    }
+                    },
                   ),
                   const Divider(height: 1),
                   Consumer(
@@ -130,28 +171,39 @@ class SettingsScreen extends ConsumerWidget {
                       final themeMode = ref.watch(themeModeProvider);
                       return ListTile(
                         title: const Text('Systeem Thema'),
-                        subtitle: const Text('Volg instellingen van je apparaat'),
+                        subtitle: const Text(
+                          'Volg instellingen van je apparaat',
+                        ),
                         leading: const Icon(Icons.brightness_auto),
                         trailing: Switch(
                           value: themeMode == ThemeMode.system,
                           onChanged: (bool value) {
                             if (value) {
-                              ref.read(themeModeProvider.notifier).set(ThemeMode.system);
+                              ref
+                                  .read(themeModeProvider.notifier)
+                                  .set(ThemeMode.system);
                             } else {
                               // Default to light if turning off system mode
-                              ref.read(themeModeProvider.notifier).set(ThemeMode.light);
+                              ref
+                                  .read(themeModeProvider.notifier)
+                                  .set(ThemeMode.light);
                             }
                           },
                         ),
                       );
-                    }
+                    },
                   ),
                 ],
               ),
             ),
 
             const SizedBox(height: 24),
-            Text('AI Instellingen', style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              'AI Instellingen',
+              style: context.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
             Card(
               child: Column(
@@ -159,11 +211,19 @@ class SettingsScreen extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.vpn_key),
                     title: const Text('Gemini API Key'),
-                    subtitle: Text(DatabaseService.getSetting('gemini_api_key') == null 
-                        ? 'Niet ingesteld' 
-                        : '••••••••'),
+                    subtitle: Text(
+                      DatabaseService.getSetting('gemini_api_key') == null
+                          ? 'Niet ingesteld'
+                          : '••••••••',
+                    ),
                     trailing: const Icon(Icons.edit),
-                    onTap: () => _showApiKeyDialog(context, ref, 'gemini_api_key', 'Gemini', 'aistudio.google.com/app/apikey'),
+                    onTap: () => _showApiKeyDialog(
+                      context,
+                      ref,
+                      'gemini_api_key',
+                      'Gemini',
+                      'aistudio.google.com/app/apikey',
+                    ),
                   ),
                   const Divider(height: 1),
                   const ListTile(
@@ -175,9 +235,14 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            Text('Data', style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              'Data',
+              style: context.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
             Card(
               child: Column(
@@ -191,16 +256,27 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Icons.delete_forever, color: AppTheme.error),
-                    title: const Text('Alle data wissen', style: TextStyle(color: AppTheme.error)),
+                    leading: const Icon(
+                      Icons.delete_forever,
+                      color: AppTheme.error,
+                    ),
+                    title: const Text(
+                      'Alle data wissen',
+                      style: TextStyle(color: AppTheme.error),
+                    ),
                     onTap: () => _showDeleteConfirmation(context, ref),
                   ),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            Text('Over', style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              'Over',
+              style: context.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
             const Card(
               child: Column(
@@ -227,11 +303,13 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   void _showDeleteConfirmation(BuildContext context, WidgetRef ref) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Alle data wissen?'),
-        content: const Text('Dit kan niet ongedaan worden gemaakt. Al je taken, dozen, en uitgaven worden verwijderd.'),
+        content: const Text(
+          'Dit kan niet ongedaan worden gemaakt. Al je taken, dozen, en uitgaven worden verwijderd.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -253,11 +331,19 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showDeleteProjectConfirmation(BuildContext context, WidgetRef ref, Project project) {
-    showDialog(
+  void _showDeleteProjectConfirmation(
+    BuildContext context,
+    WidgetRef ref,
+    Project project,
+  ) {
+    showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        icon: const Icon(Icons.warning_rounded, color: AppTheme.error, size: 48),
+        icon: const Icon(
+          Icons.warning_rounded,
+          color: AppTheme.error,
+          size: 48,
+        ),
         title: const Text('Verhuizing verwijderen?'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -277,17 +363,15 @@ class SettingsScreen extends ConsumerWidget {
             child: const Text('Annuleren'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.error,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.error),
             onPressed: () async {
               Navigator.pop(ctx);
               await ref.read(projectsProvider.notifier).delete(project.id);
-              
+
               // Reload providers
               ref.read(projectProvider.notifier).load();
               ref.read(projectsProvider.notifier).load();
-              
+
               if (context.mounted) {
                 final hasProjects = ref.read(projectsProvider).isNotEmpty;
                 if (!hasProjects) {
@@ -302,10 +386,14 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showExportDialog(BuildContext context, WidgetRef ref, Project? project) {
+  void _showExportDialog(
+    BuildContext context,
+    WidgetRef ref,
+    Project? project,
+  ) {
     if (project == null) return;
 
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       builder: (context) => SafeArea(
@@ -317,7 +405,10 @@ class SettingsScreen extends ConsumerWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: Text('Exporteer Data', style: context.textTheme.titleLarge),
+                child: Text(
+                  'Exporteer Data',
+                  style: context.textTheme.titleLarge,
+                ),
               ),
               const Divider(height: 1),
               _buildExportOption(
@@ -327,14 +418,22 @@ class SettingsScreen extends ConsumerWidget {
                 subtitle: 'Deel of sla op voor backup',
                 onShare: () async {
                   Navigator.pop(context);
-                  await ExportService.exportProjectData(project, download: false);
+                  await ExportService.exportProjectData(
+                    project,
+                    download: false,
+                  );
                 },
                 onDownload: () async {
                   Navigator.pop(context);
-                  await ExportService.exportProjectData(project, download: true);
+                  await ExportService.exportProjectData(
+                    project,
+                    download: true,
+                  );
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Opgeslagen in Documents map')),
+                      const SnackBar(
+                        content: Text('Opgeslagen in Documents map'),
+                      ),
                     );
                   }
                 },
@@ -347,14 +446,22 @@ class SettingsScreen extends ConsumerWidget {
                 subtitle: 'Voor Excel of administratie',
                 onShare: () async {
                   Navigator.pop(context);
-                  await ExportService.exportExpensesCsv(project, download: false);
+                  await ExportService.exportExpensesCsv(
+                    project,
+                    download: false,
+                  );
                 },
                 onDownload: () async {
                   Navigator.pop(context);
-                  await ExportService.exportExpensesCsv(project, download: true);
+                  await ExportService.exportExpensesCsv(
+                    project,
+                    download: true,
+                  );
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Opgeslagen in Downloads map')),
+                      const SnackBar(
+                        content: Text('Opgeslagen in Downloads map'),
+                      ),
                     );
                   }
                 },
@@ -367,14 +474,22 @@ class SettingsScreen extends ConsumerWidget {
                 subtitle: 'Compleet overzicht voor AI of print',
                 onShare: () async {
                   Navigator.pop(context);
-                  await ExportService.exportLlmOverview(project, download: false);
+                  await ExportService.exportLlmOverview(
+                    project,
+                    download: false,
+                  );
                 },
                 onDownload: () async {
                   Navigator.pop(context);
-                  await ExportService.exportLlmOverview(project, download: true);
+                  await ExportService.exportLlmOverview(
+                    project,
+                    download: true,
+                  );
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Ultiem Overzicht opgeslagen!')),
+                      const SnackBar(
+                        content: Text('Ultiem Overzicht opgeslagen!'),
+                      ),
                     );
                   }
                 },
@@ -387,14 +502,19 @@ class SettingsScreen extends ConsumerWidget {
                 subtitle: 'Automatische samenvatting via Gemini',
                 onShare: () async {
                   Navigator.pop(context);
-                  await ExportService.exportLlmSummary(project, download: false);
+                  await ExportService.exportLlmSummary(
+                    project,
+                    download: false,
+                  );
                 },
                 onDownload: () async {
                   Navigator.pop(context);
                   await ExportService.exportLlmSummary(project, download: true);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('AI Samenvatting opgeslagen!')),
+                      const SnackBar(
+                        content: Text('AI Samenvatting opgeslagen!'),
+                      ),
                     );
                   }
                 },
@@ -409,53 +529,78 @@ class SettingsScreen extends ConsumerWidget {
   void _showAddUserDialog(BuildContext context, WidgetRef ref) {
     final nameController = TextEditingController();
     String selectedColor = '#6366F1';
-    final colors = ['#6366F1', '#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#EF4444'];
+    final colors = [
+      '#6366F1',
+      '#8B5CF6',
+      '#EC4899',
+      '#10B981',
+      '#F59E0B',
+      '#EF4444',
+    ];
 
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-            left: 16, right: 16, top: 16,
+            left: 16,
+            right: 16,
+            top: 16,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Gebruiker toevoegen', style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+              Text(
+                'Gebruiker toevoegen',
+                style: context.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 16),
               TextField(
                 controller: nameController,
                 autofocus: true,
-                decoration: const InputDecoration(labelText: 'Naam', hintText: 'bijv. Jan'),
+                decoration: const InputDecoration(
+                  labelText: 'Naam',
+                  hintText: 'bijv. Jan',
+                ),
               ),
               const SizedBox(height: 16),
               Text('Kies een kleur', style: context.textTheme.labelLarge),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
-                children: colors.map((color) => GestureDetector(
-                  onTap: () => setModalState(() => selectedColor = color),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Color(int.parse(color.replaceFirst('#', '0xFF'))),
-                      shape: BoxShape.circle,
-                      border: selectedColor == color 
-                          ? Border.all(color: Colors.white, width: 3)
-                          : null,
-                    ),
-                  ),
-                )).toList(),
+                children: colors
+                    .map(
+                      (color) => GestureDetector(
+                        onTap: () => setModalState(() => selectedColor = color),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Color(
+                              int.parse(color.replaceFirst('#', '0xFF')),
+                            ),
+                            shape: BoxShape.circle,
+                            border: selectedColor == color
+                                ? Border.all(color: Colors.white, width: 3)
+                                : null,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
                   if (nameController.text.isNotEmpty) {
-                    ref.read(projectProvider.notifier).addUser(nameController.text, selectedColor);
+                    ref
+                        .read(projectProvider.notifier)
+                        .addUser(nameController.text, selectedColor);
                     Navigator.pop(context);
                   }
                 },
@@ -468,12 +613,18 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showApiKeyDialog(BuildContext context, WidgetRef ref, String settingKey, String providerName, String url) {
+  void _showApiKeyDialog(
+    BuildContext context,
+    WidgetRef ref,
+    String settingKey,
+    String providerName,
+    String url,
+  ) {
     final controller = TextEditingController(
       text: DatabaseService.getSetting(settingKey) ?? '',
     );
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('$providerName API Key'),
@@ -481,10 +632,18 @@ class SettingsScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Voer je $providerName API key in om AI samenvattingen te gebruiken.'),
+            Text(
+              'Voer je $providerName API key in om AI samenvattingen te gebruiken.',
+            ),
             const SizedBox(height: 8),
-            const Text('Gratis key aanmaken op:', style: TextStyle(fontSize: 12)),
-            Text(url, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            const Text(
+              'Gratis key aanmaken op:',
+              style: TextStyle(fontSize: 12),
+            ),
+            Text(
+              url,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 16),
             TextField(
               controller: controller,
@@ -559,4 +718,3 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 }
-

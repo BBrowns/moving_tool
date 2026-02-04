@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
-import 'package:moving_tool_flutter/features/packing/domain/entities/packing_box.dart';
 import 'package:moving_tool_flutter/features/packing/domain/entities/box_item.dart';
+import 'package:moving_tool_flutter/features/packing/domain/entities/packing_box.dart';
 
 
 class BoxCard extends StatelessWidget {
@@ -10,8 +10,8 @@ class BoxCard extends StatelessWidget {
   final VoidCallback onAddItem;
   final VoidCallback onDeleteBox;
   final VoidCallback onEditBox;
-  final Function(BoxItem) onEditItem;
-  final Function(BoxItem) onToggleItem;
+  final void Function(BoxItem) onEditItem;
+  final void Function(BoxItem) onToggleItem;
   final VoidCallback onToggleBox;
 
   const BoxCard({

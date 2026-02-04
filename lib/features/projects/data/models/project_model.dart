@@ -1,7 +1,7 @@
 
-import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
 import 'package:moving_tool_flutter/features/projects/data/models/address_model.dart';
 import 'package:moving_tool_flutter/features/projects/data/models/user_model.dart';
+import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
 
 class ProjectModel extends Project {
   ProjectModel({

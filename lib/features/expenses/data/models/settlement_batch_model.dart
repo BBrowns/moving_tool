@@ -1,6 +1,6 @@
 
-import 'package:moving_tool_flutter/features/expenses/domain/entities/settlement_batch.dart';
 import 'package:moving_tool_flutter/features/expenses/data/models/settlement_model.dart';
+import 'package:moving_tool_flutter/features/expenses/domain/entities/settlement_batch.dart';
 
 class SettlementBatchModel extends SettlementBatch {
   SettlementBatchModel({

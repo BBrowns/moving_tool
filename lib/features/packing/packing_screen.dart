@@ -1,16 +1,17 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moving_tool_flutter/core/models/models.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
-import 'package:moving_tool_flutter/features/packing/presentation/providers/packing_providers.dart';
-import 'package:moving_tool_flutter/features/packing/presentation/widgets/room_card.dart';
-import 'package:moving_tool_flutter/features/packing/presentation/widgets/box_card.dart';
-import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
 import 'package:moving_tool_flutter/core/widgets/responsive_scaffold.dart';
-import 'package:moving_tool_flutter/data/services/llm_service.dart';
+import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
 import 'package:moving_tool_flutter/data/services/database_service.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:moving_tool_flutter/data/services/llm_service.dart';
+import 'package:moving_tool_flutter/features/packing/presentation/providers/packing_providers.dart';
+import 'package:moving_tool_flutter/features/packing/presentation/widgets/box_card.dart';
+import 'package:moving_tool_flutter/features/packing/presentation/widgets/room_card.dart';
 
 class PackingScreen extends ConsumerWidget {
   const PackingScreen({super.key});

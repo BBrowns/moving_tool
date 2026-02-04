@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import '../../data/providers/providers.dart';
+import 'package:moving_tool_flutter/core/theme/app_theme.dart';
+import 'package:moving_tool_flutter/core/widgets/responsive_scaffold.dart';
+import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
+import 'package:moving_tool_flutter/data/providers/providers.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/widgets/responsive_wrapper.dart';
-import '../../core/widgets/responsive_scaffold.dart';
 
 class ProjectsScreen extends ConsumerStatefulWidget {
   const ProjectsScreen({super.key});
@@ -113,7 +113,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
   }
 
   void _confirmDelete(BuildContext context, WidgetRef ref, Project project) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         icon: const Icon(Icons.warning_rounded, color: AppTheme.error, size: 48),

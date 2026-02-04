@@ -1,17 +1,18 @@
 // Database Service - Hive-based persistent storage
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:moving_tool_flutter/core/models/models.dart';
-import 'package:moving_tool_flutter/features/expenses/domain/entities/settlement_batch.dart';
-import 'package:moving_tool_flutter/features/shopping/data/models/shopping_item_model.dart';
-import 'package:moving_tool_flutter/features/packing/data/models/room_model.dart';
-import 'package:moving_tool_flutter/features/packing/data/models/packing_box_model.dart';
-import 'package:moving_tool_flutter/features/packing/data/models/box_item_model.dart';
-import 'package:moving_tool_flutter/features/projects/data/models/project_model.dart';
-import 'package:moving_tool_flutter/features/tasks/data/models/task_model.dart';
 import 'package:moving_tool_flutter/features/expenses/data/models/expense_model.dart';
 import 'package:moving_tool_flutter/features/expenses/data/models/settlement_batch_model.dart';
+import 'package:moving_tool_flutter/features/expenses/domain/entities/settlement_batch.dart';
+import 'package:moving_tool_flutter/features/packing/data/models/box_item_model.dart';
+import 'package:moving_tool_flutter/features/packing/data/models/packing_box_model.dart';
+import 'package:moving_tool_flutter/features/packing/data/models/room_model.dart';
+import 'package:moving_tool_flutter/features/projects/data/models/project_model.dart';
+import 'package:moving_tool_flutter/features/shopping/data/models/shopping_item_model.dart';
+import 'package:moving_tool_flutter/features/tasks/data/models/task_model.dart';
 
 /// Hive-based database service with persistent storage
 class DatabaseService {
@@ -425,14 +426,14 @@ class DatabaseService {
   static JournalEntry _journalEntryFromJson(String json) {
     final m = jsonDecode(json) as Map<String, dynamic>;
     return JournalEntry(
-      id: m['id'],
-      type: JournalEventType.values[m['type']],
-      title: m['title'],
-      description: m['description'],
-      userId: m['userId'],
-      relatedEntityId: m['relatedEntityId'],
-      metadata: m['metadata'] != null ? Map<String, dynamic>.from(m['metadata']) : null,
-      timestamp: DateTime.parse(m['timestamp']),
+      id: m['id'] as String,
+      type: JournalEventType.values[m['type'] as int],
+      title: m['title'] as String,
+      description: m['description'] as String?,
+      userId: m['userId'] as String?,
+      relatedEntityId: m['relatedEntityId'] as String?,
+      metadata: m['metadata'] != null ? Map<String, dynamic>.from(m['metadata'] as Map) : null,
+      timestamp: DateTime.parse(m['timestamp'] as String),
     );
   }
 
@@ -449,13 +450,13 @@ class DatabaseService {
   static PlaybookNote _noteFromJson(String json) {
     final m = jsonDecode(json) as Map<String, dynamic>;
     return PlaybookNote(
-      id: m['id'],
-      title: m['title'],
-      content: m['content'],
-      category: m['category'],
-      isPinned: m['isPinned'] ?? false,
-      createdAt: DateTime.parse(m['createdAt']),
-      updatedAt: DateTime.parse(m['updatedAt']),
+      id: m['id'] as String,
+      title: m['title'] as String,
+      content: m['content'] as String,
+      category: m['category'] as String?,
+      isPinned: (m['isPinned'] as bool?) ?? false,
+      createdAt: DateTime.parse(m['createdAt'] as String),
+      updatedAt: DateTime.parse(m['updatedAt'] as String),
     );
   }
 

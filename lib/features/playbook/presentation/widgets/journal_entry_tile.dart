@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:moving_tool_flutter/features/playbook/domain/entities/journal_entry.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
+import 'package:moving_tool_flutter/features/playbook/domain/entities/journal_entry.dart';
 
 class JournalEntryTile extends StatelessWidget {
   final JournalEntry entry;

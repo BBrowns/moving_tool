@@ -92,9 +92,7 @@ class _DesktopShell extends StatelessWidget {
                       onDestinationSelected: (index) =>
                           navigationShell.goBranch(index),
                       extended: isExtended,
-                      labelType: isExtended
-                          ? NavigationRailLabelType.none
-                          : NavigationRailLabelType.all,
+                      labelType: NavigationRailLabelType.none,
                       // Increase text size for better readability
                       selectedLabelTextStyle: context.textTheme.bodyLarge
                           ?.copyWith(

@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:moving_tool_flutter/core/error/exceptions.dart';
+import 'package:moving_tool_flutter/data/services/database_service.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
 import 'package:moving_tool_flutter/features/projects/domain/repositories/projects_repository.dart';
-import 'package:moving_tool_flutter/data/services/database_service.dart';
 
 class ProjectsRepositoryImpl implements ProjectsRepository {
   @override

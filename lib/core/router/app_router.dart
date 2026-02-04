@@ -1,23 +1,23 @@
 // App Router - Navigation with GoRouter
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moving_tool_flutter/data/providers/providers.dart';
-import 'package:moving_tool_flutter/features/onboarding/onboarding_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
-import 'package:moving_tool_flutter/features/shell/app_shell.dart';
+import 'package:moving_tool_flutter/data/providers/providers.dart';
 import 'package:moving_tool_flutter/features/dashboard/dashboard_screen.dart';
-import 'package:moving_tool_flutter/features/tasks/tasks_screen.dart';
-import 'package:moving_tool_flutter/features/packing/packing_screen.dart';
-import 'package:moving_tool_flutter/features/shopping/shopping_screen.dart';
 import 'package:moving_tool_flutter/features/expenses/expenses_screen.dart';
+import 'package:moving_tool_flutter/features/onboarding/onboarding_screen.dart';
+import 'package:moving_tool_flutter/features/packing/packing_screen.dart';
 import 'package:moving_tool_flutter/features/playbook/playbook_screen.dart';
+import 'package:moving_tool_flutter/features/projects/projects_screen.dart';
 // ... (rest of imports)
 
 import 'package:moving_tool_flutter/features/settings/settings_screen.dart';
-import 'package:moving_tool_flutter/features/projects/projects_screen.dart';
+import 'package:moving_tool_flutter/features/shell/app_shell.dart';
+import 'package:moving_tool_flutter/features/shopping/shopping_screen.dart';
+import 'package:moving_tool_flutter/features/tasks/tasks_screen.dart';
 
 /// Custom page builder that provides adaptive transitions:
 /// - Desktop/Web: No transition (instant switch) for main tabs

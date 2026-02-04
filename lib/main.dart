@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'core/theme/app_theme.dart';
-import 'core/router/app_router.dart';
-import 'data/services/database_service.dart';
-import 'data/providers/providers.dart';
-
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:moving_tool_flutter/core/router/app_router.dart';
+import 'package:moving_tool_flutter/core/theme/app_theme.dart';
+import 'package:moving_tool_flutter/data/providers/providers.dart';
+import 'package:moving_tool_flutter/data/services/database_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   try {
     // Initialize date formatting
     await initializeDateFormatting('nl_NL', null);
-    
+
     // Initialize database
     await DatabaseService.initialize();
   } catch (e, stack) {
@@ -22,7 +21,7 @@ void main() async {
     // We continue to run the app so it doesn't just show a blank white screen,
     // though functionality might be broken.
   }
-  
+
   runApp(const ProviderScope(child: MovingToolApp()));
 }
 
@@ -39,7 +38,7 @@ class _MovingToolAppState extends ConsumerState<MovingToolApp> {
     super.initState();
     // Skip loading in test mode (test_utils sets isTestMode)
     if (AppTheme.isTestMode) return;
-    
+
     // Load all data on startup
     Future.microtask(() {
       ref.read(projectsProvider.notifier).load(); // Load all projects

@@ -1,8 +1,10 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 import 'package:moving_tool_flutter/core/models/models.dart';
-import 'package:moving_tool_flutter/features/packing/domain/repositories/packing_repository.dart';
 import 'package:moving_tool_flutter/features/packing/data/repositories/packing_repository_impl.dart';
+import 'package:moving_tool_flutter/features/packing/domain/repositories/packing_repository.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
+
+part 'packing_providers.g.dart';
 
 const _uuid = Uuid();
 
@@ -10,17 +12,21 @@ const _uuid = Uuid();
 // Repository Provider
 // ============================================================================
 
-final packingRepositoryProvider = Provider<PackingRepository>((ref) {
+@Riverpod(keepAlive: true)
+PackingRepository packingRepository(Ref ref) {
   return PackingRepositoryImpl();
-});
+}
+
+// Generated provider is packingRepositoryProvider
 
 // ============================================================================
 // Packing Providers (Room, PackingBox, BoxItem)
 // ============================================================================
 
-class RoomNotifier extends Notifier<List<Room>> {
+@Riverpod(keepAlive: true)
+class RoomNotifier extends _$RoomNotifier {
   late final PackingRepository repository;
-  
+
   @override
   List<Room> build() {
     repository = ref.watch(packingRepositoryProvider);
@@ -60,9 +66,8 @@ class RoomNotifier extends Notifier<List<Room>> {
   }
 }
 
-final roomProvider = NotifierProvider<RoomNotifier, List<Room>>(RoomNotifier.new);
-
-class BoxNotifier extends Notifier<List<PackingBox>> {
+@Riverpod(keepAlive: true)
+class BoxNotifier extends _$BoxNotifier {
   late final PackingRepository repository;
 
   @override
@@ -103,18 +108,17 @@ class BoxNotifier extends Notifier<List<PackingBox>> {
 
   Future<void> toggleBoxPacked(String id) async {
     final box = state.firstWhere((b) => b.id == id);
-    final newStatus = box.status == BoxStatus.packed 
-        ? BoxStatus.packing 
+    final newStatus = box.status == BoxStatus.packed
+        ? BoxStatus.packing
         : BoxStatus.packed;
-    
+
     final updated = box.copyWith(status: newStatus);
     await update(updated);
   }
 }
 
-final boxProvider = NotifierProvider<BoxNotifier, List<PackingBox>>(BoxNotifier.new);
-
-class BoxItemNotifier extends Notifier<List<BoxItem>> {
+@Riverpod(keepAlive: true)
+class BoxItemNotifier extends _$BoxItemNotifier {
   late final PackingRepository repository;
 
   @override
@@ -162,21 +166,39 @@ class BoxItemNotifier extends Notifier<List<BoxItem>> {
   }
 }
 
-final boxItemProvider = NotifierProvider<BoxItemNotifier, List<BoxItem>>(BoxItemNotifier.new);
-
 // ============================================================================
 // Derived Providers (Selectors)
 // ============================================================================
 
-final roomBoxesProvider = Provider.family<List<PackingBox>, String>((ref, roomId) {
+@Riverpod(keepAlive: true)
+List<PackingBox> roomBoxes(Ref ref, String roomId) {
   final boxes = ref.watch(boxProvider);
   return boxes.where((b) => b.roomId == roomId).toList();
-});
+}
 
-final boxItemsProvider = Provider.family<List<BoxItem>, String>((ref, boxId) {
+// Alias
+// Alias
+// final roomBoxesProvider = roomBoxesProvider;
+// Generated: roomBoxesProvider.
+// But wait, generated provider for family is usually `roomBoxesProvider`.
+// So explicit alias might be redundant or error-prone (circular).
+// I should CHECK usage. If I define `roomBoxesProvider` manually and generated one has same name -> collision.
+// I will rename the function to avoid collision, or use the generated name.
+// Existing usage: `ref.watch(roomBoxesProvider(roomId))` or `ref.watch(roomBoxesProvider(roomId))`.
+// Manual family: `roomBoxesProvider(roomId)`.
+// Generated family: `roomBoxesProvider(roomId)`.
+// So if I name the function `roomBoxes`, the provider is `roomBoxesProvider`.
+// I MUST NOT define a manual variable with the same name.
+// So I will just use the generated provider.
+
+@Riverpod(keepAlive: true)
+List<BoxItem> itemsInBox(Ref ref, String boxId) {
   final items = ref.watch(boxItemProvider);
   return items.where((i) => i.boxId == boxId).toList();
-});
+}
+
+// Alias for old name `boxItemsProvider`
+final ItemsInBoxFamily boxItemsProvider = itemsInBoxProvider;
 
 class PackingStats {
   final int totalBoxes;
@@ -190,14 +212,15 @@ class PackingStats {
   });
 }
 
-final packingStatsProvider = Provider<PackingStats>((ref) {
+@Riverpod(keepAlive: true)
+PackingStats packingStats(Ref ref) {
   final boxes = ref.watch(boxProvider);
   final items = ref.watch(boxItemProvider);
 
   final totalBoxes = boxes.length;
-  final packedBoxes = boxes.where((b) => 
-    b.status == BoxStatus.packed || b.status == BoxStatus.moved
-  ).length;
+  final packedBoxes = boxes
+      .where((b) => b.status == BoxStatus.packed || b.status == BoxStatus.moved)
+      .length;
   final totalItems = items.length;
 
   return PackingStats(
@@ -205,4 +228,6 @@ final packingStatsProvider = Provider<PackingStats>((ref) {
     packedBoxes: packedBoxes,
     totalItems: totalItems,
   );
-});
+}
+
+// Generated is `packingStatsProvider`.

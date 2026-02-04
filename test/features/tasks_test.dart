@@ -1,12 +1,12 @@
 // Tasks Screen Tests
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moving_tool_flutter/data/providers/providers.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:moving_tool_flutter/core/models/models.dart';
-import 'package:moving_tool_flutter/features/tasks/tasks_screen.dart';
+import 'package:moving_tool_flutter/data/providers/providers.dart';
+import 'package:moving_tool_flutter/features/projects/domain/repositories/projects_repository.dart';
 import 'package:moving_tool_flutter/features/tasks/domain/repositories/tasks_repository.dart';
-import 'package:moving_tool_flutter/features/tasks/presentation/providers/task_providers.dart';
+import 'package:moving_tool_flutter/features/tasks/tasks_screen.dart';
 
 // Mock Repository used by Real TaskNotifier
 class MockTasksRepository implements TasksRepository {
@@ -20,7 +20,7 @@ class MockTasksRepository implements TasksRepository {
 
   @override
   Future<List<Task>> getTasks() async => _tasks;
-  
+
   @override
   Future<void> saveTask(Task task) async {
     final index = _tasks.indexWhere((t) => t.id == task.id);
@@ -30,7 +30,7 @@ class MockTasksRepository implements TasksRepository {
       _tasks.add(task);
     }
   }
-  
+
   @override
   Future<void> deleteTask(String id) async {
     _tasks.removeWhere((t) => t.id == id);
@@ -39,9 +39,9 @@ class MockTasksRepository implements TasksRepository {
 
 class TestTaskNotifier extends TaskNotifier {
   final List<Task> _initialTasks;
-  
+
   TestTaskNotifier(this._initialTasks);
-  
+
   @override
   List<Task> build() {
     repository = ref.watch(tasksRepositoryProvider);
@@ -49,31 +49,78 @@ class TestTaskNotifier extends TaskNotifier {
   }
 }
 
+class TestProjectNotifier extends ProjectNotifier {
+  final Project? _initialProject;
+  TestProjectNotifier(this._initialProject);
+
+  @override
+  Project? build() {
+    repository = ref.watch(projectsRepositoryProvider);
+    return _initialProject;
+  }
+}
+
+// Mock project for testing
+final mockProject = Project(
+  id: 'test-project-id',
+  name: 'Test Verhuizing',
+  movingDate: DateTime.now().add(const Duration(days: 30)),
+  fromAddress: Address(),
+  toAddress: Address(),
+  users: [User(id: 'u1', name: 'Test User', color: '#6366F1')],
+  createdAt: DateTime.now(),
+);
+
+class MockProjectsRepository implements ProjectsRepository {
+  @override
+  List<Project> getAllProjects() => [mockProject];
+  @override
+  Project? getProject(String id) => mockProject;
+  @override
+  Project? getActiveProject() => mockProject;
+  @override
+  String? getActiveProjectId() => mockProject.id;
+  @override
+  Future<void> saveProject(Project project) async {}
+  @override
+  Future<void> deleteProject(String id) async {}
+  @override
+  Future<void> setActiveProject(String id) async {}
+}
+
 void main() {
   group('TasksScreen', () {
-    testWidgets('shows empty state when no tasks exist', (WidgetTester tester) async {
+    testWidgets('shows empty state when no tasks exist', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(400, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      
+
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-             tasksRepositoryProvider.overrideWithValue(MockTasksRepository()),
-             taskProvider.overrideWith(() => TestTaskNotifier([])),
+            tasksRepositoryProvider.overrideWithValue(MockTasksRepository()),
+            taskProvider.overrideWith(() => TestTaskNotifier([])),
+            projectsRepositoryProvider.overrideWithValue(
+              MockProjectsRepository(),
+            ),
+            projectProvider.overrideWith(
+              () => TestProjectNotifier(mockProject),
+            ),
           ],
-          child: const MaterialApp(
-            home: TasksScreen(),
-          ),
+          child: const MaterialApp(home: TasksScreen()),
         ),
       );
 
-      expect(find.text('📝'), findsOneWidget);
+      expect(find.byIcon(Icons.assignment_rounded), findsOneWidget);
       expect(find.text('Nog geen taken'), findsOneWidget);
     });
 
-    testWidgets('Mobile: shows List View grouped by Category', (WidgetTester tester) async {
+    testWidgets('Mobile: shows List View grouped by Category', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(400, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -90,16 +137,22 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            tasksRepositoryProvider.overrideWithValue(MockTasksRepository([mockTask])),
+            tasksRepositoryProvider.overrideWithValue(
+              MockTasksRepository([mockTask]),
+            ),
             taskProvider.overrideWith(() => TestTaskNotifier([mockTask])),
+            projectsRepositoryProvider.overrideWithValue(
+              MockProjectsRepository(),
+            ),
+            projectProvider.overrideWith(
+              () => TestProjectNotifier(mockProject),
+            ),
           ],
-          child: const MaterialApp(
-            home: TasksScreen(),
-          ),
+          child: const MaterialApp(home: TasksScreen()),
         ),
       );
 
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // Should find Category Header (Icon is separate)
       expect(find.text('Administratie'), findsOneWidget);
@@ -109,7 +162,9 @@ void main() {
       expect(find.byType(ListView), findsOneWidget);
     });
 
-    testWidgets('Desktop: shows Kanban View grouped by Status', (WidgetTester tester) async {
+    testWidgets('Desktop: shows Kanban View grouped by Status', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(1400, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -126,16 +181,22 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            tasksRepositoryProvider.overrideWithValue(MockTasksRepository([mockTask])),
+            tasksRepositoryProvider.overrideWithValue(
+              MockTasksRepository([mockTask]),
+            ),
             taskProvider.overrideWith(() => TestTaskNotifier([mockTask])),
+            projectsRepositoryProvider.overrideWithValue(
+              MockProjectsRepository(),
+            ),
+            projectProvider.overrideWith(
+              () => TestProjectNotifier(mockProject),
+            ),
           ],
-          child: const MaterialApp(
-            home: TasksScreen(),
-          ),
+          child: const MaterialApp(home: TasksScreen()),
         ),
       );
 
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // Should find Status Labels
       expect(find.text('Te doen'), findsOneWidget);
@@ -157,10 +218,14 @@ void main() {
           overrides: [
             tasksRepositoryProvider.overrideWithValue(MockTasksRepository()),
             taskProvider.overrideWith(() => TestTaskNotifier([])),
+            projectsRepositoryProvider.overrideWithValue(
+              MockProjectsRepository(),
+            ),
+            projectProvider.overrideWith(
+              () => TestProjectNotifier(mockProject),
+            ),
           ],
-          child: const MaterialApp(
-            home: TasksScreen(),
-          ),
+          child: const MaterialApp(home: TasksScreen()),
         ),
       );
 
@@ -169,7 +234,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Nieuwe taak'), findsOneWidget);
-      
+
       // Enter text
       await tester.enterText(find.byType(TextField).first, 'New Task');
       await tester.tap(find.text('Toevoegen'));
@@ -204,17 +269,23 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            tasksRepositoryProvider.overrideWithValue(MockTasksRepository([task1, task2])),
+            tasksRepositoryProvider.overrideWithValue(
+              MockTasksRepository([task1, task2]),
+            ),
             taskProvider.overrideWith(() => TestTaskNotifier([task1, task2])),
+            projectsRepositoryProvider.overrideWithValue(
+              MockProjectsRepository(),
+            ),
+            projectProvider.overrideWith(
+              () => TestProjectNotifier(mockProject),
+            ),
           ],
-          child: const MaterialApp(
-            home: TasksScreen(),
-          ),
+          child: const MaterialApp(home: TasksScreen()),
         ),
       );
 
-      await tester.pump();
-      
+      await tester.pumpAndSettle();
+
       // Initially both visible
       expect(find.text('Admin Task'), findsOneWidget);
       expect(find.text('Clean Task'), findsOneWidget);
@@ -224,17 +295,17 @@ void main() {
       await tester.pumpAndSettle();
 
       // Select 'Administratie'
-      await tester.tap(find.text('📋 Administratie'));
+      await tester.tap(find.text('Administratie').last);
       await tester.pumpAndSettle();
 
       // Verify filtering
       expect(find.text('Admin Task'), findsOneWidget);
       expect(find.text('Clean Task'), findsNothing);
-      
+
       // Clear filter using the X button
       await tester.tap(find.byIcon(Icons.filter_alt_off));
       await tester.pumpAndSettle();
-      
+
       expect(find.text('Clean Task'), findsOneWidget);
     });
   });

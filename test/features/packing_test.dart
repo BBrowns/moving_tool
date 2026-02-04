@@ -1,13 +1,13 @@
 // Packing Screen Tests
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moving_tool_flutter/features/packing/presentation/providers/packing_providers.dart';
-import 'package:moving_tool_flutter/features/packing/domain/repositories/packing_repository.dart';
-import 'package:moving_tool_flutter/features/packing/domain/entities/room.dart';
-import 'package:moving_tool_flutter/features/packing/domain/entities/packing_box.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:moving_tool_flutter/features/packing/domain/entities/box_item.dart';
+import 'package:moving_tool_flutter/features/packing/domain/entities/packing_box.dart';
+import 'package:moving_tool_flutter/features/packing/domain/entities/room.dart';
+import 'package:moving_tool_flutter/features/packing/domain/repositories/packing_repository.dart';
 import 'package:moving_tool_flutter/features/packing/packing_screen.dart';
+import 'package:moving_tool_flutter/features/packing/presentation/providers/packing_providers.dart';
 
 // Mock Repository
 class MockPackingRepository implements PackingRepository {
@@ -113,28 +113,25 @@ Room createMockRoom({
 
 void main() {
   group('PackingScreen', () {
-    testWidgets('shows empty state when no rooms exist', (WidgetTester tester) async {
+    testWidgets('shows empty state when no rooms exist', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: PackingScreen(),
-          ),
-        ),
+        const ProviderScope(child: MaterialApp(home: PackingScreen())),
       );
 
       // Should show empty state
-      expect(find.text('🏠'), findsOneWidget);
+      expect(find.byIcon(Icons.house_rounded), findsOneWidget);
       expect(find.text('Nog geen kamers'), findsOneWidget);
-      expect(find.text('Voeg kamers toe om te beginnen met inpakken'), findsOneWidget);
+      expect(
+        find.text('Voeg kamers toe om te beginnen met inpakken'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows app bar with title', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: PackingScreen(),
-          ),
-        ),
+        const ProviderScope(child: MaterialApp(home: PackingScreen())),
       );
 
       expect(find.text('Inpakken'), findsOneWidget);
@@ -142,11 +139,7 @@ void main() {
 
     testWidgets('shows FAB to add room', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: PackingScreen(),
-          ),
-        ),
+        const ProviderScope(child: MaterialApp(home: PackingScreen())),
       );
 
       expect(find.byType(FloatingActionButton), findsOneWidget);
@@ -155,44 +148,40 @@ void main() {
 
     testWidgets('shows rooms when they exist', (WidgetTester tester) async {
       final mockRoom = createMockRoom();
-      
+
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            packingRepositoryProvider.overrideWithValue(MockPackingRepository(rooms: [mockRoom])),
+            packingRepositoryProvider.overrideWithValue(
+              MockPackingRepository(rooms: [mockRoom]),
+            ),
             roomProvider.overrideWith(() => TestRoomNotifier([mockRoom])),
           ],
-          child: const MaterialApp(
-            home: PackingScreen(),
-          ),
+          child: const MaterialApp(home: PackingScreen()),
         ),
       );
 
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Woonkamer'), findsOneWidget);
-      expect(find.text('🛋️'), findsOneWidget);
+      expect(find.byIcon(Icons.chair_rounded), findsOneWidget);
     });
 
-    testWidgets('shows add room button in empty state', (WidgetTester tester) async {
+    testWidgets('shows add room button in empty state', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: PackingScreen(),
-          ),
-        ),
+        const ProviderScope(child: MaterialApp(home: PackingScreen())),
       );
 
       expect(find.text('Eerste kamer toevoegen'), findsOneWidget);
     });
 
-    testWidgets('opens add room bottom sheet when FAB tapped', (WidgetTester tester) async {
+    testWidgets('opens add room bottom sheet when FAB tapped', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: PackingScreen(),
-          ),
-        ),
+        const ProviderScope(child: MaterialApp(home: PackingScreen())),
       );
 
       await tester.tap(find.byType(FloatingActionButton));
@@ -202,7 +191,9 @@ void main() {
       expect(find.text('Naam'), findsOneWidget);
     });
 
-    testWidgets('shows box count and items in room card', (WidgetTester tester) async {
+    testWidgets('shows box count and items in room card', (
+      WidgetTester tester,
+    ) async {
       final mockRoom = createMockRoom();
       final mockBox = PackingBox(
         id: 'box-1',
@@ -211,20 +202,17 @@ void main() {
         isFragile: false,
         createdAt: DateTime.now(),
       );
-      
+
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            packingRepositoryProvider.overrideWithValue(MockPackingRepository(
-              rooms: [mockRoom],
-              boxes: [mockBox],
-            )),
+            packingRepositoryProvider.overrideWithValue(
+              MockPackingRepository(rooms: [mockRoom], boxes: [mockBox]),
+            ),
             roomProvider.overrideWith(() => TestRoomNotifier([mockRoom])),
             boxProvider.overrideWith(() => TestBoxNotifier([mockBox])),
           ],
-          child: const MaterialApp(
-            home: PackingScreen(),
-          ),
+          child: const MaterialApp(home: PackingScreen()),
         ),
       );
 
@@ -232,25 +220,27 @@ void main() {
 
       // Check for combined stats text (Exact match to differentiate from Chip)
       expect(find.text('1 dozen • 0 items'), findsOneWidget);
-      
+
       // Check for progress bar section
       expect(find.text('Ingepakt'), findsOneWidget);
       expect(find.byType(LinearProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('Add Box Dialog with Fragile switch works', (WidgetTester tester) async {
+    testWidgets('Add Box Dialog with Fragile switch works', (
+      WidgetTester tester,
+    ) async {
       final mockRoom = createMockRoom();
-      
+
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            packingRepositoryProvider.overrideWithValue(MockPackingRepository(rooms: [mockRoom])),
+            packingRepositoryProvider.overrideWithValue(
+              MockPackingRepository(rooms: [mockRoom]),
+            ),
             roomProvider.overrideWith(() => TestRoomNotifier([mockRoom])),
             boxProvider.overrideWith(() => TestBoxNotifier([])),
           ],
-          child: const MaterialApp(
-            home: PackingScreen(),
-          ),
+          child: const MaterialApp(home: PackingScreen()),
         ),
       );
 
@@ -259,10 +249,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Nieuwe doos'), findsOneWidget);
-      
+
       // Enter Label
       await tester.enterText(find.byType(TextField).first, 'Fragile Box');
-      
+
       // Toggle Fragile Switch
       // Find switch by name or type
       expect(find.text('Breekbaar'), findsOneWidget);
