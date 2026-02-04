@@ -66,6 +66,15 @@ extension TaskStatusExtension on TaskStatus {
 }
 
 class Task {
+
+  Task({
+    required this.id,
+    required this.title,
+    required this.category, required this.createdAt, this.description = '',
+    this.status = TaskStatus.todo,
+    this.assigneeId,
+    this.deadline,
+  });
   final String id;
   final String title;
   final String description;
@@ -74,17 +83,6 @@ class Task {
   final String? assigneeId;
   final DateTime? deadline;
   final DateTime createdAt;
-
-  Task({
-    required this.id,
-    required this.title,
-    this.description = '',
-    required this.category,
-    this.status = TaskStatus.todo,
-    this.assigneeId,
-    this.deadline,
-    required this.createdAt,
-  });
 
   Task copyWith({
     String? title,

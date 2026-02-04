@@ -1,8 +1,8 @@
 class DomainException implements Exception {
-  final String message;
-  final dynamic originalError;
 
   DomainException(this.message, [this.originalError]);
+  final String message;
+  final dynamic originalError;
 
   @override
   String toString() => 'DomainException: $message ${originalError != null ? '($originalError)' : ''}';

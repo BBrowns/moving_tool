@@ -1,14 +1,14 @@
 // Domain Models - Project & User (simplified, no HiveObject)
 class User {
-  final String id;
-  final String name;
-  final String color;
 
   User({
     required this.id,
     required this.name,
     required this.color,
   });
+  final String id;
+  final String name;
+  final String color;
 
   User copyWith({String? name, String? color}) {
     return User(
@@ -21,10 +21,6 @@ class User {
 }
 
 class Address {
-  final String street;
-  final String houseNumber;
-  final String postalCode;
-  final String city;
 
   Address({
     this.street = '',
@@ -32,6 +28,10 @@ class Address {
     this.postalCode = '',
     this.city = '',
   });
+  final String street;
+  final String houseNumber;
+  final String postalCode;
+  final String city;
 
   bool get isEmpty =>
       street.isEmpty && houseNumber.isEmpty && postalCode.isEmpty && city.isEmpty;
@@ -58,13 +58,6 @@ class Address {
 }
 
 class Project {
-  final String id;
-  final String name;
-  final DateTime movingDate;
-  final Address fromAddress;
-  final Address toAddress;
-  final List<User> users;
-  final DateTime createdAt;
 
   Project({
     required this.id,
@@ -75,6 +68,13 @@ class Project {
     required this.users,
     required this.createdAt,
   });
+  final String id;
+  final String name;
+  final DateTime movingDate;
+  final Address fromAddress;
+  final Address toAddress;
+  final List<User> users;
+  final DateTime createdAt;
 
   int get daysUntilMove {
     final now = DateTime.now();

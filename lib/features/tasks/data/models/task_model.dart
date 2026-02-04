@@ -5,12 +5,10 @@ class TaskModel extends Task {
   TaskModel({
     required super.id,
     required super.title,
-    super.description,
-    required super.category,
+    required super.category, required super.createdAt, super.description,
     super.status,
     super.assigneeId,
     super.deadline,
-    required super.createdAt,
   });
 
   factory TaskModel.fromEntity(Task entity) {

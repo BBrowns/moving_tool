@@ -4,20 +4,17 @@ import 'package:moving_tool_flutter/features/projects/domain/entities/project.da
 import 'package:moving_tool_flutter/features/tasks/domain/entities/task.dart';
 
 class TaskCard extends StatelessWidget {
+
+  const TaskCard({
+    required this.task, required this.onToggle, required this.onDelete, super.key,
+    this.assignee,
+    this.onTap,
+  });
   final Task task;
   final User? assignee;
   final VoidCallback onToggle;
   final VoidCallback onDelete;
   final VoidCallback? onTap;
-
-  const TaskCard({
-    super.key,
-    required this.task,
-    this.assignee,
-    required this.onToggle,
-    required this.onDelete,
-    this.onTap,
-  });
 
   @override
   Widget build(BuildContext context) {

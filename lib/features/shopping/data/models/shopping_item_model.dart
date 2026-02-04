@@ -5,7 +5,7 @@ class ShoppingItemModel extends ShoppingItem {
   ShoppingItemModel({
     required super.id,
     required super.name,
-    super.roomId,
+    required super.createdAt, super.roomId,
     super.status,
     super.priority,
     super.budgetMin,
@@ -17,7 +17,6 @@ class ShoppingItemModel extends ShoppingItem {
     super.marktplaatsQuery,
     super.isMarktplaatsTracked,
     super.targetPrice,
-    required super.createdAt,
   });
 
   /// Factory to create a Model from a Domain Entity

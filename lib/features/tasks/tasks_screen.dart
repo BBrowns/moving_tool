@@ -252,13 +252,6 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 }
 
 class _StatusColumn extends StatelessWidget {
-  final TaskStatus status;
-  final List<Task> tasks;
-  final List<User> users;
-  final void Function(String) onToggle;
-  final void Function(String) onDelete;
-  final void Function(String, TaskStatus) onStatusChange;
-  final void Function(Task) onEdit;
 
   const _StatusColumn({
     required this.status,
@@ -269,6 +262,13 @@ class _StatusColumn extends StatelessWidget {
     required this.onStatusChange,
     required this.onEdit,
   });
+  final TaskStatus status;
+  final List<Task> tasks;
+  final List<User> users;
+  final void Function(String) onToggle;
+  final void Function(String) onDelete;
+  final void Function(String, TaskStatus) onStatusChange;
+  final void Function(Task) onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -411,12 +411,6 @@ class _StatusColumn extends StatelessWidget {
 }
 
 class _CategorySection extends StatelessWidget {
-  final TaskCategory category;
-  final List<Task> tasks;
-  final List<User> users;
-  final void Function(String) onToggle;
-  final void Function(String) onDelete;
-  final void Function(Task) onEdit;
 
   const _CategorySection({
     required this.category,
@@ -426,6 +420,12 @@ class _CategorySection extends StatelessWidget {
     required this.onDelete,
     required this.onEdit,
   });
+  final TaskCategory category;
+  final List<Task> tasks;
+  final List<User> users;
+  final void Function(String) onToggle;
+  final void Function(String) onDelete;
+  final void Function(Task) onEdit;
 
   @override
   Widget build(BuildContext context) {

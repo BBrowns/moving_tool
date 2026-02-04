@@ -6,10 +6,9 @@ class BoxItemModel extends BoxItem {
     required super.id,
     required super.boxId,
     required super.name,
-    super.quantity,
+    required super.createdAt, super.quantity,
     super.estimatedValue,
     super.isPacked,
-    required super.createdAt,
   });
 
   factory BoxItemModel.fromEntity(BoxItem entity) {

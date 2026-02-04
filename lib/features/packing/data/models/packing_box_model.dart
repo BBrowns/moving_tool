@@ -6,10 +6,9 @@ class PackingBoxModel extends PackingBox {
     required super.id,
     required super.roomId,
     required super.label,
-    super.notes,
+    required super.createdAt, super.notes,
     super.status,
     super.isFragile,
-    required super.createdAt,
   });
 
   factory PackingBoxModel.fromEntity(PackingBox entity) {

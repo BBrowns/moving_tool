@@ -3,16 +3,13 @@ import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/features/playbook/domain/entities/playbook_note.dart';
 
 class NoteCard extends StatelessWidget {
+
+  const NoteCard({
+    required this.note, required this.onTogglePin, required this.onDelete, super.key,
+  });
   final PlaybookNote note;
   final VoidCallback onTogglePin;
   final VoidCallback onDelete;
-
-  const NoteCard({
-    super.key,
-    required this.note,
-    required this.onTogglePin,
-    required this.onDelete,
-  });
 
   @override
   Widget build(BuildContext context) {

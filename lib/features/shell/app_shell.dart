@@ -5,14 +5,12 @@ import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
 
 class AppShell extends StatelessWidget {
-  final StatefulNavigationShell navigationShell;
-  final List<Widget> children;
 
   const AppShell({
-    super.key,
-    required this.navigationShell,
-    required this.children,
+    required this.navigationShell, required this.children, super.key,
   });
+  final StatefulNavigationShell navigationShell;
+  final List<Widget> children;
 
   static const List<NavItem> navItems = [
     NavItem(
@@ -58,15 +56,15 @@ class AppShell extends StatelessWidget {
 }
 
 class _DesktopShell extends StatelessWidget {
-  final StatefulNavigationShell navigationShell;
-  final List<NavItem> navItems;
-  final List<Widget> children;
 
   const _DesktopShell({
     required this.navigationShell,
     required this.navItems,
     required this.children,
   });
+  final StatefulNavigationShell navigationShell;
+  final List<NavItem> navItems;
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
@@ -151,15 +149,15 @@ class _DesktopShell extends StatelessWidget {
 }
 
 class _MobileShell extends StatefulWidget {
-  final StatefulNavigationShell navigationShell;
-  final List<NavItem> navItems;
-  final List<Widget> children;
 
   const _MobileShell({
     required this.navigationShell,
     required this.navItems,
     required this.children,
   });
+  final StatefulNavigationShell navigationShell;
+  final List<NavItem> navItems;
+  final List<Widget> children;
 
   @override
   State<_MobileShell> createState() => _MobileShellState();
@@ -235,9 +233,9 @@ class _MobileShellState extends State<_MobileShell> {
 }
 
 class NavItem {
+
+  const NavItem({required this.path, required this.icon, required this.label});
   final String path;
   final IconData icon;
   final String label;
-
-  const NavItem({required this.path, required this.icon, required this.label});
 }

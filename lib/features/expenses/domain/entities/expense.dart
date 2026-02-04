@@ -47,6 +47,19 @@ extension ExpenseCategoryExtension on ExpenseCategory {
 }
 
 class Expense {
+
+  Expense({
+    required this.id,
+    required this.description,
+    required this.amount,
+    required this.category,
+    required this.paidById,
+    required this.splitBetweenIds,
+    required this.date,
+    required this.createdAt, this.receiptUrl,
+    this.notes = '',
+    this.settlementId,
+  });
   final String id;
   final String description;
   final double amount;
@@ -58,20 +71,6 @@ class Expense {
   final String? receiptUrl;
   final String notes;
   final DateTime createdAt;
-
-  Expense({
-    required this.id,
-    required this.description,
-    required this.amount,
-    required this.category,
-    required this.paidById,
-    required this.splitBetweenIds,
-    required this.date,
-    this.receiptUrl,
-    this.notes = '',
-    required this.createdAt,
-    this.settlementId,
-  });
 
   double get amountPerPerson {
     if (splitBetweenIds.isEmpty) return amount;
@@ -108,15 +107,15 @@ class Expense {
 }
 
 class Settlement {
-  final String fromUserId;
-  final String toUserId;
-  final double amount;
 
   Settlement({
     required this.fromUserId,
     required this.toUserId,
     required this.amount,
   });
+  final String fromUserId;
+  final String toUserId;
+  final double amount;
 
   // fromJson and toJson removed
 }

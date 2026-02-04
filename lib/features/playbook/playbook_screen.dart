@@ -245,10 +245,10 @@ class _PlaybookScreenState extends ConsumerState<PlaybookScreen>
 }
 
 class _JournalTab extends StatelessWidget {
-  final List<JournalEntry> entries;
-  final VoidCallback onAdd;
 
   const _JournalTab({required this.entries, required this.onAdd});
+  final List<JournalEntry> entries;
+  final VoidCallback onAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -316,10 +316,6 @@ class _JournalTab extends StatelessWidget {
 }
 
 class _NotesTab extends StatelessWidget {
-  final List<PlaybookNote> notes;
-  final VoidCallback onAdd;
-  final void Function(String) onTogglePin;
-  final void Function(String) onDelete;
 
   const _NotesTab({
     required this.notes,
@@ -327,6 +323,10 @@ class _NotesTab extends StatelessWidget {
     required this.onTogglePin,
     required this.onDelete,
   });
+  final List<PlaybookNote> notes;
+  final VoidCallback onAdd;
+  final void Function(String) onTogglePin;
+  final void Function(String) onDelete;
 
   @override
   Widget build(BuildContext context) {

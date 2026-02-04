@@ -7,8 +7,8 @@ import 'package:moving_tool_flutter/core/models/models.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/core/widgets/responsive_scaffold.dart';
 import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
-import 'package:moving_tool_flutter/data/services/database_service.dart';
-import 'package:moving_tool_flutter/data/services/llm_service.dart';
+
+import 'package:moving_tool_flutter/data/providers/ai_providers.dart';
 import 'package:moving_tool_flutter/features/packing/presentation/providers/packing_providers.dart';
 import 'package:moving_tool_flutter/features/packing/presentation/widgets/box_card.dart';
 import 'package:moving_tool_flutter/features/packing/presentation/widgets/room_card.dart';
@@ -33,7 +33,9 @@ class PackingScreen extends ConsumerWidget {
           padding: const EdgeInsets.only(right: 16),
           child: Chip(
             avatar: const Icon(Icons.inventory_2, size: 16),
-            label: Text('${stats.packedBoxes}/${stats.totalBoxes} dozen • ${stats.totalItems} items'),
+            label: Text(
+              '${stats.packedBoxes}/${stats.totalBoxes} dozen • ${stats.totalItems} items',
+            ),
           ),
         ),
       ],
@@ -46,27 +48,30 @@ class PackingScreen extends ConsumerWidget {
               sliver: rooms.isEmpty
                   ? SliverToBoxAdapter(child: _buildEmptyState(context, ref))
                   : SliverGrid(
-                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 400,
-                        mainAxisSpacing: 16,
-                        crossAxisSpacing: 16,
-                        childAspectRatio: 1.0,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final room = rooms[index];
-                          // Efficient filtering via derived provider (not optimal in loop but consistent with design)
-                          // Ideally we'd have a separate RoomWidget that takes just ID and watches its own scope,
-                          // but passing data is fine for now. 
-                          // NOTE: We can't watch family provider in a loop easily without a separate widget.
-                          // So we will use a separate widget for the grid item to optimize rebuilds.
-                          return _RoomGridItem(room: room).animate().fade(duration: 400.ms, delay: (index * 50).ms).scale(begin: const Offset(0.9, 0.9));
-                        },
-                        childCount: rooms.length,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 400,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16,
+                            childAspectRatio: 1.0,
+                          ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final room = rooms[index];
+                        // Efficient filtering via derived provider (not optimal in loop but consistent with design)
+                        // Ideally we'd have a separate RoomWidget that takes just ID and watches its own scope,
+                        // but passing data is fine for now.
+                        // NOTE: We can't watch family provider in a loop easily without a separate widget.
+                        // So we will use a separate widget for the grid item to optimize rebuilds.
+                        return _RoomGridItem(room: room)
+                            .animate()
+                            .fade(duration: 400.ms, delay: (index * 50).ms)
+                            .scale(begin: const Offset(0.9, 0.9));
+                      }, childCount: rooms.length),
                     ),
             ),
-             const SliverToBoxAdapter(child: SizedBox(height: 80)), // Bottom padding
+            const SliverToBoxAdapter(
+              child: SizedBox(height: 80),
+            ), // Bottom padding
           ],
         ),
       ),
@@ -78,7 +83,11 @@ class PackingScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.house_rounded, size: 64, color: context.colors.primary.withValues(alpha: 0.2)),
+          Icon(
+            Icons.house_rounded,
+            size: 64,
+            color: context.colors.primary.withValues(alpha: 0.2),
+          ),
           const SizedBox(height: 16),
           Text('Nog geen kamers', style: context.textTheme.titleLarge),
           const SizedBox(height: 8),
@@ -101,35 +110,34 @@ class PackingScreen extends ConsumerWidget {
 }
 
 class _RoomGridItem extends ConsumerWidget {
-  final Room room;
   const _RoomGridItem({required this.room});
+  final Room room;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final roomBoxes = ref.watch(roomBoxesProvider(room.id));
     // Note: To get "total items" for this room, we'd need to sum items of all boxes.
     // For now, let's keep it simple or fetch all items and filter (expensive but existing behavior).
-    // Better: Derived provider for room items. 
+    // Better: Derived provider for room items.
     // Optimization: Just count items in these boxes.
     // However, `roomCard` expects List<BoxItem> items. This might be heavy for just a count.
-    
+
     // Let's optimize: We'll calculate item count cheaply if possible, or just pass empty for now if UI only needs count?
     // Looking at RoomCard, it displays: '${items.length} items'.
     // So we need the items.
-    
+
     // We can't easily query "all items for this room" cheaply without a join.
     // Let's fetch all items and filter for now as per previous logic, but strictly speaking this should be optimized later.
     final allItems = ref.watch(boxItemProvider);
     final roomItems = allItems.where((i) {
-       // Check if item's box is in this room
-       return roomBoxes.any((b) => b.id == i.boxId);
+      // Check if item's box is in this room
+      return roomBoxes.any((b) => b.id == i.boxId);
     }).toList();
-
 
     return RoomCard(
       room: room,
       boxes: roomBoxes,
-      items: roomItems, 
+      items: roomItems,
       onAddBox: () => _ShowDialogs.showBoxDialog(context, ref, room.id),
       onDeleteRoom: () => ref.read(roomProvider.notifier).delete(room.id),
       onTap: () => _showRoomDetails(context, ref, room),
@@ -137,329 +145,425 @@ class _RoomGridItem extends ConsumerWidget {
   }
 
   void _showRoomDetails(BuildContext context, WidgetRef ref, Room room) {
-     unawaited(showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.9,
-        minChildSize: 0.5,
-        maxChildSize: 1.0,
-        expand: false,
-        builder: (context, scrollController) => Scaffold(
-          appBar: AppBar(
-            title: Text(room.name),
-            leading: IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () => Navigator.pop(context),
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        builder: (context) => DraggableScrollableSheet(
+          initialChildSize: 0.9,
+          minChildSize: 0.5,
+          maxChildSize: 1.0,
+          expand: false,
+          builder: (context, scrollController) => Scaffold(
+            appBar: AppBar(
+              title: Text(room.name),
+              leading: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.pop(context),
+              ),
+              actions: [
+                TextButton.icon(
+                  onPressed: () => _showAiSuggestions(context, ref, room.name),
+                  icon: const Icon(Icons.auto_awesome, color: AppTheme.primary),
+                  label: const Text('Tips'),
+                ),
+                IconButton(
+                  onPressed: () =>
+                      _ShowDialogs.showRoomDialog(context, ref, room: room),
+                  icon: const Icon(Icons.edit_outlined),
+                  tooltip: 'Kamer bewerken',
+                ),
+                IconButton(
+                  onPressed: () =>
+                      _ShowDialogs.showBoxDialog(context, ref, room.id),
+                  icon: const Icon(Icons.add_box),
+                  tooltip: 'Doos toevoegen',
+                ),
+              ],
             ),
-            actions: [
-              TextButton.icon(
-                onPressed: () => _showAiSuggestions(context, room.name),
-                icon: const Icon(Icons.auto_awesome, color: AppTheme.primary),
-                label: const Text('Tips'),
-              ),
-              IconButton(
-                onPressed: () => _ShowDialogs.showRoomDialog(context, ref, room: room),
-                icon: const Icon(Icons.edit_outlined),
-                tooltip: 'Kamer bewerken',
-              ),
-              IconButton(
-                onPressed: () => _ShowDialogs.showBoxDialog(context, ref, room.id),
-                icon: const Icon(Icons.add_box),
-                tooltip: 'Doos toevoegen',
-              ),
-            ],
-          ),
-          body: Consumer(
-            builder: (context, ref, child) {
-              // Now we are inside the detail, we can watch the specific room logic
-              final boxes = ref.watch(roomBoxesProvider(room.id));
-              
-              if (boxes.isEmpty) {
-                return Center(
-                  child: Text('Nog geen dozen in deze kamer', style: context.textTheme.bodyLarge),
-                );
-              }
+            body: Consumer(
+              builder: (context, ref, child) {
+                // Now we are inside the detail, we can watch the specific room logic
+                final boxes = ref.watch(roomBoxesProvider(room.id));
 
-              return ListView.builder(
-                controller: scrollController,
-                padding: const EdgeInsets.all(16),
-                itemCount: boxes.length,
-                itemBuilder: (context, index) {
-                  final box = boxes[index];
-                  // Use separate widget for BoxItem to optimize
-                  return _BoxListItem(box: box);
-                },
-              );
-            },
+                if (boxes.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'Nog geen dozen in deze kamer',
+                      style: context.textTheme.bodyLarge,
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(16),
+                  itemCount: boxes.length,
+                  itemBuilder: (context, index) {
+                    final box = boxes[index];
+                    // Use separate widget for BoxItem to optimize
+                    return _BoxListItem(box: box);
+                  },
+                );
+              },
+            ),
           ),
         ),
       ),
-    )); 
+    );
   }
 
-  Future<void> _showAiSuggestions(BuildContext context, String roomName) async {
-    unawaited(showDialog(
-      context: context,
-      barrierDismissible: false,
-      useRootNavigator: true,
-      builder: (ctx) => const Center(child: CircularProgressIndicator()),
-    ));
+  Future<void> _showAiSuggestions(
+    BuildContext context,
+    WidgetRef ref,
+    String roomName,
+  ) async {
+    unawaited(
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        useRootNavigator: true,
+        builder: (ctx) => const Center(child: CircularProgressIndicator()),
+      ),
+    );
 
     try {
-      final apiKey = DatabaseService.getSetting('gemini_api_key');
-      final suggestions = await LlmService.suggestPackingList(roomName, apiKey);
+      final aiService = ref.read(aiServiceProvider);
+
+      final prompt =
+          'Maak een checklist van 5-10 essentiële items om in te pakken voor een: $roomName. Geef alleen de lijst met bullets.';
+      final suggestions =
+          await aiService.generateContent(prompt) ??
+          'Kon geen suggesties genereren.';
 
       if (context.mounted) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
 
-        unawaited(showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            icon: const Icon(Icons.auto_awesome, color: AppTheme.primary, size: 32),
-            title: Text('AI Inpaktips: $roomName'),
-            content: SingleChildScrollView(
-              child: Text(suggestions),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Sluiten'),
+        unawaited(
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              icon: const Icon(
+                Icons.auto_awesome,
+                color: AppTheme.primary,
+                size: 32,
               ),
-            ],
+              title: Text('AI Inpaktips: $roomName'),
+              content: SingleChildScrollView(child: Text(suggestions)),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Sluiten'),
+                ),
+              ],
+            ),
           ),
-        ));
+        );
       }
     } catch (e) {
       if (context.mounted) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Fout bij ophalen tips: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Fout bij ophalen tips: $e')));
       }
     }
   }
 }
 
 class _BoxListItem extends ConsumerWidget {
-  final PackingBox box;
   const _BoxListItem({required this.box});
+  final PackingBox box;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final boxItems = ref.watch(boxItemsProvider(box.id));
-    
+
     return BoxCard(
-      box: box, 
+      box: box,
       items: boxItems,
       onAddItem: () => _ShowDialogs.showItemDialog(context, ref, box.id),
       onDeleteBox: () => ref.read(boxProvider.notifier).delete(box.id),
-      onEditBox: () => _ShowDialogs.showBoxDialog(context, ref, box.roomId, box: box),
-      onEditItem: (item) => _ShowDialogs.showItemDialog(context, ref, box.id, item: item),
-      onToggleItem: (item) => ref.read(boxItemProvider.notifier).togglePacked(item.id),
+      onEditBox: () =>
+          _ShowDialogs.showBoxDialog(context, ref, box.roomId, box: box),
+      onEditItem: (item) =>
+          _ShowDialogs.showItemDialog(context, ref, box.id, item: item),
+      onToggleItem: (item) =>
+          ref.read(boxItemProvider.notifier).togglePacked(item.id),
       onToggleBox: () => ref.read(boxProvider.notifier).toggleBoxPacked(box.id),
     );
   }
 }
 
 class _ShowDialogs {
-  static void showRoomDialog(BuildContext context, WidgetRef ref, {Room? room}) {
+  static void showRoomDialog(
+    BuildContext context,
+    WidgetRef ref, {
+    Room? room,
+  }) {
     final isEditing = room != null;
     final nameController = TextEditingController(text: room?.name);
     String selectedIcon = room?.icon ?? '📦';
 
     final icons = ['🛋️', '🛏️', '🍳', '🚿', '👶', '🧑‍💻', '📦', '🔧'];
 
-    unawaited(showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-            left: 16, right: 16, top: 16,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-              Text(
-                isEditing ? 'Kamer bewerken' : 'Nieuwe kamer', 
-                style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: nameController,
-                autofocus: !isEditing,
-                decoration: const InputDecoration(labelText: 'Naam', hintText: 'bijv. Woonkamer'),
-              ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8,
-                children: icons.map((icon) => GestureDetector(
-                  onTap: () => setModalState(() => selectedIcon = icon),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: selectedIcon == icon 
-                          ? AppTheme.primary.withValues(alpha: 0.2)
-                          : context.colors.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(12),
-                      border: selectedIcon == icon 
-                          ? Border.all(color: AppTheme.primary, width: 2)
-                          : null,
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) => StatefulBuilder(
+          builder: (context, setModalState) => Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    isEditing ? 'Kamer bewerken' : 'Nieuwe kamer',
+                    style: context.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
-                  child: Icon(_getIconData(icon), size: 24, color: selectedIcon == icon ? AppTheme.primary : context.colors.onSurfaceVariant),
                   ),
-                )).toList(),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  if (nameController.text.isNotEmpty) {
-                    if (isEditing) {
-                      ref.read(roomProvider.notifier).update(
-                        room.copyWith(
-                          name: nameController.text,
-                          icon: selectedIcon,
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: nameController,
+                    autofocus: !isEditing,
+                    decoration: const InputDecoration(
+                      labelText: 'Naam',
+                      hintText: 'bijv. Woonkamer',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8,
+                    children: icons
+                        .map(
+                          (icon) => GestureDetector(
+                            onTap: () =>
+                                setModalState(() => selectedIcon = icon),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: selectedIcon == icon
+                                    ? AppTheme.primary.withValues(alpha: 0.2)
+                                    : context.colors.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(12),
+                                border: selectedIcon == icon
+                                    ? Border.all(
+                                        color: AppTheme.primary,
+                                        width: 2,
+                                      )
+                                    : null,
+                              ),
+                              child: Icon(
+                                _getIconData(icon),
+                                size: 24,
+                                color: selectedIcon == icon
+                                    ? AppTheme.primary
+                                    : context.colors.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
                         )
-                      );
-                    } else {
-                      ref.read(roomProvider.notifier).add(
-                        name: nameController.text,
-                        icon: selectedIcon,
-                      );
-                    }
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text(isEditing ? 'Opslaan' : 'Toevoegen'),
+                        .toList(),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (nameController.text.isNotEmpty) {
+                        if (isEditing) {
+                          ref
+                              .read(roomProvider.notifier)
+                              .update(
+                                room.copyWith(
+                                  name: nameController.text,
+                                  icon: selectedIcon,
+                                ),
+                              );
+                        } else {
+                          ref
+                              .read(roomProvider.notifier)
+                              .add(
+                                name: nameController.text,
+                                icon: selectedIcon,
+                              );
+                        }
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Text(isEditing ? 'Opslaan' : 'Toevoegen'),
+                  ),
+                ],
               ),
-            ],
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 
-  static void showBoxDialog(BuildContext context, WidgetRef ref, String roomId, {PackingBox? box}) {
+  static void showBoxDialog(
+    BuildContext context,
+    WidgetRef ref,
+    String roomId, {
+    PackingBox? box,
+  }) {
     final isEditing = box != null;
     final labelController = TextEditingController(text: box?.label);
     bool isFragile = box?.isFragile ?? false;
 
-    unawaited(showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-            left: 16, right: 16, top: 16,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-              Text(
-                isEditing ? 'Doos bewerken' : 'Nieuwe doos', 
-                style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) => StatefulBuilder(
+          builder: (context, setModalState) => Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    isEditing ? 'Doos bewerken' : 'Nieuwe doos',
+                    style: context.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: labelController,
+                    autofocus: !isEditing,
+                    decoration: const InputDecoration(
+                      labelText: 'Label',
+                      hintText: 'bijv. Boeken #1',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SwitchListTile(
+                    title: const Text('Breekbaar'),
+                    subtitle: const Text('Doos bevat fragiele spullen'),
+                    value: isFragile,
+                    onChanged: (v) => setModalState(() => isFragile = v),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (labelController.text.isNotEmpty) {
+                        if (isEditing) {
+                          ref
+                              .read(boxProvider.notifier)
+                              .update(
+                                box.copyWith(
+                                  label: labelController.text,
+                                  isFragile: isFragile,
+                                ),
+                              );
+                        } else {
+                          ref
+                              .read(boxProvider.notifier)
+                              .add(
+                                roomId: roomId,
+                                label: labelController.text,
+                                isFragile: isFragile,
+                              );
+                        }
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Text(isEditing ? 'Opslaan' : 'Toevoegen'),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: labelController,
-                autofocus: !isEditing,
-                decoration: const InputDecoration(labelText: 'Label', hintText: 'bijv. Boeken #1'),
-              ),
-              const SizedBox(height: 16),
-              SwitchListTile(
-                title: const Text('Breekbaar'),
-                subtitle: const Text('Doos bevat fragiele spullen'),
-                value: isFragile,
-                onChanged: (v) => setModalState(() => isFragile = v),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  if (labelController.text.isNotEmpty) {
-                    if (isEditing) {
-                      ref.read(boxProvider.notifier).update(
-                        box.copyWith(
-                          label: labelController.text,
-                          isFragile: isFragile,
-                        )
-                      );
-                    } else {
-                      ref.read(boxProvider.notifier).add(
-                        roomId: roomId,
-                        label: labelController.text,
-                        isFragile: isFragile,
-                      );
-                    }
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text(isEditing ? 'Opslaan' : 'Toevoegen'),
-              ),
-            ],
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 
-  static void showItemDialog(BuildContext context, WidgetRef ref, String boxId, {BoxItem? item}) {
+  static void showItemDialog(
+    BuildContext context,
+    WidgetRef ref,
+    String boxId, {
+    BoxItem? item,
+  }) {
     final isEditing = item != null;
     final nameController = TextEditingController(text: item?.name);
 
-    unawaited(showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(isEditing ? 'Item bewerken' : 'Item toevoegen'),
-        content: TextField(
-          controller: nameController,
-          autofocus: !isEditing,
-          decoration: const InputDecoration(labelText: 'Naam', hintText: 'bijv. Boeken'),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuleren')),
-          ElevatedButton(
-            onPressed: () {
-              if (nameController.text.isNotEmpty) {
-                if (isEditing) {
-                  ref.read(boxItemProvider.notifier).update(
-                    item.copyWith(name: nameController.text)
-                  );
-                } else {
-                  ref.read(boxItemProvider.notifier).add(
-                    boxId: boxId,
-                    name: nameController.text,
-                  );
-                }
-                Navigator.pop(context);
-              }
-            },
-            child: Text(isEditing ? 'Opslaan' : 'Toevoegen'),
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(isEditing ? 'Item bewerken' : 'Item toevoegen'),
+          content: TextField(
+            controller: nameController,
+            autofocus: !isEditing,
+            decoration: const InputDecoration(
+              labelText: 'Naam',
+              hintText: 'bijv. Boeken',
+            ),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Annuleren'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (nameController.text.isNotEmpty) {
+                  if (isEditing) {
+                    ref
+                        .read(boxItemProvider.notifier)
+                        .update(item.copyWith(name: nameController.text));
+                  } else {
+                    ref
+                        .read(boxItemProvider.notifier)
+                        .add(boxId: boxId, name: nameController.text);
+                  }
+                  Navigator.pop(context);
+                }
+              },
+              child: Text(isEditing ? 'Opslaan' : 'Toevoegen'),
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
+
   static IconData _getIconData(String icon) {
     switch (icon) {
-      case '🛋️': return Icons.chair_rounded;
-      case '🛏️': return Icons.bed_rounded;
-      case '🍳': return Icons.kitchen_rounded;
-      case '🚿': return Icons.shower_rounded;
-      case '👶': return Icons.child_care_rounded;
-      case '🧑‍💻': return Icons.computer_rounded;
-      case '📦': return Icons.inventory_2_rounded;
-      case '🔧': return Icons.build_rounded;
-      default: return Icons.weekend_rounded;
+      case '🛋️':
+        return Icons.chair_rounded;
+      case '🛏️':
+        return Icons.bed_rounded;
+      case '🍳':
+        return Icons.kitchen_rounded;
+      case '🚿':
+        return Icons.shower_rounded;
+      case '👶':
+        return Icons.child_care_rounded;
+      case '🧑‍💻':
+        return Icons.computer_rounded;
+      case '📦':
+        return Icons.inventory_2_rounded;
+      case '🔧':
+        return Icons.build_rounded;
+      default:
+        return Icons.weekend_rounded;
     }
   }
 }

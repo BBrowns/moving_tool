@@ -55,11 +55,6 @@ extension ShoppingPriorityExtension on ShoppingPriority {
 }
 
 class MarketplaceData {
-  final String? url;
-  final double? askingPrice;
-  final String? sellerName;
-  final String? notes;
-  final DateTime? savedAt;
 
   MarketplaceData({
     this.url,
@@ -68,6 +63,11 @@ class MarketplaceData {
     this.notes,
     this.savedAt,
   });
+  final String? url;
+  final double? askingPrice;
+  final String? sellerName;
+  final String? notes;
+  final DateTime? savedAt;
 
   MarketplaceData copyWith({
     String? url,
@@ -89,6 +89,23 @@ class MarketplaceData {
 }
 
 class ShoppingItem {
+
+  ShoppingItem({
+    required this.id,
+    required this.name,
+    required this.createdAt, this.roomId,
+    this.status = ShoppingStatus.needed,
+    this.priority = ShoppingPriority.medium,
+    this.budgetMin,
+    this.budgetMax,
+    this.actualPrice,
+    this.assigneeId,
+    this.notes = '',
+    this.marketplace,
+    this.marktplaatsQuery,
+    this.isMarktplaatsTracked = false,
+    this.targetPrice,
+  });
   final String id;
   final String name;
   final String? roomId;
@@ -104,24 +121,6 @@ class ShoppingItem {
   final bool isMarktplaatsTracked;
   final double? targetPrice;
   final DateTime createdAt;
-
-  ShoppingItem({
-    required this.id,
-    required this.name,
-    this.roomId,
-    this.status = ShoppingStatus.needed,
-    this.priority = ShoppingPriority.medium,
-    this.budgetMin,
-    this.budgetMax,
-    this.actualPrice,
-    this.assigneeId,
-    this.notes = '',
-    this.marketplace,
-    this.marktplaatsQuery,
-    this.isMarktplaatsTracked = false,
-    this.targetPrice,
-    required this.createdAt,
-  });
 
   ShoppingItem copyWith({
     String? name,

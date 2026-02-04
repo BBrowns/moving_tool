@@ -167,10 +167,6 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
 }
 
 class _ProjectCard extends StatelessWidget {
-  final Project project;
-  final bool isActive;
-  final VoidCallback onTap;
-  final VoidCallback onDelete;
 
   const _ProjectCard({
     required this.project,
@@ -178,6 +174,10 @@ class _ProjectCard extends StatelessWidget {
     required this.onTap,
     required this.onDelete,
   });
+  final Project project;
+  final bool isActive;
+  final VoidCallback onTap;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {

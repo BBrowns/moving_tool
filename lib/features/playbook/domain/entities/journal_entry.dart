@@ -51,6 +51,16 @@ extension JournalEventTypeExtension on JournalEventType {
 }
 
 class JournalEntry {
+
+  JournalEntry({
+    required this.id,
+    required this.type,
+    required this.title,
+    required this.timestamp, this.description,
+    this.userId,
+    this.relatedEntityId,
+    this.metadata,
+  });
   final String id;
   final JournalEventType type;
   final String title;
@@ -59,17 +69,6 @@ class JournalEntry {
   final String? relatedEntityId;
   final Map<String, dynamic>? metadata;
   final DateTime timestamp;
-
-  JournalEntry({
-    required this.id,
-    required this.type,
-    required this.title,
-    this.description,
-    this.userId,
-    this.relatedEntityId,
-    this.metadata,
-    required this.timestamp,
-  });
 
   Map<String, dynamic> toJson() {
     return {

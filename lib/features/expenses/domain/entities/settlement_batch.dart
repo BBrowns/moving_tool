@@ -2,12 +2,6 @@
 import 'package:moving_tool_flutter/features/expenses/domain/entities/expense.dart';
 
 class SettlementBatch {
-  final String id;
-  final DateTime date;
-  final double totalAmount;
-  final List<Settlement> settlements;
-  final List<String> expenseIds;
-  final String createdByUserId;
 
   SettlementBatch({
     required this.id,
@@ -17,6 +11,12 @@ class SettlementBatch {
     required this.expenseIds,
     required this.createdByUserId,
   });
+  final String id;
+  final DateTime date;
+  final double totalAmount;
+  final List<Settlement> settlements;
+  final List<String> expenseIds;
+  final String createdByUserId;
 
   // fromJson and toJson removed
 }

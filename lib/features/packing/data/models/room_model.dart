@@ -5,12 +5,11 @@ class RoomModel extends Room {
   const RoomModel({
     required super.id,
     required super.name,
-    super.icon,
+    required super.createdAt, super.icon,
     super.color,
     super.budget,
     super.squareMeters,
     super.notes,
-    required super.createdAt,
   });
 
   factory RoomModel.fromEntity(Room entity) {

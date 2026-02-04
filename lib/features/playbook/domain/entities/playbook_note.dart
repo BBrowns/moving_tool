@@ -1,4 +1,12 @@
 class PlaybookNote {
+
+  PlaybookNote({
+    required this.id,
+    required this.title,
+    required this.content,
+    required this.createdAt, required this.updatedAt, this.category,
+    this.isPinned = false,
+  });
   final String id;
   final String title;
   final String content;
@@ -6,16 +14,6 @@ class PlaybookNote {
   final bool isPinned;
   final DateTime createdAt;
   final DateTime updatedAt;
-
-  PlaybookNote({
-    required this.id,
-    required this.title,
-    required this.content,
-    this.category,
-    this.isPinned = false,
-    required this.createdAt,
-    required this.updatedAt,
-  });
 
   PlaybookNote copyWith({
     String? title,

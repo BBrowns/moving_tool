@@ -1,47 +1,16 @@
-import 'package:flutter/material.dart';
-
-enum BoxStatus {
-  empty,
-  packing,
-  packed,
-  moved,
-  unpacked,
-}
-
-extension BoxStatusExtension on BoxStatus {
-  String get label {
-    switch (this) {
-      case BoxStatus.empty:
-        return 'Leeg';
-      case BoxStatus.packing:
-        return 'Bezig';
-      case BoxStatus.packed:
-        return 'Ingepakt';
-      case BoxStatus.moved:
-        return 'Verhuisd';
-      case BoxStatus.unpacked:
-        return 'Uitgepakt';
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case BoxStatus.empty:
-        return Icons.check_box_outline_blank_rounded;
-      case BoxStatus.packing:
-        return Icons.hourglass_empty_rounded;
-      case BoxStatus.packed:
-        return Icons.check_circle_rounded;
-      case BoxStatus.moved:
-        return Icons.local_shipping_rounded;
-      case BoxStatus.unpacked:
-        return Icons.celebration_rounded;
-    }
-  }
-}
+enum BoxStatus { empty, packing, packed, moved, unpacked }
 
 /// Renamed from Box to PackingBox to avoid conflict with Hive's Box type
 class PackingBox {
+
+  const PackingBox({
+    required this.id,
+    required this.roomId,
+    required this.label,
+    required this.createdAt, this.status = BoxStatus.empty,
+    this.isFragile = false,
+    this.notes = '',
+  });
   final String id;
   final String roomId;
   final String label;
@@ -49,16 +18,6 @@ class PackingBox {
   final bool isFragile;
   final String notes;
   final DateTime createdAt;
-
-  const PackingBox({
-    required this.id,
-    required this.roomId,
-    required this.label,
-    this.status = BoxStatus.empty,
-    this.isFragile = false,
-    this.notes = '',
-    required this.createdAt,
-  });
 
   PackingBox copyWith({
     String? roomId,

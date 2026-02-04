@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
+import 'package:moving_tool_flutter/data/providers/ai_providers.dart';
 import 'package:moving_tool_flutter/data/providers/providers.dart';
 import 'package:moving_tool_flutter/data/services/database_service.dart';
 import 'package:moving_tool_flutter/data/services/export_service.dart';
@@ -502,14 +503,21 @@ class SettingsScreen extends ConsumerWidget {
                 subtitle: 'Automatische samenvatting via Gemini',
                 onShare: () async {
                   Navigator.pop(context);
+                  final aiService = ref.read(aiServiceProvider);
                   await ExportService.exportLlmSummary(
                     project,
+                    aiService,
                     download: false,
                   );
                 },
                 onDownload: () async {
                   Navigator.pop(context);
-                  await ExportService.exportLlmSummary(project, download: true);
+                  final aiService = ref.read(aiServiceProvider);
+                  await ExportService.exportLlmSummary(
+                    project,
+                    aiService,
+                    download: true,
+                  );
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

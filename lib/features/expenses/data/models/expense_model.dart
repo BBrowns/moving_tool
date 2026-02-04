@@ -10,9 +10,8 @@ class ExpenseModel extends Expense {
     required super.paidById,
     required super.splitBetweenIds,
     required super.date,
-    super.receiptUrl,
+    required super.createdAt, super.receiptUrl,
     super.notes,
-    required super.createdAt,
     super.settlementId,
   });
 

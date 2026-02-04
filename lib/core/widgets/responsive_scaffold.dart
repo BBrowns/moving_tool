@@ -4,6 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
 
 class ResponsiveScaffold extends StatelessWidget {
+
+  const ResponsiveScaffold({
+    required this.title, required this.body, super.key,
+    this.actions,
+    this.floatingActionButton,
+    this.fabLabel,
+    this.fabIcon,
+    this.onFabPressed,
+    this.fabHeroTag,
+  });
   final String title;
   final Widget body;
   final List<Widget>? actions;
@@ -12,18 +22,6 @@ class ResponsiveScaffold extends StatelessWidget {
   final IconData? fabIcon;
   final VoidCallback? onFabPressed;
   final Object? fabHeroTag;
-
-  const ResponsiveScaffold({
-    super.key,
-    required this.title,
-    required this.body,
-    this.actions,
-    this.floatingActionButton,
-    this.fabLabel,
-    this.fabIcon,
-    this.onFabPressed,
-    this.fabHeroTag,
-  });
 
   @override
   Widget build(BuildContext context) {

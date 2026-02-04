@@ -229,9 +229,9 @@ class DashboardScreen extends ConsumerWidget {
 }
 
 class _PlaybookHeroCard extends StatelessWidget {
-  final VoidCallback onTap;
 
   const _PlaybookHeroCard({required this.onTap});
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -330,12 +330,6 @@ class _PlaybookHeroCard extends StatelessWidget {
 }
 
 class _BentoCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
 
   const _BentoCard({
     required this.title,
@@ -345,6 +339,12 @@ class _BentoCard extends StatelessWidget {
     required this.color,
     required this.onTap,
   });
+  final String title;
+  final String value;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -369,7 +369,7 @@ class _BentoCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(28),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -454,9 +454,9 @@ class _BentoCard extends StatelessWidget {
 }
 
 class _ActivityTile extends StatelessWidget {
-  final JournalEntry entry;
 
   const _ActivityTile({required this.entry});
+  final JournalEntry entry;
 
   @override
   Widget build(BuildContext context) {

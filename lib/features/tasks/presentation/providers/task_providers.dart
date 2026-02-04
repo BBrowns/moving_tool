@@ -39,8 +39,7 @@ class TaskNotifier extends _$TaskNotifier {
 
   Future<void> add({
     required String title,
-    String description = '',
-    required TaskCategory category,
+    required TaskCategory category, String description = '',
     String? assigneeId,
     DateTime? deadline,
   }) async {

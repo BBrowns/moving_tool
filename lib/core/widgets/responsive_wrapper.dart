@@ -13,18 +13,17 @@ class Breakpoints {
 /// This ensures content doesn't stretch infinitely on desktop/web views,
 /// following Material 3 guidelines for Large Screens.
 class ResponsiveWrapper extends StatelessWidget {
-  final Widget child;
-  final double maxWidth;
-  final EdgeInsetsGeometry? padding;
-  final bool centerContent;
 
   const ResponsiveWrapper({
-    super.key,
-    required this.child,
+    required this.child, super.key,
     this.maxWidth = 1200,
     this.padding,
     this.centerContent = true,
   });
+  final Widget child;
+  final double maxWidth;
+  final EdgeInsetsGeometry? padding;
+  final bool centerContent;
 
   @override
   Widget build(BuildContext context) {

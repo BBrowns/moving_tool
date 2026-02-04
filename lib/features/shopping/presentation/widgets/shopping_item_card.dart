@@ -4,18 +4,14 @@ import 'package:moving_tool_flutter/features/shopping/domain/entities/shopping_i
 import 'package:url_launcher/url_launcher.dart';
 
 class ShoppingItemCard extends StatelessWidget {
+
+  const ShoppingItemCard({
+    required this.item, required this.onStatusChange, required this.onDelete, required this.onEdit, super.key,
+  });
   final ShoppingItem item;
   final void Function(ShoppingStatus) onStatusChange;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
-
-  const ShoppingItemCard({
-    super.key,
-    required this.item,
-    required this.onStatusChange,
-    required this.onDelete,
-    required this.onEdit,
-  });
   
   Future<void> _launchMarktplaats() async {
     final query = item.marktplaatsQuery?.trim().isNotEmpty == true 

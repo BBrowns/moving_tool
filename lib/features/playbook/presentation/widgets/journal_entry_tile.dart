@@ -3,9 +3,9 @@ import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/features/playbook/domain/entities/journal_entry.dart';
 
 class JournalEntryTile extends StatelessWidget {
-  final JournalEntry entry;
 
-  const JournalEntryTile({super.key, required this.entry});
+  const JournalEntryTile({required this.entry, super.key});
+  final JournalEntry entry;
 
   @override
   Widget build(BuildContext context) {

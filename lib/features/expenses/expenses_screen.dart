@@ -471,15 +471,15 @@ class ExpensesScreen extends ConsumerWidget {
 }
 
 class _BalanceHeader extends StatelessWidget {
-  final double total;
-  final List<User> users;
-  final List<Expense> expenses;
 
   const _BalanceHeader({
     required this.total,
     required this.users,
     required this.expenses,
   });
+  final double total;
+  final List<User> users;
+  final List<Expense> expenses;
 
   @override
   Widget build(BuildContext context) {
@@ -562,9 +562,9 @@ class _BalanceHeader extends StatelessWidget {
 }
 
 class _DateHeader extends StatelessWidget {
-  final DateTime date;
 
   const _DateHeader({required this.date});
+  final DateTime date;
 
   @override
   Widget build(BuildContext context) {
@@ -596,15 +596,15 @@ class _DateHeader extends StatelessWidget {
 }
 
 class _ExpenseTile extends StatelessWidget {
-  final Expense expense;
-  final List<User> users;
-  final VoidCallback onTap;
 
   const _ExpenseTile({
     required this.expense,
     required this.users,
     required this.onTap,
   });
+  final Expense expense;
+  final List<User> users;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {

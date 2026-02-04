@@ -1,4 +1,13 @@
 class BoxItem {
+
+  const BoxItem({
+    required this.id,
+    required this.boxId,
+    required this.name,
+    required this.createdAt, this.quantity = 1,
+    this.estimatedValue,
+    this.isPacked = false,
+  });
   final String id;
   final String boxId;
   final String name;
@@ -6,16 +15,6 @@ class BoxItem {
   final double? estimatedValue;
   final bool isPacked;
   final DateTime createdAt;
-
-  const BoxItem({
-    required this.id,
-    required this.boxId,
-    required this.name,
-    this.quantity = 1,
-    this.estimatedValue,
-    this.isPacked = false,
-    required this.createdAt,
-  });
 
   BoxItem copyWith({
     String? boxId,

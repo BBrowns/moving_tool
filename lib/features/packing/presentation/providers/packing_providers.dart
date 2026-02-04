@@ -201,15 +201,15 @@ List<BoxItem> itemsInBox(Ref ref, String boxId) {
 final ItemsInBoxFamily boxItemsProvider = itemsInBoxProvider;
 
 class PackingStats {
-  final int totalBoxes;
-  final int packedBoxes;
-  final int totalItems;
 
   PackingStats({
     required this.totalBoxes,
     required this.packedBoxes,
     required this.totalItems,
   });
+  final int totalBoxes;
+  final int packedBoxes;
+  final int totalItems;
 }
 
 @Riverpod(keepAlive: true)
