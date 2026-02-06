@@ -11,7 +11,7 @@ import 'package:moving_tool_flutter/features/expenses/expenses_screen.dart';
 import 'package:moving_tool_flutter/features/onboarding/onboarding_screen.dart';
 import 'package:moving_tool_flutter/features/packing/packing_screen.dart';
 import 'package:moving_tool_flutter/features/playbook/playbook_screen.dart';
-import 'package:moving_tool_flutter/features/projects/projects_screen.dart';
+import 'package:moving_tool_flutter/features/projects/presentation/screens/projects_screen.dart';
 // ... (rest of imports)
 
 import 'package:moving_tool_flutter/features/settings/settings_screen.dart';
