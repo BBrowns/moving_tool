@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/transport_resource.dart';
 import 'package:moving_tool_flutter/features/projects/presentation/providers/project_providers.dart';
-import 'package:moving_tool_flutter/features/projects/application/transport_advisor_service.dart';
+import 'package:moving_tool_flutter/features/transport/application/transport_advisor_service.dart';
 // import 'package:moving_tool_flutter/features/packing/data/repositories/boxes_repository.dart'; // To get box count
 
 // Riverpod Provider for Transport Advisor

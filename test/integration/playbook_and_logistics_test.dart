@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:moving_tool_flutter/features/packing/domain/entities/packing_box.dart';
 import 'package:moving_tool_flutter/features/playbook/application/playbook_service.dart';
 import 'package:moving_tool_flutter/features/playbook/domain/entities/playbook_rule.dart';
-import 'package:moving_tool_flutter/features/projects/application/transport_advisor_service.dart';
+import 'package:moving_tool_flutter/features/transport/application/transport_advisor_service.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/transport_resource.dart';
 
@@ -59,8 +59,8 @@ void main() {
 
       final advice = advisor.analyzeTransport(project: project, boxes: boxes);
 
-      expect(advice.join(' '), contains('Estimated Total Volume: 0.6 m³'));
-      expect(advice.join(' '), contains('Excellent!'));
+      expect(advice.join(' '), contains('Total Load: 0.6 m³'));
+      expect(advice.join(' '), contains('Volume OK'));
     });
 
     test('TransportAdvisor warns on deficit', () {
@@ -76,7 +76,7 @@ void main() {
 
       final advice = advisor.analyzeTransport(project: project, boxes: boxes);
       expect(advice.join(' '), contains('WARNING'));
-      expect(advice.join(' '), contains('short by'));
+      expect(advice.join(' '), contains('Volume deficit of'));
     });
 
     test('PlaybookService handles basic event without crash', () async {
