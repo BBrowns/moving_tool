@@ -43,26 +43,37 @@ class TransportAdvisorService {
 
   /// Estimates dimensions from a photo using AI Vision
   Future<ItemDimensions?> estimateDimensionsFromImage(File image) async {
-    if (aiService == null) return null;
+    if (aiService == null) {
+      throw Exception('AI Service not initialized. Check API Key.');
+    }
 
     final prompt = '''
 Analyze this image of a furniture item/object.
 Estimate the Height, Width, and Depth in centimeters.
 Also estimate the weight in kg.
 Format response as JSON: {"height": 100, "width": 50, "depth": 50, "weight": 20}
-Return ONLY the JSON.
+Return ONLY the JSON. Do not include markdown formatting like ```json.
 ''';
 
     try {
       final response = await aiService!.generateContentFromImage(prompt, image);
-      if (response == null) return null;
+      if (response == null) throw Exception('AI returned no response.');
 
-      final jsonStr = response.replaceAll(RegExp(r'```json|```'), '').trim();
-      // Basic parsing (assuming simple format, could use dart:convert for robustness if AI is reliable)
+      // Clean up markdown if AI ignores instructions
+      final jsonStr = response
+          .replaceAll('```json', '')
+          .replaceAll('```', '')
+          .trim();
+
+      // Basic parsing using RegExp for robustness against malformed JSON structure
       final height = _extractVal(jsonStr, 'height');
       final width = _extractVal(jsonStr, 'width');
       final depth = _extractVal(jsonStr, 'depth');
       final weight = _extractVal(jsonStr, 'weight');
+
+      if (height == null || width == null || depth == null) {
+        throw Exception('Failed to extract dimensions from AI response.');
+      }
 
       return ItemDimensions(
         heightCm: height,
@@ -72,19 +83,20 @@ Return ONLY the JSON.
       );
     } catch (e) {
       debugPrint('Error parsing dimensions: $e');
-      return null;
+      rethrow; // Let the UI handle the specific error
     }
   }
 
   double? _extractVal(String text, String key) {
-    final regex = RegExp('"$key"\\s*:\\s*([0-9.]+)');
+    // Regex matches "key": 123 or "key": 123.45, case-insensitive
+    final regex = RegExp('"$key"\\s*:\\s*([0-9.]+)', caseSensitive: false);
     final match = regex.firstMatch(text);
     return match != null ? double.tryParse(match.group(1)!) : null;
   }
 
   Future<double> estimateItemVolume(String itemDescription) async {
     if (aiService == null) {
-      return 0.5; // Default conservative estimate for unknown item
+      return 0.5; // Fallback for unknown
     }
 
     final prompt =

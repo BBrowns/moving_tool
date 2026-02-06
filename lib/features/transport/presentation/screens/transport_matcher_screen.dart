@@ -75,37 +75,34 @@ class _TransportMatcherScreenState
     });
 
     try {
-      // In a real app we'd get the service properly
-      // final service = ref.read(transportAdvisorProvider);
-      // For this MVP we mock the AI call or need to ensure AI service is injected
-      // Since we can't easily inject the global AI service here without refactor,
-      // I'll simulate a success or fail if provider is empty,
-      // but let's try to get it right.
-
-      // Attempting to use the new method requires the AI Service to be passed to advisor
-      // We will skip actual API call if not wired up to avoid crash, and fallback to manual entry prompt
-      // But let's assume valid service for "2.0" completion
-
       if (mounted) {
-        // Use the real service
         final service = ref.read(transportAdvisorProvider);
         final dimensions = await service.estimateDimensionsFromImage(
           _itemImage!,
         );
 
         setState(() {
-          if (dimensions != null) {
-            _currentItem = dimensions;
-            _checkFit();
-          } else {
-            _fitResult =
-                'Kon afmetingen niet schatten. Probeer opnieuw of voer handmatig in.';
-          }
+          _currentItem = dimensions;
+          _checkFit();
           _isAnalyzing = false;
         });
       }
     } catch (e) {
-      if (mounted) setState(() => _isAnalyzing = false);
+      if (mounted) {
+        setState(() {
+          _isAnalyzing = false;
+          _fitResult =
+              'Fout bij analyseren: ${e.toString().replaceAll('Exception: ', '')}';
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Fout: ${e.toString().replaceAll('Exception: ', '')}',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

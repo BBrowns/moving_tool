@@ -1,13 +1,79 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 import 'package:moving_tool_flutter/core/models/item_dimensions.dart';
 import 'package:moving_tool_flutter/features/transport/application/transport_advisor_service.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/transport_resource.dart';
 
+import 'transport_advisor_service_test_mocks.mocks.dart';
+
 void main() {
   late TransportAdvisorService service;
+  late MockAIService mockAIService;
 
   setUp(() {
-    service = TransportAdvisorService();
+    mockAIService = MockAIService();
+    service = TransportAdvisorService(aiService: mockAIService);
+  });
+
+  group('TransportAdvisorService AI Logic', () {
+    test(
+      'estimateDimensionsFromImage throws Exception if AI Service is null',
+      () async {
+        final serviceNoAI = TransportAdvisorService(aiService: null);
+        expect(
+          () => serviceNoAI.estimateDimensionsFromImage(File('test_image.jpg')),
+          throwsA(isA<Exception>()),
+        );
+      },
+    );
+
+    test(
+      'estimateDimensionsFromImage returns correct dimensions on valid JSON',
+      () async {
+        when(mockAIService.generateContentFromImage(any, any)).thenAnswer(
+          (_) async =>
+              '{"height": 100, "width": 50, "depth": 30, "weight": 20}',
+        );
+
+        final result = await service.estimateDimensionsFromImage(
+          File('img.jpg'),
+        );
+
+        expect(result, isNotNull);
+        expect(result!.heightCm, 100);
+        expect(result.widthCm, 50);
+        expect(result.depthCm, 30);
+        expect(result.weightKg, 20);
+      },
+    );
+
+    test('estimateDimensionsFromImage handles markdown code blocks', () async {
+      when(mockAIService.generateContentFromImage(any, any)).thenAnswer(
+        (_) async =>
+            '```json\n{"height": 100, "width": 50, "depth": 30, "weight": 20}\n```',
+      );
+
+      final result = await service.estimateDimensionsFromImage(File('img.jpg'));
+
+      expect(result, isNotNull);
+      expect(result!.heightCm, 100);
+    });
+
+    test(
+      'estimateDimensionsFromImage throws Exception on malformed JSON',
+      () async {
+        when(
+          mockAIService.generateContentFromImage(any, any),
+        ).thenAnswer((_) async => 'I think it is about 1 meter high.');
+
+        expect(
+          () => service.estimateDimensionsFromImage(File('img.jpg')),
+          throwsA(isA<Exception>()),
+        );
+      },
+    );
   });
 
   group('TransportAdvisorService Fit Logic', () {
