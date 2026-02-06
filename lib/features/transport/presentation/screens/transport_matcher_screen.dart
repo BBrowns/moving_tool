@@ -7,6 +7,7 @@ import 'package:moving_tool_flutter/core/models/item_dimensions.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/transport_resource.dart';
 
 import 'package:moving_tool_flutter/features/transport/presentation/providers/transport_providers.dart';
+import 'package:moving_tool_flutter/features/transport/presentation/widgets/bin_packing_visualizer.dart';
 
 class TransportMatcherScreen extends ConsumerStatefulWidget {
   const TransportMatcherScreen({super.key});
@@ -133,6 +134,7 @@ class _TransportMatcherScreenState
             ),
             const SizedBox(height: 10),
             DropdownButtonFormField<TransportResource>(
+              // ignore: deprecated_member_use
               value: _selectedVehicle,
               items: _demoVehicles.map((v) {
                 return DropdownMenuItem(
@@ -171,9 +173,9 @@ class _TransportMatcherScreenState
                         borderRadius: BorderRadius.circular(12),
                         child: Image.file(_itemImage!, fit: BoxFit.cover),
                       )
-                    : Column(
+                    : const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(Icons.camera_alt, size: 50, color: Colors.grey),
                           Text('Tik om foto te maken'),
                         ],
@@ -264,8 +266,56 @@ class _TransportMatcherScreenState
                   ],
                 ),
               ),
+              const SizedBox(height: 16),
+              FilledButton.icon(
+                onPressed: _show3DView,
+                icon: const Icon(Icons.view_in_ar),
+                label: const Text('Bekijk in 3D'),
+              ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+
+  void _show3DView() {
+    if (_currentItem == null || _selectedVehicle == null) return;
+
+    final advisor = ref.read(transportAdvisorProvider);
+    final vehicleDims = advisor.getVehicleDimensions(
+      _selectedVehicle!.capacity,
+    );
+
+    if (vehicleDims == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Geen afmetingen beschikbaar voor dit voertuig.'),
+        ),
+      );
+      return;
+    }
+
+    final packer = ref.read(binPackingProvider);
+    // For demo, let's try to pack 1 instance of the item
+    // In real app, we would pack all project items.
+    // Let's add 5 dummy items to make it interesting?
+    // No, let's stick to the scanned item for now.
+    // Or maybe add a few copies to see if they fit?
+    // Let's add 1 scanned item.
+
+    final packedItems = packer.packItems([_currentItem!], vehicleDims);
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: Text('3D Laadruimte: ${_selectedVehicle!.name}'),
+          ),
+          body: BinPackingVisualizer(
+            containerDimensions: vehicleDims,
+            packedItems: packedItems,
+          ),
         ),
       ),
     );
@@ -273,9 +323,10 @@ class _TransportMatcherScreenState
 }
 
 class _DimInfo extends StatelessWidget {
+  const _DimInfo(this.label, this.value);
+
   final String label;
   final double? value;
-  const _DimInfo(this.label, this.value);
 
   @override
   Widget build(BuildContext context) {
