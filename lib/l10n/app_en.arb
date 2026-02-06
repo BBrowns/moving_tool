@@ -1,0 +1,51 @@
+
+{
+  "appTitle": "Moving Tool",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "packingTab": "Packing",
+  "@packingTab": {
+    "description": "Label for the packing tab"
+  },
+  "projectsTab": "Projects",
+  "@projectsTab": {
+    "description": "Label for the projects tab"
+  },
+  "settingsTab": "Settings",
+  "@settingsTab": {
+    "description": "Label for the settings tab"
+  },
+  "addProject": "Add Project",
+  "@addProject": {
+    "description": "Button label to add a new project"
+  },
+  "editProject": "Edit Project",
+  "@editProject": {
+      "description": "Button label to edit a project"
+  },
+  "deleteProject": "Delete Project",
+  "@deleteProject": {
+      "description": "Button label to delete a project"
+  },
+  "members": "Members",
+  "@members": {
+      "description": "Label for project members section"
+  },
+  "transport": "Transport",
+  "@transport": {
+      "description": "Label for transport resources section"
+  },
+  "expenses": "Expenses",
+  "@expenses": {
+      "description": "Label for expenses section"
+  },
+  "tasks": "Tasks",
+  "@tasks": {
+      "description": "Label for tasks section"
+  },
+  "helloWorld": "Hello World!",
+  "@helloWorld": {
+    "description": "The conventional newborn programmer greeting"
+  }
+}

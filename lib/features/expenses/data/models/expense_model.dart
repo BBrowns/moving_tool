@@ -1,16 +1,17 @@
-
 import 'package:moving_tool_flutter/features/expenses/domain/entities/expense.dart';
 
 class ExpenseModel extends Expense {
   ExpenseModel({
     required super.id,
+    required super.projectId,
     required super.description,
     required super.amount,
     required super.category,
     required super.paidById,
     required super.splitBetweenIds,
     required super.date,
-    required super.createdAt, super.receiptUrl,
+    required super.createdAt,
+    super.receiptUrl,
     super.notes,
     super.settlementId,
   });
@@ -18,6 +19,7 @@ class ExpenseModel extends Expense {
   factory ExpenseModel.fromEntity(Expense entity) {
     return ExpenseModel(
       id: entity.id,
+      projectId: entity.projectId,
       description: entity.description,
       amount: entity.amount,
       category: entity.category,
@@ -34,6 +36,7 @@ class ExpenseModel extends Expense {
   factory ExpenseModel.fromJson(Map<String, dynamic> json) {
     return ExpenseModel(
       id: json['id'] as String,
+      projectId: json['projectId'] as String? ?? '', // Fallback for migration
       description: json['description'] as String,
       amount: (json['amount'] as num).toDouble(),
       category: ExpenseCategory.values.firstWhere(
@@ -53,6 +56,7 @@ class ExpenseModel extends Expense {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'projectId': projectId,
       'description': description,
       'amount': amount,
       'category': category.name,

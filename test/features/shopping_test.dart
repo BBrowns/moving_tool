@@ -9,11 +9,10 @@ import 'package:moving_tool_flutter/features/shopping/presentation/providers/sho
 import 'package:moving_tool_flutter/features/shopping/shopping_screen.dart';
 
 class MockShoppingRepository implements ShoppingRepository {
-  List<ShoppingItem> _items = [];
-
   MockShoppingRepository([List<ShoppingItem>? initialItems]) {
     if (initialItems != null) _items = initialItems;
   }
+  List<ShoppingItem> _items = [];
 
   @override
   Future<List<ShoppingItem>> getItems() async => _items;
@@ -35,8 +34,8 @@ class MockShoppingRepository implements ShoppingRepository {
 }
 
 class TestShoppingNotifier extends ShoppingNotifier {
-  final List<ShoppingItem> _initialItems;
   TestShoppingNotifier(this._initialItems);
+  final List<ShoppingItem> _initialItems;
 
   @override
   List<ShoppingItem> build() {
@@ -55,6 +54,7 @@ void main() {
 
       final item = ShoppingItem(
         id: '1',
+        projectId: 'test-project',
         name: 'New Sofa',
         priority: ShoppingPriority.high,
         status: ShoppingStatus.needed,
@@ -86,6 +86,7 @@ void main() {
 
       final item = ShoppingItem(
         id: '1',
+        projectId: 'test-project',
         name: 'Curtains',
         priority: ShoppingPriority.medium,
         status: ShoppingStatus.needed,

@@ -85,7 +85,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       body: tasks.isEmpty
           ? _buildEmptyState()
           : isDesktop
-          ? _buildKanbanView(tasksByStatus, project?.users ?? [])
+          ? _buildKanbanView(tasksByStatus, project?.members ?? [])
           : ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: orderedCategories.length,
@@ -96,7 +96,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                 return _CategorySection(
                       category: category,
                       tasks: categoryTasks,
-                      users: project?.users ?? [],
+                      members: project?.members ?? [],
                       onToggle: (id) =>
                           ref.read(taskProvider.notifier).toggleStatus(id),
                       onDelete: (id) =>
@@ -135,7 +135,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
   Widget _buildKanbanView(
     Map<TaskStatus, List<Task>> tasksByStatus,
-    List<User> users,
+    List<ProjectMember> members,
   ) {
     return ResponsiveWrapper(
       maxWidth: 1400,
@@ -148,7 +148,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             child: _StatusColumn(
               status: status,
               tasks: tasks,
-              users: users,
+              members: members,
               onToggle: (id) =>
                   ref.read(taskProvider.notifier).toggleStatus(id),
               onDelete: (id) => ref.read(taskProvider.notifier).delete(id),
@@ -252,11 +252,10 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 }
 
 class _StatusColumn extends StatelessWidget {
-
   const _StatusColumn({
     required this.status,
     required this.tasks,
-    required this.users,
+    required this.members,
     required this.onToggle,
     required this.onDelete,
     required this.onStatusChange,
@@ -264,7 +263,7 @@ class _StatusColumn extends StatelessWidget {
   });
   final TaskStatus status;
   final List<Task> tasks;
-  final List<User> users;
+  final List<ProjectMember> members;
   final void Function(String) onToggle;
   final void Function(String) onDelete;
   final void Function(String, TaskStatus) onStatusChange;
@@ -376,7 +375,7 @@ class _StatusColumn extends StatelessWidget {
                               final task = tasks[index];
                               final card = TaskCard(
                                 task: task,
-                                assignee: users
+                                assignee: members
                                     .where((u) => u.id == task.assigneeId)
                                     .firstOrNull,
                                 onToggle: () => onToggle(task.id),
@@ -411,18 +410,17 @@ class _StatusColumn extends StatelessWidget {
 }
 
 class _CategorySection extends StatelessWidget {
-
   const _CategorySection({
     required this.category,
     required this.tasks,
-    required this.users,
+    required this.members,
     required this.onToggle,
     required this.onDelete,
     required this.onEdit,
   });
   final TaskCategory category;
   final List<Task> tasks;
-  final List<User> users;
+  final List<ProjectMember> members;
   final void Function(String) onToggle;
   final void Function(String) onDelete;
   final void Function(Task) onEdit;
@@ -465,7 +463,7 @@ class _CategorySection extends StatelessWidget {
         ...tasks.map(
           (task) => TaskCard(
             task: task,
-            assignee: users.where((u) => u.id == task.assigneeId).firstOrNull,
+            assignee: members.where((u) => u.id == task.assigneeId).firstOrNull,
             onToggle: () => onToggle(task.id),
             onDelete: () => onDelete(task.id),
             onTap: () => onEdit(task),

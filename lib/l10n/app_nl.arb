@@ -1,0 +1,15 @@
+
+{
+  "appTitle": "Verhuistool",
+  "packingTab": "Inpakken",
+  "projectsTab": "Projecten",
+  "settingsTab": "Instellingen",
+  "addProject": "Project Toevoegen",
+  "editProject": "Project Bewerken",
+  "deleteProject": "Project Verwijderen",
+  "members": "Leden",
+  "transport": "Vervoer",
+  "expenses": "Kosten",
+  "tasks": "Taken",
+  "helloWorld": "Hallo Wereld!"
+}

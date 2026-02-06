@@ -60,3 +60,5 @@ _archive/react-legacy/dist/
 *.hive
 *.lock
 !pubspec.lock
+
+sentry.properties

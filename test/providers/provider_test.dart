@@ -9,9 +9,9 @@ void main() {
         id: 'test-id',
         name: 'Test Move',
         movingDate: DateTime.now().add(const Duration(days: 15)),
-        fromAddress: Address(),
-        toAddress: Address(),
-        users: [],
+        fromAddress: const Address(),
+        toAddress: const Address(),
+        members: [],
         createdAt: DateTime.now(),
       );
 
@@ -24,9 +24,9 @@ void main() {
         id: 'test-id',
         name: 'Test Move',
         movingDate: DateTime.now().subtract(const Duration(days: 5)),
-        fromAddress: Address(),
-        toAddress: Address(),
-        users: [],
+        fromAddress: const Address(),
+        toAddress: const Address(),
+        members: [],
         createdAt: DateTime.now(),
       );
 
@@ -38,9 +38,9 @@ void main() {
         id: 'test-id',
         name: 'Original Name',
         movingDate: DateTime.now(),
-        fromAddress: Address(),
-        toAddress: Address(),
-        users: [],
+        fromAddress: const Address(),
+        toAddress: const Address(),
+        members: [],
         createdAt: DateTime.now(),
       );
 
@@ -55,6 +55,7 @@ void main() {
     test('nextStatus cycles through statuses correctly', () {
       final task = Task(
         id: 'task-1',
+        projectId: 'p1',
         title: 'Test Task',
         description: '',
         category: TaskCategory.overig,
@@ -117,6 +118,7 @@ void main() {
     test('creates item with default status needed', () {
       final item = ShoppingItem(
         id: 'item-1',
+        projectId: 'test-project',
         name: 'New Couch',
         priority: ShoppingPriority.high,
         createdAt: DateTime.now(),
@@ -130,6 +132,7 @@ void main() {
     test('creates expense with correct category', () {
       final expense = Expense(
         id: 'expense-1',
+        projectId: 'p1',
         description: 'Moving Van',
         amount: 500.0,
         category: ExpenseCategory.verhuizing,

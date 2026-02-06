@@ -18,6 +18,13 @@ import 'package:moving_tool_flutter/features/settings/settings_screen.dart';
 import 'package:moving_tool_flutter/features/shell/app_shell.dart';
 import 'package:moving_tool_flutter/features/shopping/shopping_screen.dart';
 import 'package:moving_tool_flutter/features/tasks/tasks_screen.dart';
+import 'package:moving_tool_flutter/features/transport/presentation/screens/transport_screen.dart';
+import 'package:moving_tool_flutter/features/assets/presentation/screens/asset_screen.dart';
+import 'package:moving_tool_flutter/features/admin_vault/presentation/screens/admin_vault_screen.dart';
+import 'package:moving_tool_flutter/features/ar_studio/presentation/screens/ar_studio_screen.dart';
+import 'package:moving_tool_flutter/features/ar_studio/presentation/screens/ar_camera_screen.dart';
+import 'package:moving_tool_flutter/features/receipt_scanner/presentation/screens/receipt_scanner_screen.dart';
+import 'package:moving_tool_flutter/features/transport/presentation/screens/transport_matcher_screen.dart';
 
 /// Custom page builder that provides adaptive transitions:
 /// - Desktop/Web: No transition (instant switch) for main tabs
@@ -28,15 +35,13 @@ Page<void> _buildAdaptivePage({
   bool isMainTab = false,
 }) {
   // 1. Test Mode or Desktop -> No Transition
-  final bool isDesktop = kIsWeb || 
-      (defaultTargetPlatform != TargetPlatform.iOS && 
-       defaultTargetPlatform != TargetPlatform.android);
+  final bool isDesktop =
+      kIsWeb ||
+      (defaultTargetPlatform != TargetPlatform.iOS &&
+          defaultTargetPlatform != TargetPlatform.android);
 
   if (AppTheme.isTestMode || isDesktop) {
-    return NoTransitionPage(
-      key: state.pageKey,
-      child: child,
-    );
+    return NoTransitionPage(key: state.pageKey, child: child);
   }
 
   // 2. Main Tabs -> Custom Fade Transition
@@ -57,16 +62,10 @@ Page<void> _buildAdaptivePage({
   // 3. Detail Screens (Mobile) -> Native Platform Transition
   // This enables native "Swipe Back" gesture on iOS
   if (defaultTargetPlatform == TargetPlatform.iOS) {
-    return CupertinoPage(
-      key: state.pageKey,
-      child: child,
-    );
+    return CupertinoPage(key: state.pageKey, child: child);
   }
 
-  return MaterialPage(
-    key: state.pageKey,
-    child: child,
-  );
+  return MaterialPage(key: state.pageKey, child: child);
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -102,16 +101,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
 
-
-      
       // Main app shell with navigation
       // Main app shell with navigation (Stateful for PageView swipe)
       StatefulShellRoute(
         navigatorContainerBuilder: (context, navigationShell, children) {
-          return AppShell(
-            navigationShell: navigationShell,
-            children: children,
-          );
+          return AppShell(navigationShell: navigationShell, children: children);
         },
         builder: (context, state, navigationShell) {
           return navigationShell;
@@ -180,6 +174,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: '/transport',
+                pageBuilder: (context, state) => _buildAdaptivePage(
+                  child: const TransportScreen(),
+                  state: state,
+                  isMainTab: true,
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
                 path: '/playbook',
                 pageBuilder: (context, state) => _buildAdaptivePage(
                   child: const PlaybookScreen(),
@@ -189,19 +195,95 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/assets',
+                pageBuilder: (context, state) => _buildAdaptivePage(
+                  child: const AssetScreen(),
+                  state: state,
+                  isMainTab: true,
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin-vault',
+                pageBuilder: (context, state) => _buildAdaptivePage(
+                  child: const AdminVaultScreen(),
+                  state: state,
+                  isMainTab: true,
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/ar-studio',
+                pageBuilder: (context, state) => _buildAdaptivePage(
+                  child: const ARStudioScreen(),
+                  state: state,
+                  isMainTab: true,
+                ),
+                routes: [
+                  GoRoute(
+                    path: 'camera',
+                    pageBuilder: (context, state) {
+                      final modeStr =
+                          state.uri.queryParameters['mode'] ?? 'roomScan';
+                      final mode = modeStr == 'furniturePlacement'
+                          ? ARMode.furniturePlacement
+                          : ARMode.roomScan;
+
+                      return _buildAdaptivePage(
+                        child: ARCameraScreen(mode: mode),
+                        state: state,
+                        isMainTab: false,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/receipt-scanner',
+                pageBuilder: (context, state) => _buildAdaptivePage(
+                  child: const ReceiptScannerScreen(),
+                  state: state,
+                  isMainTab: false,
+                ),
+              ),
+            ],
+          ),
         ],
+      ),
+
+      // Standalone Tools
+      GoRoute(
+        path: '/transport-matcher',
+        pageBuilder: (context, state) => _buildAdaptivePage(
+          child: const TransportMatcherScreen(),
+          state: state,
+          isMainTab: false,
+        ),
       ),
     ],
     redirect: (context, state) {
       final isOnboarding = state.matchedLocation == '/onboarding';
       final isProjects = state.matchedLocation == '/projects';
-      
+
       if (project == null && !isOnboarding && !isProjects) {
         return '/onboarding';
       }
-      
+
       return null;
     },
   );
 });
-

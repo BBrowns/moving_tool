@@ -47,20 +47,22 @@ extension ExpenseCategoryExtension on ExpenseCategory {
 }
 
 class Expense {
-
   Expense({
     required this.id,
+    required this.projectId,
     required this.description,
     required this.amount,
     required this.category,
     required this.paidById,
     required this.splitBetweenIds,
     required this.date,
-    required this.createdAt, this.receiptUrl,
+    required this.createdAt,
+    this.receiptUrl,
     this.notes = '',
     this.settlementId,
   });
   final String id;
+  final String projectId;
   final String description;
   final double amount;
   final ExpenseCategory category;
@@ -79,6 +81,7 @@ class Expense {
 
   Expense copyWith({
     String? description,
+    String? projectId,
     double? amount,
     ExpenseCategory? category,
     String? paidById,
@@ -90,6 +93,7 @@ class Expense {
   }) {
     return Expense(
       id: id,
+      projectId: projectId ?? this.projectId,
       description: description ?? this.description,
       amount: amount ?? this.amount,
       category: category ?? this.category,
@@ -107,7 +111,6 @@ class Expense {
 }
 
 class Settlement {
-
   Settlement({
     required this.fromUserId,
     required this.toUserId,
@@ -158,13 +161,16 @@ List<Settlement> calculateSettlements(
       if (remaining <= 0.01) break;
       if (creditor.value <= 0.01) continue;
 
-      final settleAmount =
-          remaining < creditor.value ? remaining : creditor.value;
-      settlements.add(Settlement(
-        fromUserId: debtor.key,
-        toUserId: creditor.key,
-        amount: settleAmount,
-      ));
+      final settleAmount = remaining < creditor.value
+          ? remaining
+          : creditor.value;
+      settlements.add(
+        Settlement(
+          fromUserId: debtor.key,
+          toUserId: creditor.key,
+          amount: settleAmount,
+        ),
+      );
 
       remaining -= settleAmount;
       creditors[creditor.key] = creditor.value - settleAmount;
@@ -173,4 +179,3 @@ List<Settlement> calculateSettlements(
 
   return settlements;
 }
-

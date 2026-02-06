@@ -53,15 +53,24 @@ void main() {
       await cleanupTestEnvironment(tempDir);
     });
 
-    testWidgets('Router: Direct to Dashboard when project pre-seeded', (tester) async {
+    testWidgets('Router: Direct to Dashboard when project pre-seeded', (
+      tester,
+    ) async {
       // Pre-seed project
       final project = Project(
         id: 'test-id',
         name: 'Pre-seeded Project',
         movingDate: DateTime.now(),
-        fromAddress: Address(),
-        toAddress: Address(),
-        users: [User(id: 'u1', name: 'TestUser', color: '#6366F1')],
+        fromAddress: const Address(),
+        toAddress: const Address(),
+        members: [
+          const ProjectMember(
+            id: 'u1',
+            name: 'TestUser',
+            role: ProjectRole.admin,
+            color: '#6366F1',
+          ),
+        ],
         createdAt: DateTime.now(),
       );
       await DatabaseService.saveProject(project);
@@ -76,7 +85,9 @@ void main() {
       expect(find.byType(OnboardingScreen), findsNothing);
     });
 
-    testWidgets('User Journey: Create Project -> Packing -> Add Box', (tester) async {
+    testWidgets('User Journey: Create Project -> Packing -> Add Box', (
+      tester,
+    ) async {
       await _navigateToDashboard(tester);
 
       // Verify Dashboard
@@ -90,7 +101,10 @@ void main() {
       await tester.tap(find.byType(FloatingActionButton));
       await pumpAndWait(tester);
 
-      await tester.enterText(find.widgetWithText(TextFormField, 'Inhoud of label'), 'Boeken');
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Inhoud of label'),
+        'Boeken',
+      );
       await tapAndWait(tester, find.text('Opslaan'));
       await pumpAndWait(tester);
 
@@ -117,7 +131,9 @@ void main() {
       // If we didn't crash, success.
     });
 
-    testWidgets('Visual Integrity: No Overflows on Mobile (375x812)', (tester) async {
+    testWidgets('Visual Integrity: No Overflows on Mobile (375x812)', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(375 * 3, 812 * 3);
       tester.view.devicePixelRatio = 3.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -129,7 +145,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Visual Integrity: No Overflows on Desktop (1200x800)', (tester) async {
+    testWidgets('Visual Integrity: No Overflows on Desktop (1200x800)', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1200 * 2, 800 * 2);
       tester.view.devicePixelRatio = 2.0;
       addTearDown(tester.view.resetPhysicalSize);

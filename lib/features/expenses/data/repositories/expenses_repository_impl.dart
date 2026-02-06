@@ -1,15 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:moving_tool_flutter/core/error/exceptions.dart';
-import 'package:moving_tool_flutter/data/services/database_service.dart';
+import 'package:moving_tool_flutter/features/expenses/data/datasources/expenses_local_data_source.dart';
 import 'package:moving_tool_flutter/features/expenses/domain/entities/expense.dart';
 import 'package:moving_tool_flutter/features/expenses/domain/entities/settlement_batch.dart';
 import 'package:moving_tool_flutter/features/expenses/domain/repositories/expenses_repository.dart';
 
 class ExpensesRepositoryImpl implements ExpensesRepository {
+  final ExpensesLocalDataSource _dataSource;
+
+  const ExpensesRepositoryImpl(this._dataSource);
+
   @override
-  Future<List<Expense>> getExpenses() async {
+  Future<List<Expense>> getExpenses(String projectId) async {
     try {
-      return DatabaseService.getAllExpenses();
+      final allExpenses = await _dataSource.getAllExpenses();
+      return allExpenses.where((e) => e.projectId == projectId).toList();
     } catch (e) {
       debugPrint('Error getting expenses: $e');
       throw FetchFailure('Failed to load expenses', e);
@@ -19,7 +24,7 @@ class ExpensesRepositoryImpl implements ExpensesRepository {
   @override
   Future<void> saveExpense(Expense expense) async {
     try {
-      await DatabaseService.saveExpense(expense);
+      await _dataSource.saveExpense(expense);
     } catch (e) {
       debugPrint('Error saving expense: $e');
       throw SaveFailure('Failed to save expense', e);
@@ -29,7 +34,7 @@ class ExpensesRepositoryImpl implements ExpensesRepository {
   @override
   Future<void> deleteExpense(String id) async {
     try {
-      await DatabaseService.deleteExpense(id);
+      await _dataSource.deleteExpense(id);
     } catch (e) {
       debugPrint('Error deleting expense: $e');
       throw DeleteFailure('Failed to delete expense', e);
@@ -37,9 +42,10 @@ class ExpensesRepositoryImpl implements ExpensesRepository {
   }
 
   @override
-  Future<List<SettlementBatch>> getSettlementBatches() async {
+  Future<List<SettlementBatch>> getSettlementBatches(String projectId) async {
     try {
-      return DatabaseService.getAllSettlementBatches();
+      final allBatches = await _dataSource.getAllSettlementBatches();
+      return allBatches.where((b) => b.projectId == projectId).toList();
     } catch (e) {
       debugPrint('Error getting settlement batches: $e');
       throw FetchFailure('Failed to load settlement batches', e);
@@ -49,7 +55,7 @@ class ExpensesRepositoryImpl implements ExpensesRepository {
   @override
   Future<void> saveSettlementBatch(SettlementBatch batch) async {
     try {
-      await DatabaseService.saveSettlementBatch(batch);
+      await _dataSource.saveSettlementBatch(batch);
     } catch (e) {
       debugPrint('Error saving settlement batch: $e');
       throw SaveFailure('Failed to save settlement batch', e);
@@ -59,7 +65,7 @@ class ExpensesRepositoryImpl implements ExpensesRepository {
   @override
   Future<void> deleteSettlementBatch(String id) async {
     try {
-      await DatabaseService.deleteSettlementBatch(id);
+      await _dataSource.deleteSettlementBatch(id);
     } catch (e) {
       debugPrint('Error deleting settlement batch: $e');
       throw DeleteFailure('Failed to delete settlement batch', e);

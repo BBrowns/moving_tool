@@ -10,11 +10,7 @@ enum TaskCategory {
   overig,
 }
 
-enum TaskStatus {
-  todo,
-  inProgress,
-  done,
-}
+enum TaskStatus { todo, inProgress, done }
 
 extension TaskCategoryExtension on TaskCategory {
   String get label {
@@ -66,16 +62,19 @@ extension TaskStatusExtension on TaskStatus {
 }
 
 class Task {
-
   Task({
     required this.id,
+    required this.projectId,
     required this.title,
-    required this.category, required this.createdAt, this.description = '',
+    required this.category,
+    required this.createdAt,
+    this.description = '',
     this.status = TaskStatus.todo,
     this.assigneeId,
     this.deadline,
   });
   final String id;
+  final String projectId;
   final String title;
   final String description;
   final TaskCategory category;
@@ -86,6 +85,7 @@ class Task {
 
   Task copyWith({
     String? title,
+    String? projectId,
     String? description,
     TaskCategory? category,
     TaskStatus? status,
@@ -94,6 +94,7 @@ class Task {
   }) {
     return Task(
       id: id,
+      projectId: projectId ?? this.projectId,
       title: title ?? this.title,
       description: description ?? this.description,
       category: category ?? this.category,

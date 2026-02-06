@@ -7,11 +7,12 @@ environment:
   sdk: ^3.10.0
 
 dependencies:
+  sentry_flutter: ^9.12.0
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
-  
-  # State Management
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2 # Explicitly listing intl though it's likely transitive
   flutter_riverpod: ^3.1.0
   
   # Local Database
@@ -23,7 +24,6 @@ dependencies:
   
   # Utilities
   uuid: ^4.5.1
-  intl: ^0.20.2
   
   # Export & Sharing
   csv: ^6.0.0
@@ -40,8 +40,19 @@ dependencies:
   shared_preferences: ^2.5.4
   url_launcher: ^6.3.2
   riverpod_annotation: ^4.0.0
+  fl_chart: ^0.69.0
+  
+  # AR (Augmented Reality)
+  ar_flutter_plugin: ^0.7.3
+  vector_math: ^2.1.4
+  permission_handler: ^10.4.5  # Compatible with ar_flutter_plugin
+  
+  # OCR (Receipt Scanner)
+  google_mlkit_text_recognition: ^0.14.0
+  image_picker: ^1.1.2
 
 dev_dependencies:
+  sentry_dart_plugin: ^3.2.1
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
@@ -54,3 +65,10 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
+
+sentry:
+  upload_debug_symbols: true
+  upload_source_maps: true
+  project: flutter
+  org: julian-bruinsma

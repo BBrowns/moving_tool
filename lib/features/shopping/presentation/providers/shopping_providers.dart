@@ -38,6 +38,7 @@ class ShoppingNotifier extends _$ShoppingNotifier {
   }
 
   Future<void> add({
+    required String projectId,
     required String name,
     String? roomId,
     ShoppingPriority priority = ShoppingPriority.medium,
@@ -46,9 +47,11 @@ class ShoppingNotifier extends _$ShoppingNotifier {
     String? marktplaatsQuery,
     bool isMarktplaatsTracked = false,
     double? targetPrice,
+    ItemDimensions? dimensions,
   }) async {
     final item = ShoppingItem(
       id: _uuid.v4(),
+      projectId: projectId,
       name: name,
       roomId: roomId,
       priority: priority,
@@ -58,8 +61,9 @@ class ShoppingNotifier extends _$ShoppingNotifier {
       isMarktplaatsTracked: isMarktplaatsTracked,
       targetPrice: targetPrice,
       createdAt: DateTime.now(),
+      dimensions: dimensions,
     );
-    await repository.saveItem(item); // Update usage
+    await repository.saveItem(item);
     state = [...state, item];
   }
 

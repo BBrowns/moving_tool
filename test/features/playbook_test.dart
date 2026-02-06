@@ -27,8 +27,8 @@ class MockPlaybookRepository implements PlaybookRepository {
 
 // Fake Notifier to mock Hive interactions
 class FakeNotesNotifier extends NotesNotifier {
-  final List<PlaybookNote> _initial;
   FakeNotesNotifier([List<PlaybookNote>? initialNotes]) : _initial = initialNotes ?? [];
+  final List<PlaybookNote> _initial;
 
   @override
   List<PlaybookNote> build() => _initial;

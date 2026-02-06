@@ -23,15 +23,15 @@ class ExpensesScreen extends ConsumerWidget {
     final totalExpenses = ref
         .read(expenseProvider.notifier)
         .totalExpenses; // Use getter we updated
-    final users = project?.users ?? [];
+    final members = project?.members ?? [];
 
     // Sort expenses by date (newest first)
     final sortedExpenses = List<Expense>.from(openExpenses)
       ..sort((a, b) => b.date.compareTo(a.date));
 
     // Calculate settlements for OPEN expenses only
-    final settlements = users.isNotEmpty
-        ? calculateSettlements(openExpenses, users.map((u) => u.id).toList())
+    final settlements = members.isNotEmpty
+        ? calculateSettlements(openExpenses, members.map((u) => u.id).toList())
         : <Settlement>[];
 
     return ResponsiveScaffold(
@@ -50,14 +50,14 @@ class ExpensesScreen extends ConsumerWidget {
         ),
         IconButton(
           onPressed: () =>
-              _showSettlementDialog(context, ref, settlements, users),
+              _showSettlementDialog(context, ref, settlements, members),
           icon: const Icon(Icons.handshake_outlined), // Changed to handshake
           tooltip: 'Verrekenen',
         ),
       ],
       fabLabel: 'Uitgave',
       fabIcon: Icons.add,
-      onFabPressed: () => _showExpenseDialog(context, ref, users),
+      onFabPressed: () => _showExpenseDialog(context, ref, members),
       body: ResponsiveWrapper(
         maxWidth: 800,
         child: CustomScrollView(
@@ -66,7 +66,7 @@ class ExpensesScreen extends ConsumerWidget {
             SliverToBoxAdapter(
               child: _BalanceHeader(
                 total: totalExpenses,
-                users: users,
+                members: members,
                 expenses: openExpenses,
               ),
             ),
@@ -118,11 +118,11 @@ class ExpensesScreen extends ConsumerWidget {
                         if (showHeader) _DateHeader(date: expense.date),
                         _ExpenseTile(
                           expense: expense,
-                          users: users,
+                          members: members,
                           onTap: () => _showExpenseDialog(
                             context,
                             ref,
-                            users,
+                            members,
                             expense: expense,
                           ),
                         ),
@@ -141,7 +141,7 @@ class ExpensesScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     List<Settlement> settlements,
-    List<User> users,
+    List<ProjectMember> members,
   ) {
     showModalBottomSheet<void>(
       context: context,
@@ -180,13 +180,23 @@ class ExpensesScreen extends ConsumerWidget {
               )
             else ...[
               ...settlements.map((settlement) {
-                final fromUser = users.cast<User>().firstWhere(
+                final fromUser = members.cast<ProjectMember>().firstWhere(
                   (u) => u.id == settlement.fromUserId,
-                  orElse: () => User(id: '', name: 'Onbekend', color: 'Grey'),
+                  orElse: () => const ProjectMember(
+                    id: '',
+                    name: 'Onbekend',
+                    role: ProjectRole.viewer,
+                    color: '#808080',
+                  ),
                 );
-                final toUser = users.cast<User>().firstWhere(
+                final toUser = members.cast<ProjectMember>().firstWhere(
                   (u) => u.id == settlement.toUserId,
-                  orElse: () => User(id: '', name: 'Onbekend', color: 'Grey'),
+                  orElse: () => const ProjectMember(
+                    id: '',
+                    name: 'Onbekend',
+                    role: ProjectRole.viewer,
+                    color: '#808080',
+                  ),
                 );
 
                 return Padding(
@@ -247,13 +257,13 @@ class ExpensesScreen extends ConsumerWidget {
                   if (confirmed == true) {
                     // For now, attribute to the first user or a system user
                     // In a real app, this would be the logged-in user
-                    final creatorId = users.isNotEmpty
-                        ? users.first.id
+                    final creatorId = members.isNotEmpty
+                        ? members.first.id
                         : 'unknown';
                     await ref
                         .read(expenseProvider.notifier)
                         .settleUp(
-                          users.map((u) => u.id).toList(),
+                          members.map((u) => u.id).toList(),
                           createdByUserId: creatorId,
                         );
                     if (context.mounted) Navigator.pop(context);
@@ -281,7 +291,7 @@ class ExpensesScreen extends ConsumerWidget {
   void _showExpenseDialog(
     BuildContext context,
     WidgetRef ref,
-    List<User> users, {
+    List<ProjectMember> members, {
     Expense? expense,
   }) {
     final isEditing = expense != null;
@@ -293,11 +303,11 @@ class ExpensesScreen extends ConsumerWidget {
 
     // Default to first user or 'me' if no users, or existing paidBy
     String? paidBy =
-        expense?.paidById ?? (users.isNotEmpty ? users.first.id : null);
+        expense?.paidById ?? (members.isNotEmpty ? members.first.id : null);
 
     // Default to all users if new, or existing split
     final List<String> splitBetween =
-        expense?.splitBetweenIds ?? users.map((u) => u.id).toList();
+        expense?.splitBetweenIds ?? members.map((u) => u.id).toList();
 
     showModalBottomSheet<void>(
       context: context,
@@ -365,14 +375,14 @@ class ExpensesScreen extends ConsumerWidget {
                       .toList(),
                   onChanged: (v) => category = v!,
                 ),
-                if (users.isNotEmpty) ...[
+                if (members.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     initialValue: paidBy,
                     decoration: const InputDecoration(
                       labelText: 'Betaald door',
                     ),
-                    items: users
+                    items: members
                         .map(
                           (u) => DropdownMenuItem(
                             value: u.id,
@@ -386,7 +396,7 @@ class ExpensesScreen extends ConsumerWidget {
                   Text('Verdeeld over:', style: context.textTheme.titleSmall),
                   Wrap(
                     spacing: 8,
-                    children: users.map((u) {
+                    children: members.map((u) {
                       final isSelected = splitBetween.contains(u.id);
                       return FilterChip(
                         label: Text(u.name),
@@ -415,7 +425,7 @@ class ExpensesScreen extends ConsumerWidget {
 
                     // Fallback for solo users
                     final effectivePaidBy =
-                        paidBy ?? (users.isEmpty ? 'me' : null);
+                        paidBy ?? (members.isEmpty ? 'me' : null);
                     final effectiveSplit = splitBetween.isEmpty
                         ? [effectivePaidBy!]
                         : splitBetween;
@@ -471,14 +481,13 @@ class ExpensesScreen extends ConsumerWidget {
 }
 
 class _BalanceHeader extends StatelessWidget {
-
   const _BalanceHeader({
     required this.total,
-    required this.users,
+    required this.members,
     required this.expenses,
   });
   final double total;
-  final List<User> users;
+  final List<ProjectMember> members;
   final List<Expense> expenses;
 
   @override
@@ -513,7 +522,7 @@ class _BalanceHeader extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          if (users.isNotEmpty) ...[
+          if (members.isNotEmpty) ...[
             const SizedBox(height: 24),
             Container(
               padding: const EdgeInsets.all(12),
@@ -523,7 +532,7 @@ class _BalanceHeader extends StatelessWidget {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: users.map((user) {
+                children: members.map((user) {
                   final paid = expenses
                       .where((e) => e.paidById == user.id)
                       .fold(0.0, (sum, e) => sum + e.amount);
@@ -562,7 +571,6 @@ class _BalanceHeader extends StatelessWidget {
 }
 
 class _DateHeader extends StatelessWidget {
-
   const _DateHeader({required this.date});
   final DateTime date;
 
@@ -596,19 +604,18 @@ class _DateHeader extends StatelessWidget {
 }
 
 class _ExpenseTile extends StatelessWidget {
-
   const _ExpenseTile({
     required this.expense,
-    required this.users,
+    required this.members,
     required this.onTap,
   });
   final Expense expense;
-  final List<User> users;
+  final List<ProjectMember> members;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final payer = users.where((u) => u.id == expense.paidById).firstOrNull;
+    final payer = members.where((u) => u.id == expense.paidById).firstOrNull;
     final payerName = payer?.name ?? 'Onbekend';
 
     return InkWell(

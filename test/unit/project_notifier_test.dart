@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -40,9 +39,9 @@ void main() {
         id: 'p1',
         name: 'Test Project',
         movingDate: DateTime.now(),
-        fromAddress: Address(),
-        toAddress: Address(),
-        users: [],
+        fromAddress: const Address(),
+        toAddress: const Address(),
+        members: [],
         createdAt: DateTime.now(),
       );
 
@@ -57,22 +56,40 @@ void main() {
       final fromDb = all.firstWhere((p) => p.id == 'p1');
       expect(fromDb.name, 'Test Project');
       // save() auto-sets active if first.
-      
+
       final activeId = DatabaseService.getActiveProjectId();
       expect(activeId, 'p1');
-      
+
       final activeProject = DatabaseService.getProject();
       expect(activeProject?.id, 'p1');
       expect(activeProject?.name, 'Test Project');
     });
 
     test('setActive() should switch projects and update state', () async {
-      final p1 = Project(id: 'p1', name: 'Project 1', movingDate: DateTime.now(), fromAddress: Address(), toAddress: Address(), users: [], createdAt: DateTime.now());
-      final p2 = Project(id: 'p2', name: 'Project 2', movingDate: DateTime.now(), fromAddress: Address(), toAddress: Address(), users: [], createdAt: DateTime.now());
+      final p1 = Project(
+        id: 'p1',
+        name: 'Project 1',
+        movingDate: DateTime.now(),
+        fromAddress: const Address(),
+        toAddress: const Address(),
+        members: [],
+        createdAt: DateTime.now(),
+      );
+      final p2 = Project(
+        id: 'p2',
+        name: 'Project 2',
+        movingDate: DateTime.now(),
+        fromAddress: const Address(),
+        toAddress: const Address(),
+        members: [],
+        createdAt: DateTime.now(),
+      );
 
       final notifier = container.read(projectProvider.notifier);
       await notifier.save(p1);
-      await notifier.save(p2); // p1 was active. p2 saved. p1 remains active? Or p2 becomes active?
+      await notifier.save(
+        p2,
+      ); // p1 was active. p2 saved. p1 remains active? Or p2 becomes active?
       // Logic: "if (getActiveProjectId() == null) { setActiveProject }".
       // So p1 set active. p2 saved but not active.
 

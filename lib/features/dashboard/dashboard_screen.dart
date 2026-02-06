@@ -7,6 +7,7 @@ import 'package:moving_tool_flutter/core/models/models.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
 import 'package:moving_tool_flutter/data/providers/providers.dart';
+import 'package:moving_tool_flutter/features/transport/presentation/screens/transport_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -57,7 +58,7 @@ class DashboardScreen extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            'Hallo ${project.users.isNotEmpty ? project.users.first.name : "Verhuizer"}! 👋',
+                            'Hallo ${project.members.isNotEmpty ? project.members.first.name : "Verhuizer"}! 👋',
                             style: context.textTheme.headlineLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: context.colors.onSurface,
@@ -145,6 +146,14 @@ class DashboardScreen extends ConsumerWidget {
                               color: const Color(0xFF9C27B0), // Vibrant Purple
                               onTap: () => context.go('/expenses'),
                             ),
+                            _BentoCard(
+                              title: 'Transport',
+                              value: '${project.resources.length}',
+                              subtitle: 'Voertuigen',
+                              icon: Icons.directions_bus,
+                              color: const Color(0xFF607D8B), // Blue Grey
+                              onTap: () => context.go('/transport'),
+                            ),
                           ]
                         : [
                                 _BentoCard(
@@ -179,6 +188,14 @@ class DashboardScreen extends ConsumerWidget {
                                   color: const Color(0xFF9C27B0),
                                   onTap: () => context.go('/expenses'),
                                 ),
+                                _BentoCard(
+                                  title: 'Transport',
+                                  value: '${project.resources.length}',
+                                  subtitle: 'Voertuigen',
+                                  icon: Icons.directions_bus,
+                                  color: const Color(0xFF607D8B),
+                                  onTap: () => context.go('/transport'),
+                                ),
                               ]
                               .animate(interval: 50.ms)
                               .fade(duration: 400.ms)
@@ -187,6 +204,161 @@ class DashboardScreen extends ConsumerWidget {
                                 end: 1.0,
                                 curve: Curves.easeOutBack,
                               ),
+                  ),
+                ),
+              ),
+
+              // Transport Warnings Section
+              Consumer(
+                builder: (context, ref, _) {
+                  final adviceAsync = ref.watch(transportAdviceProvider);
+                  return adviceAsync.when(
+                    data: (advice) {
+                      final warnings = advice
+                          .where((e) => e.startsWith('WARNING'))
+                          .toList();
+                      if (warnings.isEmpty)
+                        return const SliverToBoxAdapter(
+                          child: SizedBox.shrink(),
+                        );
+                      return SliverPadding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 8,
+                        ),
+                        sliver: SliverToBoxAdapter(
+                          child: Card(
+                            color: AppTheme.warning.withValues(alpha: 0.15),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.warning_amber,
+                                        color: AppTheme.warning,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Transport Waarschuwingen',
+                                        style: context.textTheme.titleMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ...warnings.map(
+                                    (w) => Padding(
+                                      padding: const EdgeInsets.only(bottom: 4),
+                                      child: Text(
+                                        w.replaceFirst('WARNING: ', ''),
+                                        style: context.textTheme.bodyMedium,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  TextButton(
+                                    onPressed: () => context.push('/transport'),
+                                    child: const Text('Bekijk Transport →'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    loading: () =>
+                        const SliverToBoxAdapter(child: SizedBox.shrink()),
+                    error: (_, __) =>
+                        const SliverToBoxAdapter(child: SizedBox.shrink()),
+                  );
+                },
+              ),
+
+              // Tools Section - Power Features
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children:
+                        [
+                              Text(
+                                'Tools',
+                                style: context.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _ToolCard(
+                                      title: 'Admin Vault',
+                                      subtitle: 'Contracten & Metingen',
+                                      icon: Icons.admin_panel_settings_rounded,
+                                      gradient: const [
+                                        Color(0xFF5C6BC0),
+                                        Color(0xFF7E57C2),
+                                      ],
+                                      onTap: () => context.push('/admin-vault'),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: _ToolCard(
+                                      title: 'AR Studio',
+                                      subtitle: 'Kamers & Meubels',
+                                      icon: Icons.view_in_ar_rounded,
+                                      gradient: const [
+                                        Color(0xFF26A69A),
+                                        Color(0xFF4DB6AC),
+                                      ],
+                                      onTap: () => context.push('/ar-studio'),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 12),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _ToolCard(
+                                      title: 'Assets',
+                                      subtitle: 'Bezittingen & Garanties',
+                                      icon: Icons.inventory_rounded,
+                                      gradient: const [
+                                        Color(0xFFFF7043),
+                                        Color(0xFFFFAB91),
+                                      ],
+                                      onTap: () => context.push('/assets'),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: _ToolCard(
+                                      title: 'Past het?',
+                                      subtitle: 'Transport Matcher',
+                                      icon: Icons.local_shipping_rounded,
+                                      gradient: const [
+                                        Color(0xFF546E7A),
+                                        Color(0xFF78909C),
+                                      ],
+                                      onTap: () =>
+                                          context.push('/transport-matcher'),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ]
+                            .animate(interval: 50.ms)
+                            .fadeIn(duration: 300.ms)
+                            .slideY(begin: 0.1, end: 0),
                   ),
                 ),
               ),
@@ -229,7 +401,6 @@ class DashboardScreen extends ConsumerWidget {
 }
 
 class _PlaybookHeroCard extends StatelessWidget {
-
   const _PlaybookHeroCard({required this.onTap});
   final VoidCallback onTap;
 
@@ -330,7 +501,6 @@ class _PlaybookHeroCard extends StatelessWidget {
 }
 
 class _BentoCard extends StatelessWidget {
-
   const _BentoCard({
     required this.title,
     required this.value,
@@ -454,7 +624,6 @@ class _BentoCard extends StatelessWidget {
 }
 
 class _ActivityTile extends StatelessWidget {
-
   const _ActivityTile({required this.entry});
   final JournalEntry entry;
 
@@ -539,6 +708,83 @@ class _EmptyState extends StatelessWidget {
             style: TextStyle(color: context.colors.onSurfaceVariant),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ToolCard extends StatelessWidget {
+  const _ToolCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.gradient,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final List<Color> gradient;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      elevation: 2,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: gradient,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: Colors.white, size: 24),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: context.textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.85),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Colors.white.withValues(alpha: 0.7),
+                size: 16,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

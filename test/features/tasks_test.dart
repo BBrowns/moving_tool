@@ -10,16 +10,15 @@ import 'package:moving_tool_flutter/features/tasks/tasks_screen.dart';
 
 // Mock Repository used by Real TaskNotifier
 class MockTasksRepository implements TasksRepository {
-  List<Task> _tasks = [];
-
   MockTasksRepository([List<Task>? initialTasks]) {
     if (initialTasks != null) {
       _tasks = initialTasks;
     }
   }
+  List<Task> _tasks = [];
 
   @override
-  Future<List<Task>> getTasks() async => _tasks;
+  Future<List<Task>> getTasks(String projectId) async => _tasks;
 
   @override
   Future<void> saveTask(Task task) async {
@@ -38,9 +37,8 @@ class MockTasksRepository implements TasksRepository {
 }
 
 class TestTaskNotifier extends TaskNotifier {
-  final List<Task> _initialTasks;
-
   TestTaskNotifier(this._initialTasks);
+  final List<Task> _initialTasks;
 
   @override
   List<Task> build() {
@@ -50,8 +48,8 @@ class TestTaskNotifier extends TaskNotifier {
 }
 
 class TestProjectNotifier extends ProjectNotifier {
-  final Project? _initialProject;
   TestProjectNotifier(this._initialProject);
+  final Project? _initialProject;
 
   @override
   Project? build() {
@@ -65,9 +63,16 @@ final mockProject = Project(
   id: 'test-project-id',
   name: 'Test Verhuizing',
   movingDate: DateTime.now().add(const Duration(days: 30)),
-  fromAddress: Address(),
-  toAddress: Address(),
-  users: [User(id: 'u1', name: 'Test User', color: '#6366F1')],
+  fromAddress: const Address(),
+  toAddress: const Address(),
+  members: [
+    const ProjectMember(
+      id: 'u1',
+      name: 'Test User',
+      role: ProjectRole.admin,
+      color: '#6366F1',
+    ),
+  ],
   createdAt: DateTime.now(),
 );
 
@@ -127,7 +132,8 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       final mockTask = Task(
-        id: '1',
+        id: "1",
+        projectId: "p1",
         title: 'Test Task',
         category: TaskCategory.administratie,
         status: TaskStatus.todo,
@@ -171,7 +177,8 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       final mockTask = Task(
-        id: '1',
+        id: "1",
+        projectId: "p1",
         title: 'Test Task',
         category: TaskCategory.administratie,
         status: TaskStatus.todo,
@@ -253,6 +260,7 @@ void main() {
 
       final task1 = Task(
         id: '1',
+        projectId: 'p1',
         title: 'Admin Task',
         category: TaskCategory.administratie,
         status: TaskStatus.todo,
@@ -260,6 +268,7 @@ void main() {
       );
       final task2 = Task(
         id: '2',
+        projectId: 'p1',
         title: 'Clean Task',
         category: TaskCategory.schoonmaken,
         status: TaskStatus.todo,

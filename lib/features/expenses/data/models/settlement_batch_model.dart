@@ -1,10 +1,10 @@
-
 import 'package:moving_tool_flutter/features/expenses/data/models/settlement_model.dart';
 import 'package:moving_tool_flutter/features/expenses/domain/entities/settlement_batch.dart';
 
 class SettlementBatchModel extends SettlementBatch {
   SettlementBatchModel({
     required super.id,
+    required super.projectId,
     required super.date,
     required super.totalAmount,
     required super.settlements,
@@ -15,9 +15,12 @@ class SettlementBatchModel extends SettlementBatch {
   factory SettlementBatchModel.fromEntity(SettlementBatch entity) {
     return SettlementBatchModel(
       id: entity.id,
+      projectId: entity.projectId,
       date: entity.date,
       totalAmount: entity.totalAmount,
-      settlements: entity.settlements.map((s) => s is SettlementModel ? s : SettlementModel.fromEntity(s)).toList(),
+      settlements: entity.settlements
+          .map((s) => s is SettlementModel ? s : SettlementModel.fromEntity(s))
+          .toList(),
       expenseIds: entity.expenseIds,
       createdByUserId: entity.createdByUserId,
     );
@@ -26,6 +29,7 @@ class SettlementBatchModel extends SettlementBatch {
   factory SettlementBatchModel.fromJson(Map<String, dynamic> json) {
     return SettlementBatchModel(
       id: json['id'] as String,
+      projectId: json['projectId'] as String? ?? 'p1', // Default for migration
       date: DateTime.parse(json['date'] as String),
       totalAmount: (json['totalAmount'] as num).toDouble(),
       settlements: (json['settlements'] as List<dynamic>)
@@ -39,9 +43,16 @@ class SettlementBatchModel extends SettlementBatch {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'projectId': projectId,
       'date': date.toIso8601String(),
       'totalAmount': totalAmount,
-      'settlements': settlements.map((e) => (e is SettlementModel ? e.toJson() : SettlementModel.fromEntity(e).toJson())).toList(),
+      'settlements': settlements
+          .map(
+            (e) => (e is SettlementModel
+                ? e.toJson()
+                : SettlementModel.fromEntity(e).toJson()),
+          )
+          .toList(),
       'expenseIds': expenseIds,
       'createdByUserId': createdByUserId,
     };

@@ -47,5 +47,15 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Camera permissions for AR and Receipt Scanner -->
+	<key>NSCameraUsageDescription</key>
+	<string>Camera is required for AR room scanning and receipt scanning</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Access to photos is needed to select receipt images</string>
+	<!-- AR Kit -->
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
 </dict>
 </plist>

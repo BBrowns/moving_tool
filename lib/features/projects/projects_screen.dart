@@ -8,6 +8,7 @@ import 'package:moving_tool_flutter/core/widgets/responsive_scaffold.dart';
 import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
 import 'package:moving_tool_flutter/data/providers/providers.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
+import 'package:moving_tool_flutter/seeds/scenario_seed.dart';
 
 class ProjectsScreen extends ConsumerStatefulWidget {
   const ProjectsScreen({super.key});
@@ -37,6 +38,13 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
       fabLabel: 'Nieuwe verhuizing',
       fabIcon: Icons.add,
       onFabPressed: () => context.push('/onboarding'),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.science_outlined),
+          tooltip: 'Demo Data Genereren',
+          onPressed: () => _seedDemoProject(ref),
+        ),
+      ],
       body: projects.isEmpty
           ? _buildEmptyState(context)
           : ResponsiveWrapper(
@@ -47,7 +55,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                 itemBuilder: (context, index) {
                   final project = projects[index];
                   final isActive = activeProject?.id == project.id;
-                  
+
                   return _ProjectCard(
                     project: project,
                     isActive: isActive,
@@ -67,10 +75,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
         children: [
           const Text('📦', style: TextStyle(fontSize: 64)),
           const SizedBox(height: 16),
-          Text(
-            'Nog geen verhuizingen',
-            style: context.textTheme.headlineSmall,
-          ),
+          Text('Nog geen verhuizingen', style: context.textTheme.headlineSmall),
           const SizedBox(height: 8),
           Text(
             'Start je eerste verhuizing om te beginnen',
@@ -84,15 +89,30 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
             icon: const Icon(Icons.add),
             label: const Text('Nieuwe verhuizing'),
           ),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: () => _seedDemoProject(ref),
+            child: const Text('Probeer Demo Project'),
+          ),
         ],
       ),
     );
   }
 
-  void _selectProject(BuildContext context, WidgetRef ref, String projectId) async {
+  Future<void> _seedDemoProject(WidgetRef ref) async {
+    await seedOnsAppartement(ref);
+    // Refresh
+    ref.read(projectsProvider.notifier).load();
+  }
+
+  void _selectProject(
+    BuildContext context,
+    WidgetRef ref,
+    String projectId,
+  ) async {
     await ref.read(projectProvider.notifier).setActive(projectId);
     ref.read(projectsProvider.notifier).load();
-    
+
     // Reload all data for the new project
     // Reload all data for the new project
     await Future.wait([
@@ -102,7 +122,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
       ref.read(shoppingProvider.notifier).load(),
       ref.read(expenseProvider.notifier).load(),
     ]);
-    
+
     if (context.mounted) {
       if (context.canPop()) {
         context.pop();
@@ -116,7 +136,11 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: const Icon(Icons.warning_rounded, color: AppTheme.error, size: 48),
+        icon: const Icon(
+          Icons.warning_rounded,
+          color: AppTheme.error,
+          size: 48,
+        ),
         title: const Text('Verhuizing verwijderen?'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -136,25 +160,24 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
             child: const Text('Annuleren'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.error,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.error),
             onPressed: () async {
               Navigator.pop(context);
               await ref.read(projectsProvider.notifier).delete(project.id);
-              
+
               // Reload active project
               ref.read(projectProvider.notifier).load();
               ref.read(projectsProvider.notifier).load();
-              
+
               if (context.mounted) {
                 final hasProjects = ref.read(projectsProvider).isNotEmpty;
                 if (!hasProjects) {
                   context.go('/onboarding');
                 } else if (context.canPop()) {
-                  context.pop(); // Return to previous screen (Dashboard) if valid
+                  context
+                      .pop(); // Return to previous screen (Dashboard) if valid
                 } else {
-                  context.go('/dashboard'); 
+                  context.go('/dashboard');
                 }
               }
             },
@@ -167,7 +190,6 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
 }
 
 class _ProjectCard extends StatelessWidget {
-
   const _ProjectCard({
     required this.project,
     required this.isActive,
@@ -183,7 +205,7 @@ class _ProjectCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('d MMMM yyyy', 'nl_NL');
     final daysUntil = project.daysUntilMove;
-    
+
     return Card(
       clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.only(bottom: 12),
@@ -212,7 +234,7 @@ class _ProjectCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Content
               Expanded(
                 child: Column(
@@ -260,7 +282,7 @@ class _ProjectCard extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               // Actions
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert),
@@ -276,7 +298,10 @@ class _ProjectCard extends StatelessWidget {
                       children: [
                         Icon(Icons.delete_outline, color: AppTheme.error),
                         SizedBox(width: 12),
-                        Text('Verwijderen', style: TextStyle(color: AppTheme.error)),
+                        Text(
+                          'Verwijderen',
+                          style: TextStyle(color: AppTheme.error),
+                        ),
                       ],
                     ),
                   ),
@@ -292,7 +317,7 @@ class _ProjectCard extends StatelessWidget {
   Widget _buildStatusChip(BuildContext context, int daysUntil) {
     final Color color;
     final String text;
-    
+
     if (daysUntil < 0) {
       color = context.colors.onSurfaceVariant;
       text = 'Voltooid';
@@ -316,10 +341,7 @@ class _ProjectCard extends StatelessWidget {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 6),
         Text(

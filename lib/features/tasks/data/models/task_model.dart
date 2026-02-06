@@ -1,11 +1,13 @@
-
 import 'package:moving_tool_flutter/features/tasks/domain/entities/task.dart';
 
 class TaskModel extends Task {
   TaskModel({
     required super.id,
+    required super.projectId,
     required super.title,
-    required super.category, required super.createdAt, super.description,
+    required super.category,
+    required super.createdAt,
+    super.description,
     super.status,
     super.assigneeId,
     super.deadline,
@@ -14,6 +16,7 @@ class TaskModel extends Task {
   factory TaskModel.fromEntity(Task entity) {
     return TaskModel(
       id: entity.id,
+      projectId: entity.projectId,
       title: entity.title,
       description: entity.description,
       category: entity.category,
@@ -27,6 +30,7 @@ class TaskModel extends Task {
   factory TaskModel.fromJson(Map<String, dynamic> json) {
     return TaskModel(
       id: json['id'] as String,
+      projectId: json['projectId'] as String? ?? 'todo', // Default? Or empty
       title: json['title'] as String,
       description: json['description'] as String? ?? '',
       category: TaskCategory.values.firstWhere(
@@ -38,7 +42,9 @@ class TaskModel extends Task {
         orElse: () => TaskStatus.todo,
       ),
       assigneeId: json['assigneeId'] as String?,
-      deadline: json['deadline'] != null ? DateTime.parse(json['deadline'] as String) : null,
+      deadline: json['deadline'] != null
+          ? DateTime.parse(json['deadline'] as String)
+          : null,
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }
@@ -46,6 +52,7 @@ class TaskModel extends Task {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'projectId': projectId,
       'title': title,
       'description': description,
       'category': category.name,

@@ -32,7 +32,7 @@ import 'package:moving_tool_flutter/main.dart'; // To get the main App widget if
 // Manual Mocks for All Repositories
 class MockTasksRepository extends Mock implements TasksRepository {
   @override
-  Future<List<Task>> getTasks() async => [];
+  Future<List<Task>> getTasks(String projectId) async => [];
   @override
   Future<void> saveTask(Task task) async {}
   @override
@@ -50,13 +50,14 @@ class MockShoppingRepository extends Mock implements ShoppingRepository {
 
 class MockExpensesRepository extends Mock implements ExpensesRepository {
   @override
-  Future<List<Expense>> getExpenses() async => [];
+  Future<List<Expense>> getExpenses(String projectId) async => [];
   @override
   Future<void> saveExpense(Expense expense) async {}
   @override
   Future<void> deleteExpense(String id) async {}
   @override
-  Future<List<SettlementBatch>> getSettlementBatches() async => [];
+  Future<List<SettlementBatch>> getSettlementBatches(String projectId) async =>
+      [];
   @override
   Future<void> saveSettlementBatch(SettlementBatch batch) async {}
   @override
@@ -67,16 +68,16 @@ class MockExpensesRepository extends Mock implements ExpensesRepository {
 class MockPlaybookRepository extends Mock implements PlaybookRepository {
   @override
   Future<List<JournalEntry>> getJournalEntries() async => [];
-  
+
   @override
   Future<void> saveJournalEntry(JournalEntry entry) async {}
-  
+
   @override
   Future<List<PlaybookNote>> getNotes() async => [];
-  
+
   @override
   Future<void> saveNote(PlaybookNote note) async {}
-  
+
   @override
   Future<void> deleteNote(String id) async {}
 }
@@ -88,20 +89,20 @@ class MockProjectsRepository extends Mock implements ProjectsRepository {
     name: 'Test Project',
     createdAt: DateTime.now(),
     movingDate: DateTime.now().add(const Duration(days: 30)),
-    fromAddress: Address(city: 'Old City'),
-    toAddress: Address(city: 'New City'),
-    users: [],
+    fromAddress: const Address(city: 'Old City'),
+    toAddress: const Address(city: 'New City'),
+    members: [],
   );
 
   @override
   List<Project> getAllProjects() => [_testProject];
-  
+
   @override
   Project? getActiveProject() => _testProject;
-  
+
   @override
   Future<void> saveProject(Project project) async {}
-  
+
   @override
   Future<void> setActiveProject(String id) async {}
 
@@ -133,31 +134,33 @@ class IntegrationMockRepository extends Mock implements PackingRepository {
 
   @override
   Future<void> deleteBox(String id) async {}
-  
+
   @override
   Future<void> deleteItem(String id) async {}
-  
+
   @override
   Future<void> deleteRoom(String id) async {}
-  
+
   @override
   Future<void> saveItem(BoxItem item) async {}
 }
 
 void main() {
-  testWidgets('Integration: Full User Journey (Dashboard -> Packing -> Add Box)', (WidgetTester tester) async {
+  testWidgets('Integration: Full User Journey (Dashboard -> Packing -> Add Box)', (
+    WidgetTester tester,
+  ) async {
     // 1. Setup Data & Providers
     final mockRepo = IntegrationMockRepository();
     // Pre-populate a room so we can add a box to it
     final livingRoom = Room(
-      id: 'room-1', 
-      name: 'Woonkamer', 
-      icon: '🛋️', 
-      color: 'Blue', 
-      createdAt: DateTime.now()
+      id: 'room-1',
+      name: 'Woonkamer',
+      icon: '🛋️',
+      color: 'Blue',
+      createdAt: DateTime.now(),
     );
     await mockRepo.saveRoom(livingRoom);
-    
+
     final mockProjectsRepo = MockProjectsRepository();
     final mockPlaybookRepo = MockPlaybookRepository();
     final mockTasksRepo = MockTasksRepository();
@@ -174,7 +177,8 @@ void main() {
           shoppingRepositoryProvider.overrideWithValue(mockShoppingRepo),
           expensesRepositoryProvider.overrideWithValue(mockExpensesRepo),
         ],
-        child: const MovingToolApp(), // Ensure this matches your main.dart App class
+        child:
+            const MovingToolApp(), // Ensure this matches your main.dart App class
       ),
     );
     await tester.pumpAndSettle(); // Allow router to settle
@@ -185,13 +189,16 @@ void main() {
 
     // 3. Navigate to Packing (Using NavigationBar/Rail)
     // Find icon with Packing label/icon
-    final packingIcon = find.byIcon(Icons.inventory_2_rounded).first; 
+    final packingIcon = find.byIcon(Icons.inventory_2_rounded).first;
     await tester.tap(packingIcon);
     await tester.pumpAndSettle();
 
     // Verify we are on Packing Screen
     expect(find.byType(PackingScreen), findsOneWidget);
-    expect(find.text('Woonkamer'), findsOneWidget); // Pre-populated room visible?
+    expect(
+      find.text('Woonkamer'),
+      findsOneWidget,
+    ); // Pre-populated room visible?
 
     // 4. Click Add Box (on the Room Card)
     // Finding the 'Add Box' button on the specific room card
@@ -203,7 +210,7 @@ void main() {
     // 5. Fill Dialog
     expect(find.text('Nieuwe doos'), findsOneWidget);
     await tester.enterText(find.byType(TextField).first, 'Boeken en CDs');
-    
+
     // 6. Save
     await tester.tap(find.text('Toevoegen'));
     await tester.pumpAndSettle();
@@ -216,7 +223,7 @@ void main() {
     // Now inside the BottomSheet, we should see the box
     // Might find 2 if TextField is fading out or similar (Text in field + Text in Tile)
     expect(find.text('Boeken en CDs'), findsAtLeastNWidgets(1));
-    
+
     // Close the sheet
     await tester.tap(find.byIcon(Icons.close));
     await tester.pumpAndSettle();
@@ -225,13 +232,13 @@ void main() {
     final dashboardIcon = find.byIcon(Icons.dashboard_rounded).first;
     await tester.tap(dashboardIcon);
     await tester.pumpAndSettle();
-    
+
     expect(find.byType(DashboardScreen), findsOneWidget);
 
     // 9. Return to packing (Persistence Check)
     await tester.tap(packingIcon);
     await tester.pumpAndSettle();
-    
+
     // Tap room again to see details
     await tester.tap(find.text('Woonkamer'));
     await tester.pumpAndSettle();
