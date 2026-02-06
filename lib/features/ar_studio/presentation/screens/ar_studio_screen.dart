@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/features/ar_studio/domain/entities/room.dart';
 import 'package:moving_tool_flutter/features/ar_studio/presentation/providers/room_providers.dart';
+import 'package:go_router/go_router.dart';
 
 /// AR Studio main screen for managing rooms and virtual furniture.
 class ARStudioScreen extends ConsumerStatefulWidget {
@@ -503,10 +504,27 @@ class _RoomDetailSheet extends ConsumerWidget {
                     ],
                   ),
                 ),
-                FilledButton.icon(
-                  onPressed: () => _showAddFurnitureDialog(context, ref),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Meubel'),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        // Navigate to AR Camera
+                        context.go('/ar-studio/camera?mode=furniturePlacement');
+                      },
+                      icon: const Icon(Icons.view_in_ar_rounded),
+                      tooltip: 'Bekijk in AR',
+                      style: IconButton.styleFrom(
+                        backgroundColor: context.colors.primaryContainer,
+                        foregroundColor: context.colors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton.icon(
+                      onPressed: () => _showAddFurnitureDialog(context, ref),
+                      icon: const Icon(Icons.add),
+                      label: const Text('Meubel'),
+                    ),
+                  ],
                 ),
               ],
             ),
