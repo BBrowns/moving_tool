@@ -6,6 +6,7 @@ import 'package:moving_tool_flutter/features/expenses/domain/entities/settlement
 import 'package:moving_tool_flutter/features/expenses/domain/repositories/expenses_repository.dart';
 import 'package:moving_tool_flutter/features/playbook/application/playbook_service.dart';
 import 'package:moving_tool_flutter/features/playbook/domain/entities/playbook_rule.dart';
+import 'package:moving_tool_flutter/features/expenses/data/datasources/expenses_local_data_source.dart';
 import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
@@ -15,7 +16,8 @@ const _uuid = Uuid();
 // ============================================================================
 
 final expensesRepositoryProvider = Provider<ExpensesRepository>((ref) {
-  return ExpensesRepositoryImpl();
+  final dataSource = ref.watch(expensesLocalDataSourceProvider);
+  return ExpensesRepositoryImpl(dataSource);
 });
 
 // ============================================================================
