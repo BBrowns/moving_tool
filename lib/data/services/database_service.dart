@@ -27,26 +27,24 @@ class DatabaseService {
   static const String _notesBox = 'notes';
   static const String _settingsBox = 'settings';
   static const String _settlementsBox = 'settlements';
-  
-  static const String _activeProjectKey = 'activeProjectId';
-  
 
+  static const String _activeProjectKey = 'activeProjectId';
 
   // ... (Add Settlement Operations)
   // ============================================================================
   // Settlement operations
   // ============================================================================
-  
+
   static List<SettlementBatch> getAllSettlementBatches() {
     final box = Hive.box<String>(_settlementsBox);
     return box.values.map((json) => _settlementBatchFromJson(json)).toList();
   }
-  
+
   static Future<void> saveSettlementBatch(SettlementBatch batch) async {
     final box = Hive.box<String>(_settlementsBox);
     await box.put(batch.id, _settlementBatchToJson(batch));
   }
-  
+
   static Future<void> deleteSettlementBatch(String id) async {
     final box = Hive.box<String>(_settlementsBox);
     await box.delete(id);
@@ -54,16 +52,22 @@ class DatabaseService {
 
   // ... (Add JSON helpers)
   static String _settlementBatchToJson(SettlementBatch b) {
-    final model = b is SettlementBatchModel ? b : SettlementBatchModel.fromEntity(b);
+    final model = b is SettlementBatchModel
+        ? b
+        : SettlementBatchModel.fromEntity(b);
     return jsonEncode(model.toJson());
   }
-  
+
   static SettlementBatch _settlementBatchFromJson(String json) {
-    return SettlementBatchModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
+    return SettlementBatchModel.fromJson(
+      jsonDecode(json) as Map<String, dynamic>,
+    );
   }
 
-
-  static Future<void> initialize({bool isTest = false, String? testPath}) async {
+  static Future<void> initialize({
+    bool isTest = false,
+    String? testPath,
+  }) async {
     if (isTest) {
       // In test mode, Initialize Hive with a temporary directory
       // This avoids platform channel issues (MissingPluginException)
@@ -73,7 +77,7 @@ class DatabaseService {
     } else {
       await Hive.initFlutter();
     }
-    
+
     // Open all boxes
     await Hive.openBox<String>(_projectsBox);
     await Hive.openBox<String>(_tasksBox);
@@ -91,16 +95,16 @@ class DatabaseService {
   // ============================================================================
   // Project operations - Multi-project support
   // ============================================================================
-  
+
   static List<Project> getAllProjects() {
     final box = Hive.box<String>(_projectsBox);
     return box.values.map((json) => _projectFromJson(json)).toList();
   }
-  
+
   static Project? getProject() {
     final activeId = getActiveProjectId();
     if (activeId == null) return null;
-    
+
     final box = Hive.box<String>(_projectsBox);
     final json = box.get(activeId);
     if (json == null) {
@@ -111,7 +115,7 @@ class DatabaseService {
     }
     return _projectFromJson(json);
   }
-  
+
   static String? getActiveProjectId() {
     final settingsBox = Hive.box<String>(_settingsBox);
     return settingsBox.get(_activeProjectKey);
@@ -120,22 +124,22 @@ class DatabaseService {
   static Future<void> saveProject(Project project) async {
     final box = Hive.box<String>(_projectsBox);
     await box.put(project.id, _projectToJson(project));
-    
+
     // Auto-set as active if it's the first project
     if (getActiveProjectId() == null) {
       await setActiveProject(project.id);
     }
   }
-  
+
   static Future<void> setActiveProject(String projectId) async {
     final settingsBox = Hive.box<String>(_settingsBox);
     await settingsBox.put(_activeProjectKey, projectId);
   }
-  
+
   static Future<void> deleteProject(String projectId) async {
     final box = Hive.box<String>(_projectsBox);
     await box.delete(projectId);
-    
+
     // If deleting active project, clear associated data and set new active
     final activeId = getActiveProjectId();
     if (activeId == projectId) {
@@ -148,7 +152,7 @@ class DatabaseService {
       await Hive.box<String>(_expensesBox).clear();
       await Hive.box<String>(_journalBox).clear();
       await Hive.box<String>(_notesBox).clear();
-      
+
       // Set new active project if available
       if (box.isNotEmpty) {
         final firstProject = _projectFromJson(box.values.first);
@@ -162,17 +166,17 @@ class DatabaseService {
   // ============================================================================
   // Task operations
   // ============================================================================
-  
+
   static List<Task> getAllTasks() {
     final box = Hive.box<String>(_tasksBox);
     return box.values.map((json) => _taskFromJson(json)).toList();
   }
-  
+
   static Future<void> saveTask(Task task) async {
     final box = Hive.box<String>(_tasksBox);
     await box.put(task.id, _taskToJson(task));
   }
-  
+
   static Future<void> deleteTask(String id) async {
     final box = Hive.box<String>(_tasksBox);
     await box.delete(id);
@@ -181,24 +185,27 @@ class DatabaseService {
   // ============================================================================
   // Room operations
   // ============================================================================
-  
+
   static List<Room> getAllRooms() {
     final box = Hive.box<String>(_roomsBox);
     return box.values.map((json) => _roomFromJson(json)).toList();
   }
-  
+
   static Future<void> saveRoom(Room room) async {
     final box = Hive.box<String>(_roomsBox);
     await box.put(room.id, _roomToJson(room));
   }
-  
+
   static Future<void> deleteRoom(String id) async {
     final box = Hive.box<String>(_roomsBox);
     await box.delete(id);
-    
+
     // Also delete boxes in this room
     final boxesBox = Hive.box<String>(_boxesBox);
-    final boxesToDelete = getAllBoxes().where((b) => b.roomId == id).map((b) => b.id).toList();
+    final boxesToDelete = getAllBoxes()
+        .where((b) => b.roomId == id)
+        .map((b) => b.id)
+        .toList();
     for (final boxId in boxesToDelete) {
       await boxesBox.delete(boxId);
     }
@@ -207,28 +214,31 @@ class DatabaseService {
   // ============================================================================
   // Box operations
   // ============================================================================
-  
+
   static List<PackingBox> getAllBoxes() {
     final box = Hive.box<String>(_boxesBox);
     return box.values.map((json) => _boxFromJson(json)).toList();
   }
-  
+
   static List<PackingBox> getBoxesByRoom(String roomId) {
     return getAllBoxes().where((b) => b.roomId == roomId).toList();
   }
-  
+
   static Future<void> saveBox(PackingBox packingBox) async {
     final box = Hive.box<String>(_boxesBox);
     await box.put(packingBox.id, _boxToJson(packingBox));
   }
-  
+
   static Future<void> deleteBox(String id) async {
     final box = Hive.box<String>(_boxesBox);
     await box.delete(id);
-    
+
     // Also delete items in this box
     final itemsBox = Hive.box<String>(_boxItemsBox);
-    final itemsToDelete = getAllBoxItems().where((i) => i.boxId == id).map((i) => i.id).toList();
+    final itemsToDelete = getAllBoxItems()
+        .where((i) => i.boxId == id)
+        .map((i) => i.id)
+        .toList();
     for (final itemId in itemsToDelete) {
       await itemsBox.delete(itemId);
     }
@@ -237,21 +247,21 @@ class DatabaseService {
   // ============================================================================
   // BoxItem operations
   // ============================================================================
-  
+
   static List<BoxItem> getAllBoxItems() {
     final box = Hive.box<String>(_boxItemsBox);
     return box.values.map((json) => _boxItemFromJson(json)).toList();
   }
-  
+
   static List<BoxItem> getItemsByBox(String boxId) {
     return getAllBoxItems().where((i) => i.boxId == boxId).toList();
   }
-  
+
   static Future<void> saveBoxItem(BoxItem item) async {
     final box = Hive.box<String>(_boxItemsBox);
     await box.put(item.id, _boxItemToJson(item));
   }
-  
+
   static Future<void> deleteBoxItem(String id) async {
     final box = Hive.box<String>(_boxItemsBox);
     await box.delete(id);
@@ -260,17 +270,29 @@ class DatabaseService {
   // ============================================================================
   // Shopping operations
   // ============================================================================
-  
+
   static List<ShoppingItem> getAllShoppingItems() {
     final box = Hive.box<String>(_shoppingBox);
-    return box.values.map((json) => _shoppingItemFromJson(json)).toList();
+    return box.values
+        .map((json) {
+          try {
+            return _shoppingItemFromJson(json);
+          } catch (e) {
+            // Skip invalid items to prevent app crash
+            print('Error parsing shopping item: $e');
+            return null;
+          }
+        })
+        .where((item) => item != null)
+        .cast<ShoppingItem>()
+        .toList();
   }
-  
+
   static Future<void> saveShoppingItem(ShoppingItem item) async {
     final box = Hive.box<String>(_shoppingBox);
     await box.put(item.id, _shoppingItemToJson(item));
   }
-  
+
   static Future<void> deleteShoppingItem(String id) async {
     final box = Hive.box<String>(_shoppingBox);
     await box.delete(id);
@@ -279,17 +301,17 @@ class DatabaseService {
   // ============================================================================
   // Expense operations
   // ============================================================================
-  
+
   static List<Expense> getAllExpenses() {
     final box = Hive.box<String>(_expensesBox);
     return box.values.map((json) => _expenseFromJson(json)).toList();
   }
-  
+
   static Future<void> saveExpense(Expense expense) async {
     final box = Hive.box<String>(_expensesBox);
     await box.put(expense.id, _expenseToJson(expense));
   }
-  
+
   static Future<void> deleteExpense(String id) async {
     final box = Hive.box<String>(_expensesBox);
     await box.delete(id);
@@ -298,12 +320,12 @@ class DatabaseService {
   // ============================================================================
   // Journal operations
   // ============================================================================
-  
+
   static List<JournalEntry> getAllJournalEntries() {
     final box = Hive.box<String>(_journalBox);
     return box.values.map((json) => _journalEntryFromJson(json)).toList();
   }
-  
+
   static Future<void> saveJournalEntry(JournalEntry entry) async {
     final box = Hive.box<String>(_journalBox);
     await box.put(entry.id, _journalEntryToJson(entry));
@@ -312,17 +334,17 @@ class DatabaseService {
   // ============================================================================
   // Notes operations
   // ============================================================================
-  
+
   static List<PlaybookNote> getAllNotes() {
     final box = Hive.box<String>(_notesBox);
     return box.values.map((json) => _noteFromJson(json)).toList();
   }
-  
+
   static Future<void> saveNote(PlaybookNote note) async {
     final box = Hive.box<String>(_notesBox);
     await box.put(note.id, _noteToJson(note));
   }
-  
+
   static Future<void> deleteNote(String id) async {
     final box = Hive.box<String>(_notesBox);
     await box.delete(id);
@@ -331,7 +353,7 @@ class DatabaseService {
   // ============================================================================
   // Clear all data
   // ============================================================================
-  
+
   static Future<void> clearAll() async {
     await Hive.box<String>(_projectsBox).clear();
     await Hive.box<String>(_tasksBox).clear();
@@ -348,12 +370,12 @@ class DatabaseService {
   // ============================================================================
   // JSON Serialization helpers
   // ============================================================================
-  
+
   static String _projectToJson(Project p) {
     final model = p is ProjectModel ? p : ProjectModel.fromEntity(p);
     return jsonEncode(model.toJson());
   }
-  
+
   static Project _projectFromJson(String json) {
     return ProjectModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
@@ -362,7 +384,7 @@ class DatabaseService {
     final model = t is TaskModel ? t : TaskModel.fromEntity(t);
     return jsonEncode(model.toJson());
   }
-  
+
   static Task _taskFromJson(String json) {
     return TaskModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
@@ -371,7 +393,7 @@ class DatabaseService {
     final model = r is RoomModel ? r : RoomModel.fromEntity(r);
     return jsonEncode(model.toJson());
   }
-  
+
   static Room _roomFromJson(String json) {
     return RoomModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
@@ -380,7 +402,7 @@ class DatabaseService {
     final model = b is PackingBoxModel ? b : PackingBoxModel.fromEntity(b);
     return jsonEncode(model.toJson());
   }
-  
+
   static PackingBox _boxFromJson(String json) {
     return PackingBoxModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
@@ -389,7 +411,7 @@ class DatabaseService {
     final model = i is BoxItemModel ? i : BoxItemModel.fromEntity(i);
     return jsonEncode(model.toJson());
   }
-  
+
   static BoxItem _boxItemFromJson(String json) {
     return BoxItemModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
@@ -398,7 +420,7 @@ class DatabaseService {
     final model = i is ShoppingItemModel ? i : ShoppingItemModel.fromEntity(i);
     return jsonEncode(model.toJson());
   }
-  
+
   static ShoppingItem _shoppingItemFromJson(String json) {
     return ShoppingItemModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
@@ -407,7 +429,7 @@ class DatabaseService {
     final model = e is ExpenseModel ? e : ExpenseModel.fromEntity(e);
     return jsonEncode(model.toJson());
   }
-  
+
   static Expense _expenseFromJson(String json) {
     return ExpenseModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
   }
@@ -422,7 +444,7 @@ class DatabaseService {
     'metadata': e.metadata,
     'timestamp': e.timestamp.toIso8601String(),
   });
-  
+
   static JournalEntry _journalEntryFromJson(String json) {
     final m = jsonDecode(json) as Map<String, dynamic>;
     return JournalEntry(
@@ -432,7 +454,9 @@ class DatabaseService {
       description: m['description'] as String?,
       userId: m['userId'] as String?,
       relatedEntityId: m['relatedEntityId'] as String?,
-      metadata: m['metadata'] != null ? Map<String, dynamic>.from(m['metadata'] as Map) : null,
+      metadata: m['metadata'] != null
+          ? Map<String, dynamic>.from(m['metadata'] as Map)
+          : null,
       timestamp: DateTime.parse(m['timestamp'] as String),
     );
   }
@@ -446,7 +470,7 @@ class DatabaseService {
     'createdAt': n.createdAt.toIso8601String(),
     'updatedAt': n.updatedAt.toIso8601String(),
   });
-  
+
   static PlaybookNote _noteFromJson(String json) {
     final m = jsonDecode(json) as Map<String, dynamic>;
     return PlaybookNote(
@@ -463,20 +487,19 @@ class DatabaseService {
   // ============================================================================
   // Settings operations
   // ============================================================================
-  
+
   static Future<void> saveSetting(String key, String value) async {
     final box = Hive.box<String>(_settingsBox);
     await box.put(key, value);
   }
-  
+
   static String? getSetting(String key) {
     final box = Hive.box<String>(_settingsBox);
     return box.get(key);
   }
-  
+
   static Future<void> deleteSetting(String key) async {
     final box = Hive.box<String>(_settingsBox);
     await box.delete(key);
   }
 }
-
