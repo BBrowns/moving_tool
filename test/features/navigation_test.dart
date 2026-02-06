@@ -141,7 +141,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Mijn Verhuizingen'), findsNothing);
-      expect(find.text('Recente Activiteit'), findsOneWidget);
+      expect(find.text('Hallo Verhuizer! 👋'), findsOneWidget);
     });
 
     testWidgets('Can navigate to Projects screen even if project active', (
@@ -160,7 +160,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final context = tester.element(find.text('Recente Activiteit'));
+      final context = tester.element(find.text('Hallo Verhuizer! 👋'));
       GoRouter.of(context).go('/projects');
       await tester.pumpAndSettle();
 
