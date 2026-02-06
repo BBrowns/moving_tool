@@ -24,6 +24,7 @@ import 'package:moving_tool_flutter/features/admin_vault/presentation/screens/ad
 import 'package:moving_tool_flutter/features/ar_studio/presentation/screens/ar_studio_screen.dart';
 import 'package:moving_tool_flutter/features/ar_studio/presentation/screens/ar_camera_screen.dart';
 import 'package:moving_tool_flutter/features/receipt_scanner/presentation/screens/receipt_scanner_screen.dart';
+import 'package:moving_tool_flutter/features/projects/presentation/screens/transport_matcher_screen.dart';
 
 /// Custom page builder that provides adaptive transitions:
 /// - Desktop/Web: No transition (instant switch) for main tabs
@@ -248,6 +249,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
+
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -261,6 +263,16 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+
+      // Standalone Tools
+      GoRoute(
+        path: '/transport-matcher',
+        pageBuilder: (context, state) => _buildAdaptivePage(
+          child: const TransportMatcherScreen(),
+          state: state,
+          isMainTab: false,
+        ),
       ),
     ],
     redirect: (context, state) {

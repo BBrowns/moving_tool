@@ -340,9 +340,19 @@ class DashboardScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  const Expanded(
-                                    child: SizedBox(),
-                                  ), // Empty placeholder for grid balance
+                                  Expanded(
+                                    child: _ToolCard(
+                                      title: 'Past het?',
+                                      subtitle: 'Transport Matcher',
+                                      icon: Icons.local_shipping_rounded,
+                                      gradient: const [
+                                        Color(0xFF546E7A),
+                                        Color(0xFF78909C),
+                                      ],
+                                      onTap: () =>
+                                          context.push('/transport-matcher'),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ]
