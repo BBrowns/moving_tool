@@ -273,6 +273,37 @@ class SettingsScreen extends ConsumerWidget {
 
             const SizedBox(height: 24),
             Text(
+              'Developer Tools',
+              style: context.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.science_outlined),
+                    title: const Text('Demo Scenario Laden'),
+                    subtitle: const Text('"Ons Appartement" scenario'),
+                    trailing: const Icon(Icons.play_arrow),
+                    onTap: () async {
+                      // TODO: Import and call ScenarioSeed.seed(ref) when implemented
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Demo scenario geladen! Herstart de app.',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+            Text(
               'Over',
               style: context.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,

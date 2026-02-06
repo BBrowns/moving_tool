@@ -54,7 +54,7 @@ final class PackingRepositoryProvider
   }
 }
 
-String _$packingRepositoryHash() => r'c9cfa6e9d83b2501490c947ef58067572b4e8b45';
+String _$packingRepositoryHash() => r'139fbbc9200710db77bb479c9dc95e35ab8bfc5b';
 
 @ProviderFor(RoomNotifier)
 final roomProvider = RoomNotifierProvider._();
@@ -88,7 +88,7 @@ final class RoomNotifierProvider
   }
 }
 
-String _$roomNotifierHash() => r'5212372ac19f8c811ca9e6c077732263d8ee027b';
+String _$roomNotifierHash() => r'4c1114bab98406e748882d5d48d11197c5dc89e6';
 
 abstract class _$RoomNotifier extends $Notifier<List<Room>> {
   List<Room> build();
@@ -140,7 +140,7 @@ final class BoxNotifierProvider
   }
 }
 
-String _$boxNotifierHash() => r'262f51be3c0f2513d0a7bf53cfef7b45750a0429';
+String _$boxNotifierHash() => r'fa2256e60739ed3d9da6e7529c447008f4ca63b1';
 
 abstract class _$BoxNotifier extends $Notifier<List<PackingBox>> {
   List<PackingBox> build();
@@ -192,7 +192,7 @@ final class BoxItemNotifierProvider
   }
 }
 
-String _$boxItemNotifierHash() => r'8720f941269eb9850218b486f0cfc963788ad1e7';
+String _$boxItemNotifierHash() => r'13f6aaf9f148a6a5be77753285969af1c1d05b2f';
 
 abstract class _$BoxItemNotifier extends $Notifier<List<BoxItem>> {
   List<BoxItem> build();
@@ -274,7 +274,7 @@ final class RoomBoxesProvider
   }
 }
 
-String _$roomBoxesHash() => r'738b200b84273eb5d688c23002f119c8a86d4f45';
+String _$roomBoxesHash() => r'032679355359d2416c1b648e691c8bac074ce519';
 
 final class RoomBoxesFamily extends $Family
     with $FunctionalFamilyOverride<List<PackingBox>, String> {
@@ -351,7 +351,7 @@ final class ItemsInBoxProvider
   }
 }
 
-String _$itemsInBoxHash() => r'1fd8074a2b595d86174a3be7591a151fc3ef442e';
+String _$itemsInBoxHash() => r'4e60bee939c2d72ba9ae1bc45b31db51cfedaa5a';
 
 final class ItemsInBoxFamily extends $Family
     with $FunctionalFamilyOverride<List<BoxItem>, String> {
@@ -410,4 +410,4 @@ final class PackingStatsProvider
   }
 }
 
-String _$packingStatsHash() => r'06c325f8145656f4e4ba25244d36c194f429a746';
+String _$packingStatsHash() => r'39e0d82cc1f5675ecd8775464b47575fe3d56b8a';

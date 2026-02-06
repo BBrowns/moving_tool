@@ -375,9 +375,11 @@ class ShoppingScreen extends ConsumerWidget {
                               ),
                             );
                       } else {
+                        // TODO: Get projectId from selected project context
                         ref
                             .read(shoppingProvider.notifier)
                             .add(
+                              projectId: 'default', // Placeholder
                               name: nameController.text,
                               priority: priority,
                               marktplaatsQuery: query,

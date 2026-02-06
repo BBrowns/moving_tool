@@ -49,7 +49,7 @@ final class TasksRepositoryProvider
   }
 }
 
-String _$tasksRepositoryHash() => r'ac5612374fec3554a802b0fa57b213aa35593624';
+String _$tasksRepositoryHash() => r'f7279b928f0eb1f0056cd52267b7159209c56e1d';
 
 @ProviderFor(TaskNotifier)
 final taskProvider = TaskNotifierProvider._();
@@ -83,7 +83,7 @@ final class TaskNotifierProvider
   }
 }
 
-String _$taskNotifierHash() => r'f9f908ab80c76165f5fc63088244b5c4672b7479';
+String _$taskNotifierHash() => r'8f7fcbf2b46eecd83a17d49de90e6e4cf568cf37';
 
 abstract class _$TaskNotifier extends $Notifier<List<Task>> {
   List<Task> build();

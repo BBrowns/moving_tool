@@ -55,7 +55,7 @@ final class ShoppingRepositoryProvider
 }
 
 String _$shoppingRepositoryHash() =>
-    r'359c3bc06162ac322ea123b4384f224f48096369';
+    r'fd5690bf6d98e4627738e0bde1779e37b97ac92f';
 
 @ProviderFor(ShoppingNotifier)
 final shoppingProvider = ShoppingNotifierProvider._();
@@ -89,7 +89,7 @@ final class ShoppingNotifierProvider
   }
 }
 
-String _$shoppingNotifierHash() => r'dc91c38f0d94a3ab1a782781287f2efca61c856a';
+String _$shoppingNotifierHash() => r'00699d061a773cb9c50e21674f743462ccb72411';
 
 abstract class _$ShoppingNotifier extends $Notifier<List<ShoppingItem>> {
   List<ShoppingItem> build();

@@ -118,6 +118,7 @@ void main() {
     test('creates item with default status needed', () {
       final item = ShoppingItem(
         id: 'item-1',
+        projectId: 'test-project',
         name: 'New Couch',
         priority: ShoppingPriority.high,
         createdAt: DateTime.now(),

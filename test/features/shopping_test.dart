@@ -9,7 +9,6 @@ import 'package:moving_tool_flutter/features/shopping/presentation/providers/sho
 import 'package:moving_tool_flutter/features/shopping/shopping_screen.dart';
 
 class MockShoppingRepository implements ShoppingRepository {
-
   MockShoppingRepository([List<ShoppingItem>? initialItems]) {
     if (initialItems != null) _items = initialItems;
   }
@@ -55,6 +54,7 @@ void main() {
 
       final item = ShoppingItem(
         id: '1',
+        projectId: 'test-project',
         name: 'New Sofa',
         priority: ShoppingPriority.high,
         status: ShoppingStatus.needed,
@@ -86,6 +86,7 @@ void main() {
 
       final item = ShoppingItem(
         id: '1',
+        projectId: 'test-project',
         name: 'Curtains',
         priority: ShoppingPriority.medium,
         status: ShoppingStatus.needed,

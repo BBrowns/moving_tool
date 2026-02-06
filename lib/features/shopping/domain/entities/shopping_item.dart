@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:moving_tool_flutter/core/models/item_dimensions.dart';
 
-enum ShoppingStatus {
-  needed,
-  searching,
-  found,
-  purchased,
-}
+enum ShoppingStatus { needed, searching, found, purchased }
 
 extension ShoppingStatusExtension on ShoppingStatus {
   String get label {
@@ -35,11 +31,7 @@ extension ShoppingStatusExtension on ShoppingStatus {
   }
 }
 
-enum ShoppingPriority {
-  low,
-  medium,
-  high,
-}
+enum ShoppingPriority { low, medium, high }
 
 extension ShoppingPriorityExtension on ShoppingPriority {
   String get label {
@@ -55,7 +47,6 @@ extension ShoppingPriorityExtension on ShoppingPriority {
 }
 
 class MarketplaceData {
-
   MarketplaceData({
     this.url,
     this.askingPrice,
@@ -84,16 +75,15 @@ class MarketplaceData {
       savedAt: savedAt ?? this.savedAt,
     );
   }
-
-
 }
 
 class ShoppingItem {
-
   ShoppingItem({
     required this.id,
+    required this.projectId,
     required this.name,
-    required this.createdAt, this.roomId,
+    required this.createdAt,
+    this.roomId,
     this.status = ShoppingStatus.needed,
     this.priority = ShoppingPriority.medium,
     this.budgetMin,
@@ -105,8 +95,11 @@ class ShoppingItem {
     this.marktplaatsQuery,
     this.isMarktplaatsTracked = false,
     this.targetPrice,
+    this.dimensions,
+    this.linkedAssetId,
   });
   final String id;
+  final String projectId;
   final String name;
   final String? roomId;
   final ShoppingStatus status;
@@ -122,6 +115,12 @@ class ShoppingItem {
   final double? targetPrice;
   final DateTime createdAt;
 
+  /// Physical dimensions for transport matching
+  final ItemDimensions? dimensions;
+
+  /// Link to Asset when purchased
+  final String? linkedAssetId;
+
   ShoppingItem copyWith({
     String? name,
     String? roomId,
@@ -136,9 +135,12 @@ class ShoppingItem {
     String? marktplaatsQuery,
     bool? isMarktplaatsTracked,
     double? targetPrice,
+    ItemDimensions? dimensions,
+    String? linkedAssetId,
   }) {
     return ShoppingItem(
       id: id,
+      projectId: projectId,
       name: name ?? this.name,
       roomId: roomId ?? this.roomId,
       status: status ?? this.status,
@@ -153,8 +155,8 @@ class ShoppingItem {
       isMarktplaatsTracked: isMarktplaatsTracked ?? this.isMarktplaatsTracked,
       targetPrice: targetPrice ?? this.targetPrice,
       createdAt: createdAt,
+      dimensions: dimensions ?? this.dimensions,
+      linkedAssetId: linkedAssetId ?? this.linkedAssetId,
     );
   }
-
-
 }
