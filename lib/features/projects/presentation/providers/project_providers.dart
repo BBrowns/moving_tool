@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moving_tool_flutter/features/projects/data/datasources/projects_local_data_source.dart';
 import 'package:moving_tool_flutter/features/projects/data/repositories/projects_repository_impl.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/project.dart';
 import 'package:moving_tool_flutter/features/projects/domain/repositories/projects_repository.dart';
@@ -6,8 +7,15 @@ import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
 
+final projectsLocalDataSourceProvider = Provider<ProjectsLocalDataSource>((
+  ref,
+) {
+  return ProjectsLocalDataSourceImpl();
+});
+
 final projectsRepositoryProvider = Provider<ProjectsRepository>((ref) {
-  return ProjectsRepositoryImpl();
+  final dataSource = ref.watch(projectsLocalDataSourceProvider);
+  return ProjectsRepositoryImpl(dataSource);
 });
 
 // ============================================================================
