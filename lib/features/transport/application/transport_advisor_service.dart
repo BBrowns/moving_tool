@@ -8,9 +8,9 @@ import 'package:moving_tool_flutter/features/projects/domain/entities/project.da
 import 'package:moving_tool_flutter/features/projects/domain/entities/transport_resource.dart';
 
 class TransportAdvisorService {
-  final AIService? aiService;
-
   TransportAdvisorService({this.aiService});
+
+  final AIService? aiService;
 
   // Rough estimates in cubic meters
 
@@ -40,6 +40,10 @@ class TransportAdvisorService {
       depthCm: 450, // Box Truck
     ),
   };
+
+  ItemDimensions? getVehicleDimensions(TransportCapacity capacity) {
+    return _vehicleDimensions[capacity];
+  }
 
   /// Estimates dimensions from a photo using AI Vision
   Future<ItemDimensions?> estimateDimensionsFromImage(File image) async {
