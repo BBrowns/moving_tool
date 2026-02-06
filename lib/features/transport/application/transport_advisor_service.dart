@@ -13,6 +13,8 @@ class TransportAdvisorService {
   TransportAdvisorService({this.aiService});
 
   // Rough estimates in cubic meters
+
+  // Rough estimates in cubic meters
   static const double _boxVolume = 0.06; // Standard moving box ~60L
 
   /// Approximate inner dimensions (LxWxH in cm) for capacity types
@@ -81,8 +83,9 @@ Return ONLY the JSON.
   }
 
   Future<double> estimateItemVolume(String itemDescription) async {
-    if (aiService == null)
+    if (aiService == null) {
       return 0.5; // Default conservative estimate for unknown item
+    }
 
     final prompt =
         'Estimate the volume in cubic meters (m3) for: "$itemDescription". Return ONLY the estimated number, e.g. "0.4". Do not add text.';
@@ -114,8 +117,9 @@ Return ONLY the JSON.
   /// Returns a reason string if it doesn't fit, or null if it fits
   String? checkPhysicalFit(ItemDimensions item, TransportResource resource) {
     final vehicleDims = _vehicleDimensions[resource.capacity];
-    if (vehicleDims == null)
+    if (vehicleDims == null) {
       return null; // Unknown dimensions, assume fit based on volume
+    }
 
     // Check if item is too large in any SINGLE dimension (assuming rotation)
     // We sort dimensions to find best fit (greedy orientation)

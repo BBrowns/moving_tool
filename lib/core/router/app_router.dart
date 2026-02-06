@@ -18,13 +18,13 @@ import 'package:moving_tool_flutter/features/settings/settings_screen.dart';
 import 'package:moving_tool_flutter/features/shell/app_shell.dart';
 import 'package:moving_tool_flutter/features/shopping/shopping_screen.dart';
 import 'package:moving_tool_flutter/features/tasks/tasks_screen.dart';
-import 'package:moving_tool_flutter/features/projects/presentation/screens/transport_screen.dart';
+import 'package:moving_tool_flutter/features/transport/presentation/screens/transport_screen.dart';
 import 'package:moving_tool_flutter/features/assets/presentation/screens/asset_screen.dart';
 import 'package:moving_tool_flutter/features/admin_vault/presentation/screens/admin_vault_screen.dart';
 import 'package:moving_tool_flutter/features/ar_studio/presentation/screens/ar_studio_screen.dart';
 import 'package:moving_tool_flutter/features/ar_studio/presentation/screens/ar_camera_screen.dart';
 import 'package:moving_tool_flutter/features/receipt_scanner/presentation/screens/receipt_scanner_screen.dart';
-import 'package:moving_tool_flutter/features/projects/presentation/screens/transport_matcher_screen.dart';
+import 'package:moving_tool_flutter/features/transport/presentation/screens/transport_matcher_screen.dart';
 
 /// Custom page builder that provides adaptive transitions:
 /// - Desktop/Web: No transition (instant switch) for main tabs

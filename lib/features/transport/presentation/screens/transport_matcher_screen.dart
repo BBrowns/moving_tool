@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:moving_tool_flutter/core/models/item_dimensions.dart';
 import 'package:moving_tool_flutter/features/projects/domain/entities/transport_resource.dart';
 
-import 'package:moving_tool_flutter/features/projects/presentation/providers/transport_providers.dart';
+import 'package:moving_tool_flutter/features/transport/presentation/providers/transport_providers.dart';
 
 class TransportMatcherScreen extends ConsumerStatefulWidget {
   const TransportMatcherScreen({super.key});

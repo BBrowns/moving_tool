@@ -7,7 +7,7 @@ import 'package:moving_tool_flutter/core/models/models.dart';
 import 'package:moving_tool_flutter/core/theme/app_theme.dart';
 import 'package:moving_tool_flutter/core/widgets/responsive_wrapper.dart';
 import 'package:moving_tool_flutter/data/providers/providers.dart';
-import 'package:moving_tool_flutter/features/projects/presentation/screens/transport_screen.dart';
+import 'package:moving_tool_flutter/features/transport/presentation/screens/transport_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
